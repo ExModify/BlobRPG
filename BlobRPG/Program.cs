@@ -1,4 +1,4 @@
-﻿using BlobRPG.Window;
+﻿using BlobRPG.MainComponents;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using System;
@@ -28,8 +28,9 @@ namespace BlobRPG
             if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
                 nativeWindowSettings.Flags |= ContextFlags.ForwardCompatible;
 
-            using Game game = new Game(gameWindowSettings, nativeWindowSettings);
+            using Window game = new Window(gameWindowSettings, nativeWindowSettings);
             game.Run();
+            Loader.CleanUp();
         }
     }
 }

@@ -5,13 +5,17 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using BlobRPG.Input;
+using BlobRPG.Render;
+using BlobRPG.Models;
 
-namespace BlobRPG.Window
+namespace BlobRPG.MainComponents
 {
-    public class Game : GameWindow
+    public class Window : GameWindow
     {
+        public Window(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings) { }
 
-        public Game(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings) { }
+        EntityRenderer entityRenderer;
+        RawModel model;
 
         protected override void OnLoad()
         {
@@ -19,6 +23,20 @@ namespace BlobRPG.Window
 
             GL.Viewport(0, 0, ClientSize.X, ClientSize.Y);
             InputManager.Init(this);
+            Loader.Init();
+            entityRenderer = new EntityRenderer();
+            model = Loader.LoadToVao(new float[]
+            {
+                 0.5f,  0.5f, 0.0f,
+                 0.5f, -0.5f, 0.0f,
+                -0.5f, -0.5f, 0.0f,
+                -0.5f,  0.5f, 0.0f,
+            }, new int[]
+            {
+                0, 1, 3, 
+                1, 2, 3 
+            });
+
         }
 
         protected override void OnUpdateFrame(FrameEventArgs args)
@@ -33,13 +51,16 @@ namespace BlobRPG.Window
             {
                 InputManager.ToggleMouse(this);
             }
-            
-            
+
             base.OnUpdateFrame(args);
         }
 
         protected override void OnRenderFrame(FrameEventArgs args)
         {
+            entityRenderer.Prepare();
+            entityRenderer.Render(model);
+
+            SwapBuffers();
             base.OnRenderFrame(args);
         }
     }
