@@ -14,7 +14,7 @@ namespace BlobRPG.Input
         static KeyboardState keyboardState;
         static MouseState mouseState;
 
-        static float lastX = 0, lastY = 0, lastScroll = 0, scroll = 0;
+        static float scroll;
 
         public static float X { get; private set; } = 0;
         public static float Y { get; private set; } = 0;
@@ -52,17 +52,13 @@ namespace BlobRPG.Input
                 else i++;
             }
 
-            lastX = X;
-            lastY = Y;
-            lastScroll = scroll;
+            XDelta = mouseState.X - X;
+            YDelta = mouseState.Y - Y;
+            ScrollDelta = mouseState.Scroll.Y - scroll;
 
             X = mouseState.X;
             Y = mouseState.Y;
             scroll = mouseState.Scroll.Y;
-
-            XDelta = X - lastX;
-            YDelta = Y - lastY;
-            ScrollDelta = scroll - lastScroll;
         }
         public static bool IsKeyDown(Keys key)
         {
