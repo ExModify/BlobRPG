@@ -9,6 +9,7 @@
     <PackageReference Include="GlmSharpStd" Version="0.9.8" />
     <PackageReference Include="NVorbis" Version="0.10.1" />
     <PackageReference Include="OpenTK" Version="4.5.0" />
+    <PackageReference Include="System.Drawing.Common" Version="5.0.1" />
   </ItemGroup>
 
 </Project>
