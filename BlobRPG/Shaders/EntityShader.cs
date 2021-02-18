@@ -14,6 +14,7 @@ namespace BlobRPG.Shaders
         protected override void BindAttributes()
         {
             BindAttribute(0, "position");
+            BindAttribute(1, "textureCoords");
         }
     }
 }

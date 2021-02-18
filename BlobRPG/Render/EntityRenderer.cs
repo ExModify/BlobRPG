@@ -14,12 +14,18 @@ namespace BlobRPG.Render
             GL.ClearColor(1, 0, 0, 1);
         }
 
-        public void Render(RawModel model)
+        public void Render(TexturedModel model)
         {
-            GL.BindVertexArray(model.VaoId);
+            GL.BindVertexArray(model.Model.VaoId);
             GL.EnableVertexAttribArray(0);
-            GL.DrawElements(PrimitiveType.Triangles, model.VertexCount, DrawElementsType.UnsignedInt, 0);
+            GL.EnableVertexAttribArray(1);
+            GL.ActiveTexture(TextureUnit.Texture0);
+            GL.BindTexture(TextureTarget.Texture2D, model.Texture.Id);
+
+            GL.DrawElements(PrimitiveType.Triangles, model.Model.VertexCount, DrawElementsType.UnsignedInt, 0);
+
             GL.DisableVertexAttribArray(0);
+            GL.DisableVertexAttribArray(1);
             GL.BindVertexArray(0);
         }
     }

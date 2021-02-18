@@ -8,6 +8,7 @@ using BlobRPG.Input;
 using BlobRPG.Render;
 using BlobRPG.Models;
 using BlobRPG.Shaders;
+using BlobRPG.Textures;
 
 namespace BlobRPG.MainComponents
 {
@@ -17,7 +18,8 @@ namespace BlobRPG.MainComponents
 
         EntityRenderer entityRenderer;
         EntityShader entityShader;
-        RawModel model;
+        TexturedModel model;
+
 
         protected override void OnLoad()
         {
@@ -29,18 +31,25 @@ namespace BlobRPG.MainComponents
             Loader.Load();
             entityRenderer = new EntityRenderer();
             entityShader = new EntityShader();
-            model = Loader.LoadToVao(new float[]
+            RawModel rm = Loader.LoadToVao(new float[]
             {
-                 0.5f,  0.5f, 0.0f,
-                 0.5f, -0.5f, 0.0f,
-                -0.5f, -0.5f, 0.0f,
-                -0.5f,  0.5f, 0.0f,
+                 -0.5f, 0.5f, 0,
+                 -0.5f, -0.5f, 0,
+                 0.5f, -0.5f, 0,
+                 0.5f, 0.5f, 0
+            }, new float[]
+            {
+                0, 0,
+                0, 1,
+                1, 1,
+                1, 0
             }, new int[]
             {
                 0, 1, 3, 
-                1, 2, 3 
+                3, 1, 2
             });
-
+            ModelTexture mt = new ModelTexture(Loader.LoadTexture("starter/texture/grass.png"));
+            model = new TexturedModel(rm, mt);
         }
 
         protected override void OnUpdateFrame(FrameEventArgs args)
