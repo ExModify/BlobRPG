@@ -1,4 +1,5 @@
 ﻿using BlobRPG.MainComponents;
+using GlmSharp;
 using OpenTK.Graphics.OpenGL;
 using System;
 using System.Collections.Generic;
@@ -22,10 +23,12 @@ namespace BlobRPG.Shaders
             GL.AttachShader(ProgramId, VertexShaderId);
             GL.AttachShader(ProgramId, FragmentShaderId);
 
+            BindAttributes();
+
             GL.LinkProgram(ProgramId);
             GL.ValidateProgram(ProgramId);
 
-            BindAttributes();
+            GetAllUniformLocations();
         }
 
         public void Start()
@@ -48,11 +51,46 @@ namespace BlobRPG.Shaders
             GL.DeleteProgram(ProgramId);
         }
 
+        protected void LoadFloat(int location, float value)
+        {
+            GL.Uniform1(location, value);
+        }
+        protected void LoadInt(int location, int value)
+        {
+            GL.Uniform1(location, value);
+        }
+        protected void LoadBool(int location, bool value)
+        {
+            GL.Uniform1(location, value ? 1 : 0);
+        }
+        protected void LoadVector(int location, vec2 vector)
+        {
+            GL.Uniform2(location, vector.x, vector.y);
+        }
+        protected void LoadVector(int location, vec3 vector)
+        {
+            GL.Uniform3(location, vector.x, vector.y, vector.z);
+        }
+        protected void LoadVector(int location, vec4 vector)
+        {
+            GL.Uniform4(location, vector.x, vector.y, vector.z, vector.w);
+        }
+        protected void LoadMatrix(int location, mat4 matrix)
+        {
+            GL.UniformMatrix4(location, 1, false, ref matrix.Values1D[0]);
+            
+        }
+
         protected abstract void BindAttributes();
+        protected abstract void GetAllUniformLocations();
 
         protected void BindAttribute(int attrib, string name)
         {
             GL.BindAttribLocation(ProgramId, attrib, name);
+        }
+        protected int GetUniformLocation(string name)
+        {
+            return GL.GetUniformLocation(ProgramId, name);
         }
 
         private int LoadShader(string name, ShaderType type)

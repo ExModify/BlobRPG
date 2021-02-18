@@ -9,6 +9,7 @@ using BlobRPG.Render;
 using BlobRPG.Models;
 using BlobRPG.Shaders;
 using BlobRPG.Textures;
+using BlobRPG.Entities;
 
 namespace BlobRPG.MainComponents
 {
@@ -16,21 +17,23 @@ namespace BlobRPG.MainComponents
     {
         public Window(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings) { }
 
-        EntityRenderer entityRenderer;
-        EntityShader entityShader;
-        TexturedModel model;
+        Renderer Renderer;
 
+        Entity entity;
 
         protected override void OnLoad()
         {
             base.OnLoad();
 
             GL.Viewport(0, 0, ClientSize.X, ClientSize.Y);
+
             InputManager.Init(this);
+
             Loader.Init();
             Loader.Load();
-            entityRenderer = new EntityRenderer();
-            entityShader = new EntityShader();
+
+            Renderer = new Renderer(this);
+
             RawModel rm = Loader.LoadToVao(new float[]
             {
                  -0.5f, 0.5f, 0,
@@ -49,7 +52,7 @@ namespace BlobRPG.MainComponents
                 3, 1, 2
             });
             ModelTexture mt = new ModelTexture(Loader.LoadTexture("starter/texture/grass.png"));
-            model = new TexturedModel(rm, mt);
+            entity = new Entity(new TexturedModel(rm, mt), new GlmSharp.vec3(0, 0, -4));
         }
 
         protected override void OnUpdateFrame(FrameEventArgs args)
@@ -65,15 +68,15 @@ namespace BlobRPG.MainComponents
                 InputManager.ToggleMouse(this);
             }
 
+            Renderer.ProcessObject(entity);
+
             base.OnUpdateFrame(args);
         }
 
         protected override void OnRenderFrame(FrameEventArgs args)
         {
-            entityRenderer.Prepare();
-            entityShader.Start();
-            entityRenderer.Render(model);
-            entityShader.Stop();
+            Renderer.Render();
+
             SwapBuffers();
             base.OnRenderFrame(args);
         }
