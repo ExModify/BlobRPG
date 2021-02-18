@@ -7,6 +7,7 @@ using System.Text;
 using BlobRPG.Input;
 using BlobRPG.Render;
 using BlobRPG.Models;
+using BlobRPG.Shaders;
 
 namespace BlobRPG.MainComponents
 {
@@ -15,6 +16,7 @@ namespace BlobRPG.MainComponents
         public Window(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings) { }
 
         EntityRenderer entityRenderer;
+        EntityShader entityShader;
         RawModel model;
 
         protected override void OnLoad()
@@ -24,7 +26,9 @@ namespace BlobRPG.MainComponents
             GL.Viewport(0, 0, ClientSize.X, ClientSize.Y);
             InputManager.Init(this);
             Loader.Init();
+            Loader.Load();
             entityRenderer = new EntityRenderer();
+            entityShader = new EntityShader();
             model = Loader.LoadToVao(new float[]
             {
                  0.5f,  0.5f, 0.0f,
@@ -58,8 +62,9 @@ namespace BlobRPG.MainComponents
         protected override void OnRenderFrame(FrameEventArgs args)
         {
             entityRenderer.Prepare();
+            entityShader.Start();
             entityRenderer.Render(model);
-
+            entityShader.Stop();
             SwapBuffers();
             base.OnRenderFrame(args);
         }

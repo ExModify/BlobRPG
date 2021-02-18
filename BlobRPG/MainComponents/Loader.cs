@@ -2,6 +2,8 @@
 using OpenTK.Graphics.OpenGL;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace BlobRPG.MainComponents
@@ -10,10 +12,28 @@ namespace BlobRPG.MainComponents
     {
         private static List<int> Vaos;
         private static List<int> Vbos;
+        private static Dictionary<string, string> Shaders;
+
         public static void Init()
         {
             Vaos = new List<int>();
             Vbos = new List<int>();
+
+            Shaders = new Dictionary<string, string>();
+        }
+        public static void Load()
+        {
+            string[] shaders = Directory.EnumerateFiles("Shaders/GLSLs").ToArray();
+            foreach (string shader in shaders)
+            {
+                string data = File.ReadAllText(shader);
+                string key = Path.GetFileNameWithoutExtension(shader);
+                Shaders.Add(key, data);
+            }
+        }
+        public static string GetShader(string name, ShaderType type)
+        {
+            return Shaders[name + (type == ShaderType.VertexShader ? "VS" : "FS")];
         }
 
         public static RawModel LoadToVao(float[] positions, int[] indices)
