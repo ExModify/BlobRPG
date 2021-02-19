@@ -1,4 +1,5 @@
-﻿using GlmSharp;
+﻿using BlobRPG.Entities;
+using GlmSharp;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -9,6 +10,7 @@ namespace BlobRPG.Shaders
     {
         private int TransformationMatrixLocation;
         private int ProjectionMatrixLocation;
+        private int ViewMatrixLocation;
         public EntityShader() : base("entity")
         {
             
@@ -24,6 +26,7 @@ namespace BlobRPG.Shaders
         {
             TransformationMatrixLocation = GetUniformLocation("transformationMatrix");
             ProjectionMatrixLocation = GetUniformLocation("projectionMatrix");
+            ViewMatrixLocation = GetUniformLocation("viewMatrix");
         }
 
         public void LoadTransformationMatrix(mat4 matrix)
@@ -33,6 +36,10 @@ namespace BlobRPG.Shaders
         public void LoadProjectionMatrix(mat4 matrix)
         {
             LoadMatrix(ProjectionMatrixLocation, matrix);
+        }
+        public void LoadViewMatrix(Camera camera)
+        {
+            LoadMatrix(ViewMatrixLocation, camera.ViewMatrix);
         }
     }
 }

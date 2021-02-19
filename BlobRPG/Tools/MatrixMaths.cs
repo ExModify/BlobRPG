@@ -1,4 +1,5 @@
-﻿using GlmSharp;
+﻿using BlobRPG.Entities;
+using GlmSharp;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
@@ -17,6 +18,19 @@ namespace BlobRPG.Tools
             matrix *= mat4.RotateY(MathHelper.DegreesToRadians(ry));
             matrix *= mat4.RotateZ(MathHelper.DegreesToRadians(rz));
             matrix *= mat4.Scale(scale);
+
+            return matrix;
+        }
+        public static mat4 CreateViewMatrix(Camera camera)
+        {
+            mat4 matrix = mat4.Identity;
+
+            matrix *= mat4.RotateX(MathHelper.DegreesToRadians(camera.Pitch));
+            matrix *= mat4.RotateY(MathHelper.DegreesToRadians(camera.Yaw));
+
+            vec3 negCamPos = -camera.Position;
+
+            matrix *= mat4.Translate(negCamPos);
 
             return matrix;
         }

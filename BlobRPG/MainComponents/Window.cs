@@ -19,7 +19,9 @@ namespace BlobRPG.MainComponents
 
         Renderer Renderer;
 
-        Entity entity;
+        Entity Entity;
+
+        Camera Camera;
 
         protected override void OnLoad()
         {
@@ -52,7 +54,9 @@ namespace BlobRPG.MainComponents
                 3, 1, 2
             });
             ModelTexture mt = new ModelTexture(Loader.LoadTexture("starter/texture/grass.png"));
-            entity = new Entity(new TexturedModel(rm, mt), new GlmSharp.vec3(0, 0, -4));
+            Entity = new Entity(new TexturedModel(rm, mt), new GlmSharp.vec3(0, 0, -4));
+
+            Camera = new Camera(new GlmSharp.vec3(), 0, 0, 0);
         }
 
         protected override void OnUpdateFrame(FrameEventArgs args)
@@ -68,14 +72,17 @@ namespace BlobRPG.MainComponents
                 InputManager.ToggleMouse(this);
             }
 
-            Renderer.ProcessObject(entity);
+            Camera.Move();
+
+            Renderer.ProcessObject(Entity);
+
 
             base.OnUpdateFrame(args);
         }
 
         protected override void OnRenderFrame(FrameEventArgs args)
         {
-            Renderer.Render();
+            Renderer.Render(Camera);
 
             SwapBuffers();
             base.OnRenderFrame(args);

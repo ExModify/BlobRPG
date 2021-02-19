@@ -42,11 +42,11 @@ namespace BlobRPG.Render
             UpdateProjectionMatrix();
         }
         
-        public void Render()
+        public void Render(Camera camera)
         {
             Prepare();
 
-            EntityRenderer.Render(Entities);
+            EntityRenderer.Render(Entities, camera);
 
             Entities.Clear();
         }
