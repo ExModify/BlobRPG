@@ -26,6 +26,9 @@ namespace BlobRPG.Render
 
         public Renderer(GameWindow window)
         {
+            GL.Enable(EnableCap.CullFace);
+            GL.CullFace(CullFaceMode.Back);
+
             Entities = new Dictionary<TexturedModel, List<Entity>>();
             window.Resize += (s) =>
             {
