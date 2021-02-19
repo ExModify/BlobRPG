@@ -67,7 +67,8 @@ namespace BlobRPG.Render
 
         private void Prepare()
         {
-            GL.Clear(ClearBufferMask.ColorBufferBit);
+            GL.Enable(EnableCap.DepthTest);
+            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             GL.ClearColor(1, 0, 0, 1);
         }
 

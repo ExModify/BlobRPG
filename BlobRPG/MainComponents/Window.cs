@@ -10,6 +10,7 @@ using BlobRPG.Models;
 using BlobRPG.Shaders;
 using BlobRPG.Textures;
 using BlobRPG.Entities;
+using BlobRPG.ObjectManager;
 
 namespace BlobRPG.MainComponents
 {
@@ -36,27 +37,13 @@ namespace BlobRPG.MainComponents
 
             Renderer = new Renderer(this);
 
-            RawModel rm = Loader.LoadToVao(new float[]
-            {
-                 -0.5f, 0.5f, 0,
-                 -0.5f, -0.5f, 0,
-                 0.5f, -0.5f, 0,
-                 0.5f, 0.5f, 0
-            }, new float[]
-            {
-                0, 0,
-                0, 1,
-                1, 1,
-                1, 0
-            }, new int[]
-            {
-                0, 1, 3, 
-                3, 1, 2
-            });
-            ModelTexture mt = new ModelTexture(Loader.LoadTexture("starter/texture/grass.png"));
+            RawModel rm = OBJLoader.LoadOBJ("starter/model/blob.obj");
+            ModelTexture mt = new ModelTexture(Loader.LoadTexture("starter/texture/blobTexture.png"));
             Entity = new Entity(new TexturedModel(rm, mt), new GlmSharp.vec3(0, 0, -4));
 
             Camera = new Camera(new GlmSharp.vec3(), 0, 0, 0);
+
+            
         }
 
         protected override void OnUpdateFrame(FrameEventArgs args)
