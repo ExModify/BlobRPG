@@ -57,10 +57,13 @@ namespace BlobRPG.Render
             GL.EnableVertexAttribArray(1);
             GL.EnableVertexAttribArray(2);
 
+            if (model.Texture.HasTransparency) Renderer.DisableCulling();
+
             GL.ActiveTexture(TextureUnit.Texture0);
             GL.BindTexture(TextureTarget.Texture2D, model.Texture.Id);
 
             Shader.LoadShineVariables(model.Texture.Reflectivity, model.Texture.ShineDamper);
+            Shader.LoadFakeLighting(model.Texture.UseFakeLighting);
         }
         private void PrepareInstance(Entity entity)
         {
@@ -69,6 +72,7 @@ namespace BlobRPG.Render
         }
         private void FinishTexturedModel()
         {
+            Renderer.EnableCulling();
             GL.DisableVertexAttribArray(0);
             GL.DisableVertexAttribArray(1);
             GL.DisableVertexAttribArray(2);

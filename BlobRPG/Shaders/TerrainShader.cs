@@ -6,8 +6,9 @@ using System.Text;
 
 namespace BlobRPG.Shaders
 {
-    public class EntityShader : ShaderCore
+    public class TerrainShader : ShaderCore
     {
+
         private int TransformationMatrixLocation;
         private int ProjectionMatrixLocation;
         private int ViewMatrixLocation;
@@ -15,11 +16,10 @@ namespace BlobRPG.Shaders
         private int LightColorLocation;
         private int ReflectivityLocation;
         private int ShineDamperLocation;
-        private int UseFakeLightingLocation;
 
-        public EntityShader() : base("entity")
+        public TerrainShader() : base("terrain")
         {
-            
+
         }
 
         protected override void BindAttributes()
@@ -28,6 +28,7 @@ namespace BlobRPG.Shaders
             BindAttribute(1, "textureCoords");
             BindAttribute(2, "normal");
         }
+
 
         protected override void GetAllUniformLocations()
         {
@@ -38,7 +39,6 @@ namespace BlobRPG.Shaders
             LightColorLocation = GetUniformLocation("lightColor");
             ReflectivityLocation = GetUniformLocation("reflectivity");
             ShineDamperLocation = GetUniformLocation("shineDamper");
-            UseFakeLightingLocation = GetUniformLocation("useFakeLighting");
         }
 
         public void LoadTransformationMatrix(mat4 matrix)
@@ -58,10 +58,7 @@ namespace BlobRPG.Shaders
             LoadVector(LightPositionLocation, light.Position);
             LoadVector(LightColorLocation, light.Color);
         }
-        public void LoadFakeLighting(bool fakeLighting)
-        {
-            LoadBool(UseFakeLightingLocation, fakeLighting);
-        }
+
         public void LoadShineVariables(float reflectivity, float shineDamper)
         {
             LoadFloat(ReflectivityLocation, reflectivity);

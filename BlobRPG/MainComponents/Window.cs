@@ -25,6 +25,8 @@ namespace BlobRPG.MainComponents
 
         Camera Camera;
 
+        Terrain Terrain;
+
         protected override void OnLoad()
         {
             base.OnLoad();
@@ -44,9 +46,17 @@ namespace BlobRPG.MainComponents
             mt.Reflectivity = 1;
             Entity = new Entity(new TexturedModel(rm, mt), new GlmSharp.vec3(0, 0, -4));
 
-            Camera = new Camera(new GlmSharp.vec3(), 0, 0, 0);
+            Camera = new Camera(new GlmSharp.vec3(0, 1, 0), 0, 0, 0);
             Light = new Light(new GlmSharp.vec3(0, 0, 20), new GlmSharp.vec3(1, 1, 1));
+
             
+            Terrain = new Terrain(0, 0, Loader.LoadTexture("starter/texture/grass.png"), "starter/texture/heightMap.png");
+        }
+
+        protected override void OnClosed()
+        {
+            Renderer.CleanUp();
+            base.OnClosed();
         }
 
         protected override void OnUpdateFrame(FrameEventArgs args)
@@ -65,7 +75,7 @@ namespace BlobRPG.MainComponents
             Camera.Move();
 
             Renderer.ProcessObject(Entity);
-
+            Renderer.ProcessTerrain(Terrain);
 
             base.OnUpdateFrame(args);
         }

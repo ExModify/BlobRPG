@@ -22,14 +22,29 @@ namespace BlobRPG.Render
         readonly EntityRenderer EntityRenderer;
         readonly EntityShader EntityShader;
 
-        readonly Dictionary<TexturedModel, List<Entity>> Entities;
+        readonly TerrainRenderer TerrainRenderer;
+        readonly TerrainShader TerrainShader;
 
-        public Renderer(GameWindow window)
+        readonly Dictionary<TexturedModel, List<Entity>> Entities;
+        readonly List<Terrain> Terrains;
+
+        public static void EnableCulling()
         {
             GL.Enable(EnableCap.CullFace);
             GL.CullFace(CullFaceMode.Back);
+        }
+        public static void DisableCulling()
+        {
+            GL.Disable(EnableCap.CullFace);
+        }
 
+        public Renderer(GameWindow window)
+        {
             Entities = new Dictionary<TexturedModel, List<Entity>>();
+            Terrains = new List<Terrain>();
+
+            EnableCulling();
+
             window.Resize += (s) =>
             {
                 CreateProjectionMatrix(FOV, s.Width, s.Height, NEAR, FAR);
@@ -42,6 +57,9 @@ namespace BlobRPG.Render
             EntityShader = new EntityShader();
             EntityRenderer = new EntityRenderer(EntityShader, ref ProjectionMatrix);
 
+            TerrainShader = new TerrainShader();
+            TerrainRenderer = new TerrainRenderer(TerrainShader, ref ProjectionMatrix);
+
             UpdateProjectionMatrix();
         }
         
@@ -51,11 +69,21 @@ namespace BlobRPG.Render
 
             EntityRenderer.Render(Entities, camera, light);
 
+            TerrainRenderer.Render(Terrains, camera, light);
+
+            Terrains.Clear();
             Entities.Clear();
         }
-
+        public void CleanUp()
+        {
+            EntityShader.CleanUp();
+            TerrainShader.CleanUp();
+        }
         
-
+        public void ProcessTerrain(Terrain terrain)
+        {
+            Terrains.Add(terrain);
+        }
         public void ProcessObject(Entity entity)
         {
             if (Entities.Keys.Contains(entity.Model))
