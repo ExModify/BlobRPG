@@ -24,9 +24,9 @@ namespace BlobRPG.Render
             shader.Stop();
         }
 
-        public void Render(Dictionary<TexturedModel, List<Entity>> entities, Camera camera)
+        public void Render(Dictionary<TexturedModel, List<Entity>> entities, Camera camera, Light light)
         {
-            Prepare(camera);
+            Prepare(camera, light);
             foreach (TexturedModel model in entities.Keys)
             {
                 PrepareTexturedModel(model);
@@ -42,10 +42,11 @@ namespace BlobRPG.Render
 
             Shader.Stop();
         }
-        private void Prepare(Camera camera)
+        private void Prepare(Camera camera, Light light)
         {
             Shader.Start();
             Shader.LoadViewMatrix(camera);
+            Shader.LoadLight(light);
         }
 
         private void PrepareTexturedModel(TexturedModel model)
@@ -54,6 +55,7 @@ namespace BlobRPG.Render
 
             GL.EnableVertexAttribArray(0);
             GL.EnableVertexAttribArray(1);
+            GL.EnableVertexAttribArray(2);
 
             GL.ActiveTexture(TextureUnit.Texture0);
             GL.BindTexture(TextureTarget.Texture2D, model.Texture.Id);
@@ -67,6 +69,7 @@ namespace BlobRPG.Render
         {
             GL.DisableVertexAttribArray(0);
             GL.DisableVertexAttribArray(1);
+            GL.DisableVertexAttribArray(2);
 
             GL.BindVertexArray(0);
         }

@@ -21,6 +21,7 @@ namespace BlobRPG.MainComponents
         Renderer Renderer;
 
         Entity Entity;
+        Light Light;
 
         Camera Camera;
 
@@ -42,7 +43,7 @@ namespace BlobRPG.MainComponents
             Entity = new Entity(new TexturedModel(rm, mt), new GlmSharp.vec3(0, 0, -4));
 
             Camera = new Camera(new GlmSharp.vec3(), 0, 0, 0);
-
+            Light = new Light(new GlmSharp.vec3(0, 0, 20), new GlmSharp.vec3(1, 1, 1));
             
         }
 
@@ -69,7 +70,7 @@ namespace BlobRPG.MainComponents
 
         protected override void OnRenderFrame(FrameEventArgs args)
         {
-            Renderer.Render(Camera);
+            Renderer.Render(Camera, Light);
 
             SwapBuffers();
             base.OnRenderFrame(args);

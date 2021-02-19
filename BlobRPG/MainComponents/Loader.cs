@@ -40,12 +40,13 @@ namespace BlobRPG.MainComponents
             return Shaders[name + (type == ShaderType.VertexShader ? "VS" : "FS")];
         }
 
-        public static RawModel LoadToVao(float[] positions, float[] textureCoords, int[] indices)
+        public static RawModel LoadToVao(float[] positions, float[] textureCoords, float[] normals, int[] indices)
         {
             int vao = CreateVao();
             BindIndicesBuffer(indices);
             StoreDataInAttributeList(0, 3, positions);
             StoreDataInAttributeList(1, 2, textureCoords);
+            StoreDataInAttributeList(2, 3, normals);
             UnbindVao();
             return new RawModel(vao, indices.Length);
         }

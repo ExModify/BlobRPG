@@ -11,6 +11,8 @@ namespace BlobRPG.Shaders
         private int TransformationMatrixLocation;
         private int ProjectionMatrixLocation;
         private int ViewMatrixLocation;
+        private int LightPositionLocation;
+        private int LightColorLocation;
         public EntityShader() : base("entity")
         {
             
@@ -20,6 +22,7 @@ namespace BlobRPG.Shaders
         {
             BindAttribute(0, "position");
             BindAttribute(1, "textureCoords");
+            BindAttribute(2, "normal");
         }
 
         protected override void GetAllUniformLocations()
@@ -27,6 +30,8 @@ namespace BlobRPG.Shaders
             TransformationMatrixLocation = GetUniformLocation("transformationMatrix");
             ProjectionMatrixLocation = GetUniformLocation("projectionMatrix");
             ViewMatrixLocation = GetUniformLocation("viewMatrix");
+            LightPositionLocation = GetUniformLocation("lightPosition");
+            LightColorLocation = GetUniformLocation("lightColor");
         }
 
         public void LoadTransformationMatrix(mat4 matrix)
@@ -40,6 +45,11 @@ namespace BlobRPG.Shaders
         public void LoadViewMatrix(Camera camera)
         {
             LoadMatrix(ViewMatrixLocation, camera.ViewMatrix);
+        }
+        public void LoadLight(Light light)
+        {
+            LoadVector(LightPositionLocation, light.Position);
+            LoadVector(LightColorLocation, light.Color);
         }
     }
 }

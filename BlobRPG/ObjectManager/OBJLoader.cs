@@ -27,10 +27,8 @@ namespace BlobRPG.ObjectManager
             List<vec3> normals = new List<vec3>();
             List<int> indices = new List<int>();
 
-            float[] verticesArray = null;
             float[] textureCoordsArray = null;
             float[] normalsArray = null;
-            int[] indicesArray = null;
 
             string line;
             while ((line = reader.ReadLine()) != null)
@@ -78,16 +76,16 @@ namespace BlobRPG.ObjectManager
 
             reader.Close();
 
-            verticesArray = new float[vertices.Count * 3];
+            float[] verticesArray = new float[vertices.Count * 3];
             for (int i = 0; i < vertices.Count; i++)
             {
                 verticesArray[i * 3] = vertices[i].x;
                 verticesArray[i * 3 + 1] = vertices[i].y;
                 verticesArray[i * 3 + 2] = vertices[i].z;
             }
-            indicesArray = indices.ToArray();
+            int[] indicesArray = indices.ToArray();
 
-            return Loader.LoadToVao(verticesArray, textureCoordsArray, indicesArray);
+            return Loader.LoadToVao(verticesArray, textureCoordsArray, normalsArray, indicesArray);
         }
 
         private static void ProcessVertex(string[] vertexData, List<vec2> textureCoords, List<vec3> normals, List<int> indices, ref float[] textureArray, ref float[] normalsArray)
