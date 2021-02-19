@@ -59,6 +59,8 @@ namespace BlobRPG.Render
 
             GL.ActiveTexture(TextureUnit.Texture0);
             GL.BindTexture(TextureTarget.Texture2D, model.Texture.Id);
+
+            Shader.LoadShineVariables(model.Texture.Reflectivity, model.Texture.ShineDamper);
         }
         private void PrepareInstance(Entity entity)
         {

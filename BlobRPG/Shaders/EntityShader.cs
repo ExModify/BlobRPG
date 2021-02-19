@@ -13,6 +13,9 @@ namespace BlobRPG.Shaders
         private int ViewMatrixLocation;
         private int LightPositionLocation;
         private int LightColorLocation;
+        private int ReflectivityLocation;
+        private int ShineDamperLocation;
+
         public EntityShader() : base("entity")
         {
             
@@ -32,6 +35,8 @@ namespace BlobRPG.Shaders
             ViewMatrixLocation = GetUniformLocation("viewMatrix");
             LightPositionLocation = GetUniformLocation("lightPosition");
             LightColorLocation = GetUniformLocation("lightColor");
+            ReflectivityLocation = GetUniformLocation("reflectivity");
+            ShineDamperLocation = GetUniformLocation("shineDamper");
         }
 
         public void LoadTransformationMatrix(mat4 matrix)
@@ -50,6 +55,12 @@ namespace BlobRPG.Shaders
         {
             LoadVector(LightPositionLocation, light.Position);
             LoadVector(LightColorLocation, light.Color);
+        }
+
+        public void LoadShineVariables(float reflectivity, float shineDamper)
+        {
+            LoadFloat(ReflectivityLocation, reflectivity);
+            LoadFloat(ShineDamperLocation, shineDamper);
         }
     }
 }

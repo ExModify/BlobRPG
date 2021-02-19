@@ -40,6 +40,8 @@ namespace BlobRPG.MainComponents
 
             RawModel rm = OBJLoader.LoadOBJ("starter/model/blob.obj");
             ModelTexture mt = new ModelTexture(Loader.LoadTexture("starter/texture/blobTexture.png"));
+            mt.ShineDamper = 10;
+            mt.Reflectivity = 1;
             Entity = new Entity(new TexturedModel(rm, mt), new GlmSharp.vec3(0, 0, -4));
 
             Camera = new Camera(new GlmSharp.vec3(), 0, 0, 0);
