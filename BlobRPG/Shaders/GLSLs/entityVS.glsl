@@ -14,7 +14,7 @@ uniform mat4 projectionMatrix;
 uniform mat4 viewMatrix;
 uniform vec3 lightPosition;
 
-uniform int useFakeLighting;
+uniform float useFakeLighting;
 
 void main(void)
 {
@@ -22,7 +22,7 @@ void main(void)
 	gl_Position =  projectionMatrix * viewMatrix * worldPosition;
 
 	pass_textureCoords = textureCoords;
-
+	
 	vec3 actualNormal = normal;
 	if (useFakeLighting > 0.5)
 	{

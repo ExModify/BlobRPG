@@ -50,7 +50,7 @@ namespace BlobRPG.MainComponents
             Light = new Light(new GlmSharp.vec3(0, 0, 20), new GlmSharp.vec3(1, 1, 1));
 
             
-            Terrain = new Terrain(0, 0, Loader.LoadTexture("starter/texture/grass.png"), "starter/texture/heightMap.png");
+            Terrain = new Terrain(-1, -1, Loader.LoadTexture("starter/texture/grass.png"), "starter/texture/heightMap.png");
         }
 
         protected override void OnClosed()
