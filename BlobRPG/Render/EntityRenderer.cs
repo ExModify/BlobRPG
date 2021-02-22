@@ -24,9 +24,9 @@ namespace BlobRPG.Render
             shader.Stop();
         }
 
-        public void Render(Dictionary<TexturedModel, List<Entity>> entities, Camera camera, Light light)
+        public void Render(Dictionary<TexturedModel, List<Entity>> entities, Camera camera, Light light, Fog fog)
         {
-            Prepare(camera, light);
+            Prepare(camera, light, fog);
             foreach (TexturedModel model in entities.Keys)
             {
                 PrepareTexturedModel(model);
@@ -42,11 +42,12 @@ namespace BlobRPG.Render
 
             Shader.Stop();
         }
-        private void Prepare(Camera camera, Light light)
+        private void Prepare(Camera camera, Light light, Fog fog)
         {
             Shader.Start();
             Shader.LoadViewMatrix(camera);
             Shader.LoadLight(light);
+            Shader.LoadFog(fog);
         }
 
         private void PrepareTexturedModel(TexturedModel model)

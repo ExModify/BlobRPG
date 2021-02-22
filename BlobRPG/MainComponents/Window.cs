@@ -11,11 +11,14 @@ using BlobRPG.Shaders;
 using BlobRPG.Textures;
 using BlobRPG.Entities;
 using BlobRPG.ObjectManager;
+using GlmSharp;
 
 namespace BlobRPG.MainComponents
 {
     public class Window : GameWindow
     {
+        public vec3 SkyColor;
+
         public Window(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings) { }
 
         Renderer Renderer;
@@ -26,12 +29,16 @@ namespace BlobRPG.MainComponents
         Camera Camera;
 
         Terrain Terrain;
+        Fog Fog;
 
         protected override void OnLoad()
         {
             base.OnLoad();
 
             GL.Viewport(0, 0, ClientSize.X, ClientSize.Y);
+
+            SkyColor = new vec3(0.529f, 0.807f, 0.921f);
+            Fog = new Fog(this);
 
             InputManager.Init(this);
 
@@ -41,9 +48,11 @@ namespace BlobRPG.MainComponents
             Renderer = new Renderer(this);
 
             RawModel rm = OBJLoader.LoadOBJ("starter/model/blob.obj");
-            ModelTexture mt = new ModelTexture(Loader.LoadTexture("starter/texture/blobTexture.png"));
-            mt.ShineDamper = 10;
-            mt.Reflectivity = 1;
+            ModelTexture mt = new ModelTexture(Loader.LoadTexture("starter/texture/blobTexture.png"))
+            {
+                ShineDamper = 10,
+                Reflectivity = 1
+            };
             Entity = new Entity(new TexturedModel(rm, mt), new GlmSharp.vec3(0, 0, -4));
 
             Camera = new Camera(new GlmSharp.vec3(0, 1, 0), 0, 0, 0);
@@ -82,7 +91,7 @@ namespace BlobRPG.MainComponents
 
         protected override void OnRenderFrame(FrameEventArgs args)
         {
-            Renderer.Render(Camera, Light);
+            Renderer.Render(Camera, Light, Fog);
 
             SwapBuffers();
             base.OnRenderFrame(args);

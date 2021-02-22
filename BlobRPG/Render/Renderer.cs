@@ -1,4 +1,5 @@
 ﻿using BlobRPG.Entities;
+using BlobRPG.MainComponents;
 using BlobRPG.Models;
 using BlobRPG.Shaders;
 using GlmSharp;
@@ -28,6 +29,8 @@ namespace BlobRPG.Render
         readonly Dictionary<TexturedModel, List<Entity>> Entities;
         readonly List<Terrain> Terrains;
 
+        Window Window;
+
         public static void EnableCulling()
         {
             GL.Enable(EnableCap.CullFace);
@@ -38,8 +41,10 @@ namespace BlobRPG.Render
             GL.Disable(EnableCap.CullFace);
         }
 
-        public Renderer(GameWindow window)
+        public Renderer(Window window)
         {
+            Window = window;
+
             Entities = new Dictionary<TexturedModel, List<Entity>>();
             Terrains = new List<Terrain>();
 
@@ -63,13 +68,13 @@ namespace BlobRPG.Render
             UpdateProjectionMatrix();
         }
         
-        public void Render(Camera camera, Light light)
+        public void Render(Camera camera, Light light, Fog fog)
         {
             Prepare();
 
-            EntityRenderer.Render(Entities, camera, light);
+            EntityRenderer.Render(Entities, camera, light, fog);
 
-            TerrainRenderer.Render(Terrains, camera, light);
+            TerrainRenderer.Render(Terrains, camera, light, fog);
 
             Terrains.Clear();
             Entities.Clear();
@@ -100,7 +105,7 @@ namespace BlobRPG.Render
         {
             GL.Enable(EnableCap.DepthTest);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-            GL.ClearColor(1, 0, 0, 1);
+            GL.ClearColor(Window.SkyColor.x, Window.SkyColor.y, Window.SkyColor.z, 1);
         }
 
         private void CreateProjectionMatrix(float fov, int width, int height, float near, float far)

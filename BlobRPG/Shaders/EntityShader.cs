@@ -17,6 +17,10 @@ namespace BlobRPG.Shaders
         private int ShineDamperLocation;
         private int UseFakeLightingLocation;
 
+        private int GradientLocation;
+        private int DensityLocation;
+        private int FogColor;
+
         public EntityShader() : base("entity")
         {
             
@@ -39,6 +43,10 @@ namespace BlobRPG.Shaders
             ReflectivityLocation = GetUniformLocation("reflectivity");
             ShineDamperLocation = GetUniformLocation("shineDamper");
             UseFakeLightingLocation = GetUniformLocation("useFakeLighting");
+
+            GradientLocation = GetUniformLocation("gradient");
+            DensityLocation = GetUniformLocation("density");
+            FogColor = GetUniformLocation("fogColor");
         }
 
         public void LoadTransformationMatrix(mat4 matrix)
@@ -66,6 +74,12 @@ namespace BlobRPG.Shaders
         {
             LoadFloat(ReflectivityLocation, reflectivity);
             LoadFloat(ShineDamperLocation, shineDamper);
+        }
+        public void LoadFog(Fog fog)
+        {
+            LoadFloat(GradientLocation, fog.Gradient);
+            LoadFloat(DensityLocation, fog.Density);
+            LoadVector(FogColor, fog.FogColor);
         }
     }
 }
