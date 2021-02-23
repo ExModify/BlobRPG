@@ -12,6 +12,7 @@ using BlobRPG.Textures;
 using BlobRPG.Entities;
 using BlobRPG.ObjectManager;
 using GlmSharp;
+using System.IO;
 
 namespace BlobRPG.MainComponents
 {
@@ -58,8 +59,18 @@ namespace BlobRPG.MainComponents
             Camera = new Camera(new GlmSharp.vec3(0, 1, 0), 0, 0, 0);
             Light = new Light(new GlmSharp.vec3(0, 0, 20), new GlmSharp.vec3(1, 1, 1));
 
-            
-            Terrain = new Terrain(-1, -1, Loader.LoadTexture("starter/texture/grass.png"), "starter/texture/heightMap.png");
+
+            TerrainTexture backgroundTexture = new TerrainTexture(Loader.LoadTexture("starter/texture/grass.png"));
+            TerrainTexture rTexture = new TerrainTexture(Loader.LoadTexture("starter/texture/mud.png"));
+            TerrainTexture gTexture = new TerrainTexture(Loader.LoadTexture("starter/texture/grassFlowers.png"));
+            TerrainTexture bTexture = new TerrainTexture(Loader.LoadTexture("starter/texture/path.png"));
+            TerrainTexture blendTexture = new TerrainTexture(Loader.LoadTexture("starter/texture/blendMap.png"));
+
+            TerrainTexturePack pack = new TerrainTexturePack(backgroundTexture, rTexture, gTexture, bTexture);
+
+            FileStream fs = new FileStream("starter/texture/heightMap.png", FileMode.Open, FileAccess.Read);
+            Terrain = new Terrain(-1, -1, pack, blendTexture, fs);
+            fs.Close();
         }
 
         protected override void OnClosed()

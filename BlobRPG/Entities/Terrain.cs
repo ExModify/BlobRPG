@@ -27,34 +27,9 @@ namespace BlobRPG.Entities
         public RawModel Model { get; private set; }
         public TerrainTexturePack TexturePack { get; private set; }
         public TerrainTexture BlendMap { get; private set; }
-        public ModelTexture Texture { get; private set; }
 
         public mat4 TransformationMatrix { get; private set; }
 
-
-        public Terrain(int gridX, int gridZ, int textureId, string heightMap)
-        {
-            X = gridX * Size;
-            Z = gridZ * Size;
-            Boundaries = new vec4(X, Z, (gridX + 1) * Size, (gridZ + 1) * Size);
-            Texture = new ModelTexture(textureId);
-            FileStream fs = new FileStream(heightMap, FileMode.Open, FileAccess.Read);
-            GenerateTerrain(fs);
-            fs.Close();
-            UpdateTransformationMatrix();
-        }
-
-        public Terrain(int gridX, int gridZ, int textureId, Stream heightMap)
-        {
-            X = gridX * Size;
-            Z = gridZ * Size;
-            Boundaries = new vec4(X, Z, (gridX + 1) * Size, (gridZ + 1) * Size);
-            Texture = new ModelTexture(textureId);
-            GenerateTerrain(heightMap);
-            UpdateTransformationMatrix();
-        }
-
-        // todo
         public Terrain(int gridX, int gridZ, TerrainTexturePack texturePack, TerrainTexture blendMap, Stream heightMap)
         {
             X = gridX * Size;

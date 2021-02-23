@@ -22,6 +22,12 @@ namespace BlobRPG.Shaders
         private int FogColor;
 
 
+        private int BackgroundTextureLocation;
+        private int RTextureLocation;
+        private int GTextureLocation;
+        private int BTextureLocation;
+        private int BlendTextureLocation;
+
         public TerrainShader() : base("terrain")
         {
 
@@ -48,6 +54,21 @@ namespace BlobRPG.Shaders
             GradientLocation = GetUniformLocation("gradient");
             DensityLocation = GetUniformLocation("density");
             FogColor = GetUniformLocation("fogColor");
+
+
+            BackgroundTextureLocation = GetUniformLocation("backgroundTexture");
+            RTextureLocation = GetUniformLocation("rTexture");
+            GTextureLocation = GetUniformLocation("gTexture");
+            BTextureLocation = GetUniformLocation("bTexture");
+            BlendTextureLocation = GetUniformLocation("blendTexture");
+        }
+        public void ConnectTextureUnits()
+        {
+            LoadInt(BackgroundTextureLocation, 0);
+            LoadInt(RTextureLocation, 1);
+            LoadInt(GTextureLocation, 2);
+            LoadInt(BTextureLocation, 3);
+            LoadInt(BlendTextureLocation, 4);
         }
 
         public void LoadTransformationMatrix(mat4 matrix)
@@ -79,5 +100,6 @@ namespace BlobRPG.Shaders
             LoadFloat(ReflectivityLocation, reflectivity);
             LoadFloat(ShineDamperLocation, shineDamper);
         }
+
     }
 }

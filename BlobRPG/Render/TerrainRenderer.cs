@@ -18,6 +18,7 @@ namespace BlobRPG.Render
             Shader = shader;
             shader.Start();
             shader.LoadProjectionMatrix(projectionMatrix);
+            shader.ConnectTextureUnits();
             shader.Stop();
         }
 
@@ -51,9 +52,21 @@ namespace BlobRPG.Render
             GL.EnableVertexAttribArray(2);
 
             GL.ActiveTexture(TextureUnit.Texture0);
-            GL.BindTexture(TextureTarget.Texture2D, terrain.Texture.Id);
+            GL.BindTexture(TextureTarget.Texture2D, terrain.TexturePack.BackgroundTexture.TextureId);
 
-            Shader.LoadShineVariables(terrain.Texture.Reflectivity, terrain.Texture.ShineDamper);
+            GL.ActiveTexture(TextureUnit.Texture1);
+            GL.BindTexture(TextureTarget.Texture2D, terrain.TexturePack.RTexture.TextureId);
+
+            GL.ActiveTexture(TextureUnit.Texture2);
+            GL.BindTexture(TextureTarget.Texture2D, terrain.TexturePack.GTexture.TextureId);
+
+            GL.ActiveTexture(TextureUnit.Texture3);
+            GL.BindTexture(TextureTarget.Texture2D, terrain.TexturePack.BTexture.TextureId);
+
+            GL.ActiveTexture(TextureUnit.Texture4);
+            GL.BindTexture(TextureTarget.Texture2D, terrain.BlendMap.TextureId);
+
+            Shader.LoadShineVariables(0, 1);
         }
         private void LoadModelMatrix(Terrain terrain)
         {
