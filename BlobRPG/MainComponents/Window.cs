@@ -20,11 +20,14 @@ namespace BlobRPG.MainComponents
     {
         public vec3 SkyColor;
 
+        public double DeltaTime { get; private set; } = 0;
+        public double Gravity { get; private set; } = -10;
+
         public Window(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings) { }
 
         Renderer Renderer;
 
-        Entity Entity;
+        Player Entity;
         Light Light;
 
         Camera Camera;
@@ -54,10 +57,10 @@ namespace BlobRPG.MainComponents
                 ShineDamper = 10,
                 Reflectivity = 1
             };
-            Entity = new Entity(new TexturedModel(rm, mt), new GlmSharp.vec3(0, 0, -4));
+            Entity = new Player(new TexturedModel(rm, mt), new vec3(0, 0, -4), this);
 
-            Camera = new Camera(new GlmSharp.vec3(0, 1, 0), 0, 0, 0);
-            Light = new Light(new GlmSharp.vec3(0, 0, 20), new GlmSharp.vec3(1, 1, 1));
+            Camera = new Camera(new vec3(0, 1, 0), 0, 0, 0);
+            Light = new Light(new vec3(0, 0, 20), new vec3(1, 1, 1));
 
 
             TerrainTexture backgroundTexture = new TerrainTexture(Loader.LoadTexture("starter/texture/grass.png"));
@@ -81,6 +84,8 @@ namespace BlobRPG.MainComponents
 
         protected override void OnUpdateFrame(FrameEventArgs args)
         {
+            DeltaTime = args.Time;
+
             InputManager.Update(this);
 
             if (InputManager.IsKeyPressed(OpenTK.Windowing.GraphicsLibraryFramework.Keys.Escape))
@@ -92,10 +97,13 @@ namespace BlobRPG.MainComponents
                 InputManager.ToggleMouse(this);
             }
 
+            Entity.Move(Terrain);
+            
             Camera.Move();
 
             Renderer.ProcessObject(Entity);
             Renderer.ProcessTerrain(Terrain);
+
 
             base.OnUpdateFrame(args);
         }

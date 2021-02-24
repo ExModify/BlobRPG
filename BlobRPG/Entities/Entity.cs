@@ -9,7 +9,7 @@ namespace BlobRPG.Entities
     public class Entity
     {
         public TexturedModel Model { get; private set; }
-        public vec3 Position { get; private set; }
+        public vec3 Position { get; protected set; }
         public float RotationX { get; private set; }
         public float RotationY { get; private set; }
         public float RotationZ { get; private set; }

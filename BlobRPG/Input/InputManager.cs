@@ -24,10 +24,16 @@ namespace BlobRPG.Input
 
         public static bool MouseLocked { get; private set; } = true;
 
+        public static bool IsMouseLeftDown { get; private set; } = false;
+        public static bool IsMouseRightDown { get; private set; } = false;
+        public static bool IsMouseMiddleDown { get; private set; } = false;
+
         public static void Init(GameWindow window)
         {
             keysDown = new List<Keys>();
             window.CursorGrabbed = true;
+
+            Update(window);
         }
 
         public static void ToggleMouse(GameWindow window)
@@ -38,6 +44,7 @@ namespace BlobRPG.Input
                 window.CursorVisible = true;
 
             MouseLocked = !MouseLocked;
+            Update(window);
         }
 
         public static void Update(GameWindow window)
@@ -59,6 +66,10 @@ namespace BlobRPG.Input
             X = mouseState.X;
             Y = mouseState.Y;
             scroll = mouseState.Scroll.Y;
+
+            IsMouseLeftDown = mouseState.IsButtonDown(MouseButton.Left);
+            IsMouseRightDown = mouseState.IsButtonDown(MouseButton.Right);
+            IsMouseMiddleDown = mouseState.IsButtonDown(MouseButton.Middle);
         }
         public static bool IsKeyDown(Keys key)
         {

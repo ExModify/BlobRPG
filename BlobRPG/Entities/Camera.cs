@@ -30,22 +30,6 @@ namespace BlobRPG.Entities
 
         public void Move()
         {
-            if (InputManager.IsKeyDown(OpenTK.Windowing.GraphicsLibraryFramework.Keys.W))
-            {
-                position.z -= 0.02f;
-            }
-            if (InputManager.IsKeyDown(OpenTK.Windowing.GraphicsLibraryFramework.Keys.S))
-            {
-                position.z += 0.02f;
-            }
-            if (InputManager.IsKeyDown(OpenTK.Windowing.GraphicsLibraryFramework.Keys.D))
-            {
-                position.x += 0.02f;
-            }
-            if (InputManager.IsKeyDown(OpenTK.Windowing.GraphicsLibraryFramework.Keys.A))
-            {
-                position.x -= 0.02f;
-            }
 
             UpdateViewMatrix();
         }
