@@ -123,7 +123,7 @@ namespace BlobRPG.Entities
                     vertices[vertexPointer * 3] = j / ((float)vertexCount - 1) * Size;
 
                     float vertexHeight = GetHeight(j, i, heightMap);
-                    TerrainHeight[i, j] = vertexHeight;
+                    TerrainHeight[j, i] = vertexHeight;
                     vertices[vertexPointer * 3 + 1] = vertexHeight;
                     vertices[vertexPointer * 3 + 2] = i / ((float)vertexCount - 1) * Size;
                     vec3 normal = CalculateNormal(j, i, heightMap);

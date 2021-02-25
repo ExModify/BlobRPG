@@ -59,7 +59,7 @@ namespace BlobRPG.MainComponents
             };
             Entity = new Player(new TexturedModel(rm, mt), new vec3(0, 0, -4), this);
 
-            Camera = new Camera(new vec3(0, 1, 0), 0, 0, 0);
+            Camera = new Camera(Entity, this);
             Light = new Light(new vec3(0, 0, 20), new vec3(1, 1, 1));
 
 
