@@ -27,12 +27,12 @@ namespace BlobRPG.MainComponents
 
         Renderer Renderer;
 
-        Player Entity;
+        Player Player;
         Light Light;
 
         Camera Camera;
 
-        Terrain Terrain;
+        List<Terrain> Terrains;
         Fog Fog;
 
         protected override void OnLoad()
@@ -57,11 +57,13 @@ namespace BlobRPG.MainComponents
                 ShineDamper = 10,
                 Reflectivity = 1
             };
-            Entity = new Player(new TexturedModel(rm, mt), new vec3(0, 0, -4), this);
+            Player = new Player(new TexturedModel(rm, mt), new vec3(0, 10, 0), this);
 
-            Camera = new Camera(Entity, this);
+            Camera = new Camera(Player, this);
             Light = new Light(new vec3(0, 0, 20), new vec3(1, 1, 1));
 
+
+            Terrains = new List<Terrain>();
 
             TerrainTexture backgroundTexture = new TerrainTexture(Loader.LoadTexture("starter/texture/grass.png"));
             TerrainTexture rTexture = new TerrainTexture(Loader.LoadTexture("starter/texture/mud.png"));
@@ -71,9 +73,11 @@ namespace BlobRPG.MainComponents
 
             TerrainTexturePack pack = new TerrainTexturePack(backgroundTexture, rTexture, gTexture, bTexture);
 
+
             FileStream fs = new FileStream("starter/texture/heightMap.png", FileMode.Open, FileAccess.Read);
-            Terrain = new Terrain(-1, -1, pack, blendTexture, fs);
+            Terrain t = new Terrain(-1, -1, pack, blendTexture, fs);
             fs.Close();
+            Terrains.Add(t);
         }
 
         protected override void OnClosed()
@@ -97,12 +101,15 @@ namespace BlobRPG.MainComponents
                 InputManager.ToggleMouse(this);
             }
 
-            Entity.Move(Terrain);
+            Player.Move(Terrains);
             
             Camera.Move();
 
-            Renderer.ProcessObject(Entity);
-            Renderer.ProcessTerrain(Terrain);
+            if (Player.Render)
+                Renderer.ProcessObject(Player);
+
+            foreach (Terrain t in Terrains)
+                Renderer.ProcessTerrain(t);
 
 
             base.OnUpdateFrame(args);

@@ -36,57 +36,47 @@ namespace BlobRPG.Entities
 
             CurrentVerticalSpeed = 0;
             CurrentHorizontalSpeed = 0;
-            Accelerator = 0;
+            Accelerator = 1;
             UpwardSpeed = 0;
         }
 
-        public void Move(Terrain terrain)
+        public void Move(List<Terrain> terrains)
         {
             ProcessInput();
-
-            if (!InputManager.IsMouseRightDown && !InputManager.IsMouseLeftDown && Accelerator < 20)
-            {
-                float delta = InputManager.XDelta * 0.2f;
-                if (InputManager.IsKeyDown(Keys.Space) && ((delta < 0 && InputManager.IsKeyDown(Keys.D)) || (delta > 0 && InputManager.IsKeyDown(Keys.A))))
-                {
-                    Accelerator += 0.01f;
-                }
-            }
 
             double d = CurrentVerticalSpeed * Accelerator * Window.DeltaTime;
 
             float dX = (float)(d * Math.Sin(MathHelper.DegreesToRadians(RotationY)));
             float dZ = (float)(d * Math.Cos(MathHelper.DegreesToRadians(RotationY)));
 
-            d = CurrentHorizontalSpeed * Window.DeltaTime;
+            d = CurrentHorizontalSpeed * Accelerator * Window.DeltaTime;
 
             dX += (float)(d * Math.Sin(MathHelper.DegreesToRadians(RotationY + 90)));
             dZ += (float)(d * Math.Cos(MathHelper.DegreesToRadians(RotationY + 90)));
 
             UpwardSpeed += Window.Gravity * Window.DeltaTime;
-            float TerrainHeight = terrain.GetHeightOfTerrain(Position.x, Position.z);
-            Position += new vec3(dX, (float)(UpwardSpeed * Window.DeltaTime), dZ);
 
-            if (!(Position.x > terrain.Boundaries.x && Position.x < terrain.Boundaries.z))
+
+            float dY = (float)(UpwardSpeed * Window.DeltaTime);
+
+            float terrainHeight = 0;
+            for (int i = 0; i < terrains.Count; i++)
             {
-                Position -= new vec3(dX, 0, 0);
-            }
-            if (!(Position.z > terrain.Boundaries.y && Position.z < terrain.Boundaries.w))
-            {
-                Position -= new vec3(0, 0, dZ);
+                if (terrains[i].OnTerrain(Position.x, Position.z))
+                {
+                    terrainHeight = terrains[i].GetHeightOfTerrain(Position.x, Position.z);
+                    break;
+                }
             }
 
-            if (Position.y < TerrainHeight)
+            if (Position.y + dY < terrainHeight)
             {
                 UpwardSpeed = 0;
-                Position = new vec3(Position.x, TerrainHeight, Position.z);
+                dY = terrainHeight - Position.y;
                 InAir = false;
             }
 
-            if (Position.y < -Terrain.MaxHeight)
-            {
-                Position = new vec3(Position.x, TerrainHeight + 1, Position.z);
-            }
+            Position = new vec3(Position.x + dX, Position.y + dY, Position.z + dZ);
         }
         private void Jump()
         {

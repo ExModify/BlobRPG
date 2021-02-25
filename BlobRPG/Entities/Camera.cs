@@ -70,12 +70,8 @@ namespace BlobRPG.Entities
         private void CalculateZoom()
         {
             float zoomLevel = InputManager.ScrollDelta * 5f;
-            float last = DistanceFromPlayer;
-            DistanceFromPlayer += zoomLevel;
-            if (DistanceFromPlayer < 0 || DistanceFromPlayer > 40)
-            {
-                DistanceFromPlayer = last;
-            }
+            DistanceFromPlayer -= zoomLevel;
+            DistanceFromPlayer = Math.Clamp(DistanceFromPlayer, 0, 20);
 
             if (DistanceFromPlayer == 0)
             {
@@ -88,11 +84,8 @@ namespace BlobRPG.Entities
         }
         private void CalculatePitch()
         {
-            float pitchChange = (float)(InputManager.YDelta * Window.DeltaTime);
-            Console.WriteLine(pitchChange);
-            float last = Pitch;
-            Pitch -= pitchChange;
-
+            float pitchChange = (float)(InputManager.YDelta * Window.DeltaTime * 20);
+            Pitch += pitchChange;
             Pitch = MathHelper.Clamp(Pitch, 5, 60);
 
         }
