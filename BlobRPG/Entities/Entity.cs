@@ -15,7 +15,9 @@ namespace BlobRPG.Entities
         public float RotationZ { get; private set; }
         public float Scale { get; private set; }
 
-        public Entity(TexturedModel model, vec3 position, float rx = 0, float ry = 0, float rz = 0, float scale = 1)
+        public int TextureIndex { get; private set; }
+
+        public Entity(TexturedModel model, vec3 position, float rx = 0, float ry = 0, float rz = 0, float scale = 1, int textureIndex = 0)
         {
             Model = model;
             Position = position;
@@ -23,6 +25,8 @@ namespace BlobRPG.Entities
             RotationY = ry;
             RotationZ = rz;
             Scale = scale;
+
+            TextureIndex = textureIndex;
         }
 
         public void Move(float dx, float dy, float dz)
@@ -34,6 +38,14 @@ namespace BlobRPG.Entities
             RotationX += dx;
             RotationY += dy;
             RotationZ += dz;
+        }
+
+        public vec2 CalculateTextureOffset()
+        {
+            float column = TextureIndex % Model.Texture.NumberOfRows;
+            float row = TextureIndex / Model.Texture.NumberOfRows;
+
+            return new vec2(column / Model.Texture.NumberOfRows, row / Model.Texture.NumberOfRows);
         }
     }
 }

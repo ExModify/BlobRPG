@@ -21,6 +21,9 @@ namespace BlobRPG.Shaders
         private int DensityLocation;
         private int FogColor;
 
+        private int TextureOffsetLocation;
+        private int NumberOfRowsLocation;
+
         public EntityShader() : base("entity")
         {
             
@@ -47,8 +50,18 @@ namespace BlobRPG.Shaders
             GradientLocation = GetUniformLocation("gradient");
             DensityLocation = GetUniformLocation("density");
             FogColor = GetUniformLocation("fogColor");
-        }
 
+            TextureOffsetLocation = GetUniformLocation("textureOffset");
+            NumberOfRowsLocation = GetUniformLocation("numberOfRows");
+        }
+        public void LoadNumberOfRows(int numberOfRows)
+        {
+            LoadInt(NumberOfRowsLocation, numberOfRows);
+        }
+        public void LoadTextureOffset(vec2 textureOffset)
+        {
+            LoadVector(TextureOffsetLocation, textureOffset);
+        }
         public void LoadTransformationMatrix(mat4 matrix)
         {
             LoadMatrix(TransformationMatrixLocation, matrix);

@@ -13,9 +13,12 @@ namespace BlobRPG.Textures
         public bool HasTransparency { get; set; } = false;
         public bool UseFakeLighting { get; set; } = false;
 
-        public ModelTexture(int textureId)
+        public int NumberOfRows { get; set; }
+
+        public ModelTexture(int textureId, int numberOfRows = 1)
         {
             Id = textureId;
+            NumberOfRows = numberOfRows;
         }
     }
 }

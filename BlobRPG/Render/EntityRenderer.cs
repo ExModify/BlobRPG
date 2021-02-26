@@ -65,11 +65,13 @@ namespace BlobRPG.Render
 
             Shader.LoadShineVariables(model.Texture.Reflectivity, model.Texture.ShineDamper);
             Shader.LoadFakeLighting(model.Texture.UseFakeLighting);
+            Shader.LoadNumberOfRows(model.Texture.NumberOfRows);
         }
         private void PrepareInstance(Entity entity)
         {
             mat4 transformationMatrix = MatrixMaths.CreateTransformationMatrix(entity.Position, entity.RotationX, entity.RotationY, entity.RotationZ, entity.Scale);
             Shader.LoadTransformationMatrix(transformationMatrix);
+            Shader.LoadTextureOffset(entity.CalculateTextureOffset());
         }
         private void FinishTexturedModel()
         {

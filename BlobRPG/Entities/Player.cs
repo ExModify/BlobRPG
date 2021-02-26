@@ -30,7 +30,7 @@ namespace BlobRPG.Entities
         bool InAir { get; set; } = false;
 
 
-        public Player(TexturedModel model, vec3 position, MainComponents.Window window, float rx = 0, float ry = 0, float rz = 0, float scale = 1) : base(model, position, rx, ry, rz, scale)
+        public Player(TexturedModel model, vec3 position, MainComponents.Window window, float rx = 0, float ry = 0, float rz = 0, float scale = 1, int textureIndex = 1) : base(model, position, rx, ry, rz, scale, textureIndex)
         {
             Window = window;
 

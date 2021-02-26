@@ -52,12 +52,13 @@ namespace BlobRPG.MainComponents
             Renderer = new Renderer(this);
 
             RawModel rm = OBJLoader.LoadOBJ("starter/model/blob.obj");
-            ModelTexture mt = new ModelTexture(Loader.LoadTexture("starter/texture/blobTexture.png"))
+            ModelTexture mt = new ModelTexture(Loader.LoadTexture("starter/texture/blobTextureAtlas.png"))
             {
                 ShineDamper = 10,
-                Reflectivity = 1
+                Reflectivity = 1,
+                NumberOfRows = 2
             };
-            Player = new Player(new TexturedModel(rm, mt), new vec3(0, 10, 0), this);
+            Player = new Player(new TexturedModel(rm, mt), new vec3(0, 10, 0), this, textureIndex: 1);
 
             Camera = new Camera(Player, this);
             Light = new Light(new vec3(0, 0, 20), new vec3(1, 1, 1));
