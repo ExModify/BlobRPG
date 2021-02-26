@@ -50,6 +50,13 @@ namespace BlobRPG.MainComponents
             UnbindVao();
             return new RawModel(vao, indices.Length);
         }
+        public static RawModel LoadToVao(float[] positions, int dimension = 2)
+        {
+            int vao = CreateVao();
+            StoreDataInAttributeList(0, dimension, positions);
+            UnbindVao();
+            return new RawModel(vao, positions.Length / dimension);
+        }
         public static int LoadTexture(string file, bool lodBias = false)
         {
             FileStream fs = new FileStream(file, FileMode.Open, FileAccess.Read);

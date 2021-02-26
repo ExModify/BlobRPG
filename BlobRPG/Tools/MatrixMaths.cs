@@ -34,5 +34,15 @@ namespace BlobRPG.Tools
 
             return matrix;
         }
+
+        public static mat4 CreateTransformationMatrix(vec2 translation, vec2 scale)
+        {
+            mat4 matrix = mat4.Identity;
+
+            matrix *= mat4.Translate(translation.x, translation.y, 1);
+            matrix *= mat4.Scale(scale.x, scale.y, 1);
+
+            return matrix;
+        }
     }
 }

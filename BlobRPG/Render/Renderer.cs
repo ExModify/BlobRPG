@@ -2,6 +2,7 @@
 using BlobRPG.MainComponents;
 using BlobRPG.Models;
 using BlobRPG.Shaders;
+using BlobRPG.Textures;
 using GlmSharp;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Windowing.Desktop;
@@ -22,23 +23,35 @@ namespace BlobRPG.Render
 
         readonly EntityRenderer EntityRenderer;
         readonly EntityShader EntityShader;
+        readonly GUIRenderer GUIRenderer;
 
         readonly TerrainRenderer TerrainRenderer;
         readonly TerrainShader TerrainShader;
+        readonly GUIShader GUIShader;
 
         readonly Dictionary<TexturedModel, List<Entity>> Entities;
         readonly List<Terrain> Terrains;
+        readonly List<GUITexture> GUIs;
 
-        Window Window;
+        readonly Window Window;
 
         public static void EnableCulling()
         {
             GL.Enable(EnableCap.CullFace);
             GL.CullFace(CullFaceMode.Back);
         }
+        public static void EnableAlphaBlend()
+        {
+            GL.Enable(EnableCap.Blend);
+            GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+        }
         public static void DisableCulling()
         {
             GL.Disable(EnableCap.CullFace);
+        }
+        public static void DisableAlphaBlend()
+        {
+            GL.Disable(EnableCap.Blend);
         }
 
         public Renderer(Window window)
@@ -47,6 +60,7 @@ namespace BlobRPG.Render
 
             Entities = new Dictionary<TexturedModel, List<Entity>>();
             Terrains = new List<Terrain>();
+            GUIs = new List<GUITexture>();
 
             EnableCulling();
 
@@ -65,7 +79,8 @@ namespace BlobRPG.Render
             TerrainShader = new TerrainShader();
             TerrainRenderer = new TerrainRenderer(TerrainShader, ref ProjectionMatrix);
 
-            UpdateProjectionMatrix();
+            GUIShader = new GUIShader();
+            GUIRenderer = new GUIRenderer(GUIShader);
         }
         
         public void Render(Camera camera, Light light, Fog fog)
@@ -76,6 +91,8 @@ namespace BlobRPG.Render
 
             TerrainRenderer.Render(Terrains, camera, light, fog);
 
+            GUIRenderer.Render(GUIs);
+
             Terrains.Clear();
             Entities.Clear();
         }
@@ -83,8 +100,14 @@ namespace BlobRPG.Render
         {
             EntityShader.CleanUp();
             TerrainShader.CleanUp();
+            GUIShader.CleanUp();
         }
         
+        public void AddGUI(GUITexture texture)
+        {
+            GUIs.Add(texture);
+        }
+
         public void ProcessTerrain(Terrain terrain)
         {
             Terrains.Add(terrain);
@@ -118,6 +141,10 @@ namespace BlobRPG.Render
             EntityShader.Start();
             EntityShader.LoadProjectionMatrix(ProjectionMatrix);
             EntityShader.Stop();
+
+            TerrainShader.Start();
+            TerrainShader.LoadProjectionMatrix(ProjectionMatrix);
+            TerrainShader.Stop();
         }
     }
 }

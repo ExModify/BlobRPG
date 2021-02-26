@@ -79,6 +79,8 @@ namespace BlobRPG.MainComponents
             Terrain t = new Terrain(-1, -1, pack, blendTexture, fs);
             fs.Close();
             Terrains.Add(t);
+
+            Renderer.AddGUI(new GUITexture(Loader.LoadTexture("starter/texture/grass.png"), new vec2(0.5f, 0.5f), new vec2(0.25f, 0.25f)));
         }
 
         protected override void OnClosed()

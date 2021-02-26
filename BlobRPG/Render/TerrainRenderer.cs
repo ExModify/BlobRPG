@@ -16,6 +16,7 @@ namespace BlobRPG.Render
         public TerrainRenderer(TerrainShader shader, ref mat4 projectionMatrix)
         {
             Shader = shader;
+
             shader.Start();
             shader.LoadProjectionMatrix(projectionMatrix);
             shader.ConnectTextureUnits();
