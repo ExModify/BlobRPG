@@ -28,7 +28,7 @@ namespace BlobRPG.MainComponents
         Renderer Renderer;
 
         Player Player;
-        Light Light;
+        List<Light> Lights;
 
         Camera Camera;
 
@@ -61,7 +61,10 @@ namespace BlobRPG.MainComponents
             Player = new Player(new TexturedModel(rm, mt), new vec3(0, 10, 0), this, textureIndex: 1);
 
             Camera = new Camera(Player, this);
-            Light = new Light(new vec3(0, 0, 20), new vec3(1, 1, 1));
+            Lights = new List<Light>()
+            {
+                new Light(new vec3(0, 0, 20), new vec3(1, 1, 1))
+            };
 
 
             Terrains = new List<Terrain>();
@@ -120,7 +123,7 @@ namespace BlobRPG.MainComponents
 
         protected override void OnRenderFrame(FrameEventArgs args)
         {
-            Renderer.Render(Camera, Light, Fog);
+            Renderer.Render(Camera, Lights, Fog);
 
             SwapBuffers();
             base.OnRenderFrame(args);

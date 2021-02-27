@@ -83,13 +83,13 @@ namespace BlobRPG.Render
             GUIRenderer = new GUIRenderer(GUIShader);
         }
         
-        public void Render(Camera camera, Light light, Fog fog)
+        public void Render(Camera camera, List<Light> lights, Fog fog)
         {
             Prepare();
 
-            EntityRenderer.Render(Entities, camera, light, fog);
+            EntityRenderer.Render(Entities, camera, lights, fog);
 
-            TerrainRenderer.Render(Terrains, camera, light, fog);
+            TerrainRenderer.Render(Terrains, camera, lights, fog);
 
             GUIRenderer.Render(GUIs);
 

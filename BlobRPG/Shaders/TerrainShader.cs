@@ -12,8 +12,6 @@ namespace BlobRPG.Shaders
         private int TransformationMatrixLocation;
         private int ProjectionMatrixLocation;
         private int ViewMatrixLocation;
-        private int LightPositionLocation;
-        private int LightColorLocation;
         private int ReflectivityLocation;
         private int ShineDamperLocation;
 
@@ -21,6 +19,10 @@ namespace BlobRPG.Shaders
         private int DensityLocation;
         private int FogColor;
 
+
+        private int LightCountLocation;
+        private int[] LightPositionLocation;
+        private int[] LightColorLocation;
 
         private int BackgroundTextureLocation;
         private int RTextureLocation;
@@ -43,11 +45,12 @@ namespace BlobRPG.Shaders
 
         protected override void GetAllUniformLocations()
         {
+            LightPositionLocation = new int[Program.MAX_LIGHTS];
+            LightColorLocation = new int[Program.MAX_LIGHTS];
+
             TransformationMatrixLocation = GetUniformLocation("transformationMatrix");
             ProjectionMatrixLocation = GetUniformLocation("projectionMatrix");
             ViewMatrixLocation = GetUniformLocation("viewMatrix");
-            LightPositionLocation = GetUniformLocation("lightPosition");
-            LightColorLocation = GetUniformLocation("lightColor");
             ReflectivityLocation = GetUniformLocation("reflectivity");
             ShineDamperLocation = GetUniformLocation("shineDamper");
 
@@ -55,6 +58,12 @@ namespace BlobRPG.Shaders
             DensityLocation = GetUniformLocation("density");
             FogColor = GetUniformLocation("fogColor");
 
+            LightCountLocation = GetUniformLocation("lightCount");
+            for (int i = 0; i < Program.MAX_LIGHTS; i++)
+            {
+                LightPositionLocation[i] = GetUniformLocation("lightPosition[" + i + "]");
+                LightColorLocation[i] = GetUniformLocation("lightColor[" + i + "]");
+            }
 
             BackgroundTextureLocation = GetUniformLocation("backgroundTexture");
             RTextureLocation = GetUniformLocation("rTexture");
@@ -83,10 +92,15 @@ namespace BlobRPG.Shaders
         {
             LoadMatrix(ViewMatrixLocation, camera.ViewMatrix);
         }
-        public void LoadLight(Light light)
+        public void LoadLights(List<Light> lights)
         {
-            LoadVector(LightPositionLocation, light.Position);
-            LoadVector(LightColorLocation, light.Color);
+            LoadInt(LightCountLocation, lights.Count);
+            int count = Math.Min(lights.Count, Program.MAX_LIGHTS);
+            for (int i = 0; i < count; i++)
+            {
+                LoadVector(LightPositionLocation[i], lights[i].Position);
+                LoadVector(LightColorLocation[i], lights[i].Color);
+            }
         }
 
         public void LoadFog(Fog fog)

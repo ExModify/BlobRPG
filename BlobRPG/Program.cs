@@ -8,8 +8,9 @@ using System.Threading;
 
 namespace BlobRPG
 {
-    class Program
+    public class Program
     {
+        public const int MAX_LIGHTS = 8;
         static void Main(string[] args)
         {
             GameWindowSettings gameWindowSettings = new GameWindowSettings()
