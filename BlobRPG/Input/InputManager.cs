@@ -58,10 +58,12 @@ namespace BlobRPG.Input
                     keysDown.RemoveAt(i);
                 else i++;
             }
-
-            XDelta = mouseState.X - X;
-            YDelta = mouseState.Y - Y;
-            ScrollDelta = mouseState.Scroll.Y - scroll;
+            if (MouseLocked)
+            {
+                XDelta = mouseState.X - X;
+                YDelta = mouseState.Y - Y;
+                ScrollDelta = mouseState.Scroll.Y - scroll;
+            }
 
             X = mouseState.X;
             Y = mouseState.Y;
