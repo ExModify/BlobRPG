@@ -11,6 +11,7 @@ in float visibility;
 uniform sampler2D textureSampler;
 
 uniform vec3 lightColor[MAX_LIGHTS];
+uniform vec3 lightAttenuation[MAX_LIGHTS];
 uniform float reflectivity;
 uniform float shineDamper;
 uniform vec3 fogColor;
@@ -38,6 +39,8 @@ void main(void)
 
 	for (int i = 0; i < lightCount; i++)
 	{
+		float distance = length(toLightVector[i]);
+		float attFactor = lightAttenuation[i].x + (lightAttenuation[i].y * distance) + (lightAttenuation[i].z * distance * distance);
 		vec3 unitLight = NormalizeIfGreaterThanZero(toLightVector[i]);
 
 		float nDotl = dot(unitNormal, unitLight);
@@ -52,8 +55,8 @@ void main(void)
 
 		float dampedFactor = pow(specularFactor, shineDamper);
 		
-		totalDiffuse = totalDiffuse + brightness * lightColor[i];
-		totalSpecular = totalSpecular + dampedFactor * reflectivity * lightColor[i];
+		totalDiffuse = totalDiffuse + (brightness * lightColor[i]) / attFactor;
+		totalSpecular = totalSpecular + (dampedFactor * reflectivity * lightColor[i]) / attFactor;
 	}
 	totalDiffuse = max(totalDiffuse, 0.1);
 

@@ -23,6 +23,7 @@ namespace BlobRPG.Shaders
         private int LightCountLocation;
         private int[] LightPositionLocation;
         private int[] LightColorLocation;
+        private int[] LightAttenuationLocation;
 
         private int BackgroundTextureLocation;
         private int RTextureLocation;
@@ -47,6 +48,7 @@ namespace BlobRPG.Shaders
         {
             LightPositionLocation = new int[Program.MAX_LIGHTS];
             LightColorLocation = new int[Program.MAX_LIGHTS];
+            LightAttenuationLocation = new int[Program.MAX_LIGHTS];
 
             TransformationMatrixLocation = GetUniformLocation("transformationMatrix");
             ProjectionMatrixLocation = GetUniformLocation("projectionMatrix");
@@ -63,6 +65,7 @@ namespace BlobRPG.Shaders
             {
                 LightPositionLocation[i] = GetUniformLocation("lightPosition[" + i + "]");
                 LightColorLocation[i] = GetUniformLocation("lightColor[" + i + "]");
+                LightAttenuationLocation[i] = GetUniformLocation("lightAttenuation[" + i + "]");
             }
 
             BackgroundTextureLocation = GetUniformLocation("backgroundTexture");
@@ -100,6 +103,7 @@ namespace BlobRPG.Shaders
             {
                 LoadVector(LightPositionLocation[i], lights[i].Position);
                 LoadVector(LightColorLocation[i], lights[i].Color);
+                LoadVector(LightAttenuationLocation[i], lights[i].Attenuation);
             }
         }
 

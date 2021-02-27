@@ -58,12 +58,13 @@ namespace BlobRPG.MainComponents
                 Reflectivity = 1,
                 NumberOfRows = 2
             };
-            Player = new Player(new TexturedModel(rm, mt), new vec3(0, 10, 0), this, textureIndex: 1);
+            Player = new Player(new TexturedModel(rm, mt), new vec3(153, 5, -274), this, textureIndex: 1);
 
             Camera = new Camera(Player, this);
             Lights = new List<Light>()
             {
-                new Light(new vec3(0, 0, 20), new vec3(1, 1, 1))
+                new Light(new vec3(0, 1000, -7000), new vec3(.8f, .8f, .8f)),
+                new Light(new vec3(185, 10, -293), new vec3(0, 2, 2), new vec3(1f, 0.01f, 0.002f))
             };
 
 
@@ -79,7 +80,7 @@ namespace BlobRPG.MainComponents
 
 
             FileStream fs = new FileStream("starter/texture/heightMap.png", FileMode.Open, FileAccess.Read);
-            Terrain t = new Terrain(-1, -1, pack, blendTexture, fs);
+            Terrain t = new Terrain(0, -1, pack, blendTexture, fs);
             fs.Close();
             Terrains.Add(t);
 

@@ -6,6 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Entities\Light.cs~RF55cab56e.TMP" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="GlmSharpStd" Version="0.9.8" />
     <PackageReference Include="NVorbis" Version="0.10.1" />
     <PackageReference Include="OpenTK" Version="4.5.0" />

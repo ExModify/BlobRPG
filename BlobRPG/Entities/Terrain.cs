@@ -15,7 +15,7 @@ namespace BlobRPG.Entities
     {
         public const float MaxHeight = 40;
 
-        private const float Size = 500;
+        private const float Size = 1000;
         private const float MaxPixelColor = 256 * 256 * 256;
 
         public float X { get; private set; }
