@@ -19,18 +19,20 @@ namespace BlobRPG.MainComponents
     public class Window : GameWindow
     {
         public vec3 SkyColor;
+        public vec3 NightColor;
 
         public double DeltaTime { get; private set; } = 0;
         public double Gravity { get; private set; } = -10;
+        public float SkyboxRotation { get; private set; } = 1f;
 
         public Window(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings) { }
 
-        Renderer Renderer;
+        public Renderer Renderer;
+        public Camera Camera;
 
         Player Player;
         List<Light> Lights;
 
-        Camera Camera;
 
         List<Terrain> Terrains;
         Fog Fog;
@@ -42,6 +44,8 @@ namespace BlobRPG.MainComponents
             GL.Viewport(0, 0, ClientSize.X, ClientSize.Y);
 
             SkyColor = new vec3(0.529f, 0.807f, 0.921f);
+            NightColor = new vec3(SkyColor * 0.5f);
+
             Fog = new Fog(this);
 
             InputManager.Init(this);
@@ -67,6 +71,7 @@ namespace BlobRPG.MainComponents
                 new Light(new vec3(185, 10, -293), new vec3(0, 2, 2), new vec3(1f, 0.01f, 0.002f))
             };
 
+            InputManager.InitMouseRay(this);
 
             Terrains = new List<Terrain>();
 
@@ -84,7 +89,33 @@ namespace BlobRPG.MainComponents
             fs.Close();
             Terrains.Add(t);
 
-            Renderer.AddGUI(new GUITexture(Loader.LoadTexture("starter/texture/grass.png"), new vec2(0.5f, 0.5f), new vec2(0.25f, 0.25f)));
+            string[] dayTextures = new string[]
+            {
+                "starter/texture/skybox_day_right.png",
+                "starter/texture/skybox_day_left.png",
+                "starter/texture/skybox_day_top.png",
+                "starter/texture/skybox_day_bottom.png",
+                "starter/texture/skybox_day_back.png",
+                "starter/texture/skybox_day_front.png"
+            };
+            string[] nightTextures = new string[]
+            {
+                "starter/texture/skybox_night_right.png",
+                "starter/texture/skybox_night_left.png",
+                "starter/texture/skybox_night_top.png",
+                "starter/texture/skybox_night_bottom.png",
+                "starter/texture/skybox_night_back.png",
+                "starter/texture/skybox_night_front.png"
+            };
+            Stream[] dayStreams = Loader.OpenStreams(dayTextures);
+            Stream[] nightStreams = Loader.OpenStreams(nightTextures);
+
+            Renderer.SkyboxRenderer.LoadTextures(dayStreams, nightStreams);
+
+            Loader.CloseStreams(dayStreams);
+            Loader.CloseStreams(nightStreams);
+
+            //Renderer.AddGUI(new GUITexture(Loader.LoadTexture("starter/texture/grass.png"), new vec2(0.5f, 0.5f), new vec2(0.25f, 0.25f)));
         }
 
         protected override void OnClosed()
@@ -111,6 +142,7 @@ namespace BlobRPG.MainComponents
             Player.Move(Terrains);
             
             Camera.Move();
+            InputManager.UpdateMouseRay();
 
             if (Player.Render)
                 Renderer.ProcessObject(Player);
@@ -118,6 +150,7 @@ namespace BlobRPG.MainComponents
             foreach (Terrain t in Terrains)
                 Renderer.ProcessTerrain(t);
 
+            Renderer.Update();
 
             base.OnUpdateFrame(args);
         }
@@ -129,5 +162,6 @@ namespace BlobRPG.MainComponents
             SwapBuffers();
             base.OnRenderFrame(args);
         }
+
     }
 }

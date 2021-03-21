@@ -94,6 +94,34 @@ namespace BlobRPG.MainComponents
 
             return textureId;
         }
+        public static int LoadCubeMap(Stream[] textures)
+        {
+            int textureId = GL.GenTexture();
+            Textures.Add(textureId);
+
+            GL.ActiveTexture(TextureUnit.Texture0);
+            GL.BindTexture(TextureTarget.TextureCubeMap, textureId);
+
+            for (int i = 0; i < textures.Length; i++)
+            {
+                using Bitmap map = new Bitmap(Image.FromStream(textures[i]));
+                BitmapData data = map.LockBits(new Rectangle(0, 0, map.Width, map.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+                GL.TexImage2D(TextureTarget.TextureCubeMapPositiveX + i, 0, PixelInternalFormat.Rgba, data.Width, data.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
+
+
+                map.UnlockBits(data);
+
+            }
+
+            GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+            GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+
+            GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
+
+
+            return textureId;
+        }
 
         public static void CleanUp()
         {
@@ -140,5 +168,26 @@ namespace BlobRPG.MainComponents
             GL.BufferData(BufferTarget.ElementArrayBuffer, buffer.Length * sizeof(int), buffer, BufferUsageHint.StaticDraw);
         }
 
+        public static Stream[] OpenStreams(string[] names)
+        {
+            List<Stream> streams = new List<Stream>();
+
+            foreach (string name in names)
+            {
+                FileStream fs = new FileStream(name, FileMode.Open, FileAccess.Read, FileShare.Read);
+
+                streams.Add(fs);
+            }
+
+            return streams.ToArray();
+        }
+
+        public static void CloseStreams(Stream[] streams)
+        {
+            foreach (Stream s in streams)
+            {
+                (s as FileStream).Close();
+            }
+        }
     }
 }

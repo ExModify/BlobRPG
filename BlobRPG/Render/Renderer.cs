@@ -19,21 +19,25 @@ namespace BlobRPG.Render
         private const float NEAR = 0.1f;
         private const float FAR = 1000f;
 
-        mat4 ProjectionMatrix;
-
-        readonly EntityRenderer EntityRenderer;
-        readonly EntityShader EntityShader;
-        readonly GUIRenderer GUIRenderer;
+        internal readonly EntityRenderer EntityRenderer;
+        internal readonly EntityShader EntityShader;
+        internal readonly GUIRenderer GUIRenderer;
+        internal readonly SkyboxRenderer SkyboxRenderer;
 
         readonly TerrainRenderer TerrainRenderer;
         readonly TerrainShader TerrainShader;
         readonly GUIShader GUIShader;
+        readonly SkyboxShader SkyboxShader;
 
         readonly Dictionary<TexturedModel, List<Entity>> Entities;
         readonly List<Terrain> Terrains;
         readonly List<GUITexture> GUIs;
 
         readonly Window Window;
+
+
+        public mat4 ProjectionMatrix;
+
 
         public static void EnableCulling()
         {
@@ -81,6 +85,13 @@ namespace BlobRPG.Render
 
             GUIShader = new GUIShader();
             GUIRenderer = new GUIRenderer(GUIShader);
+
+            SkyboxShader = new SkyboxShader(window);
+            SkyboxRenderer = new SkyboxRenderer(SkyboxShader, window, ref ProjectionMatrix);
+        }
+        public void Update()
+        {
+            SkyboxRenderer.Update();
         }
         
         public void Render(Camera camera, List<Light> lights, Fog fog)
@@ -90,6 +101,8 @@ namespace BlobRPG.Render
             EntityRenderer.Render(Entities, camera, lights, fog);
 
             TerrainRenderer.Render(Terrains, camera, lights, fog);
+
+            SkyboxRenderer.Render(camera, fog);
 
             GUIRenderer.Render(GUIs);
 
@@ -145,6 +158,10 @@ namespace BlobRPG.Render
             TerrainShader.Start();
             TerrainShader.LoadProjectionMatrix(ProjectionMatrix);
             TerrainShader.Stop();
+
+            SkyboxShader.Start();
+            SkyboxShader.LoadProjectionMatrix(ref ProjectionMatrix);
+            SkyboxShader.Stop();
         }
     }
 }

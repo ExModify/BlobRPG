@@ -29,6 +29,12 @@
     <None Update="Shaders\GLSLs\guiVS.glsl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Shaders\GLSLs\skyboxFS.glsl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Shaders\GLSLs\skyboxVS.glsl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Shaders\GLSLs\terrainFS.glsl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

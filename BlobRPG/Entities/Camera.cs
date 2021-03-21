@@ -16,12 +16,12 @@ namespace BlobRPG.Entities
 
         private vec3 position;
 
-        public vec3 Position { get => position; private set => position = value; }
-        public float Pitch { get; private set; }
-        public float Yaw { get; private set; }
-        public float Roll { get; private set; }
+        internal vec3 Position { get => position; private set => position = value; }
+        internal float Pitch { get; private set; }
+        internal float Yaw { get; private set; }
+        internal float Roll { get; private set; }
 
-        public mat4 ViewMatrix { get; private set; }
+        internal mat4 ViewMatrix { get; private set; }
 
         private readonly Player Player;
         private readonly Window Window;
@@ -40,7 +40,7 @@ namespace BlobRPG.Entities
         }
 
 
-        public void Move()
+        internal void Move()
         {
             CalculateZoom();
             CalculatePitch();

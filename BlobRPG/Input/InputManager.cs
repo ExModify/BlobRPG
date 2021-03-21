@@ -1,4 +1,5 @@
-﻿using OpenTK.Windowing.Desktop;
+﻿using GlmSharp;
+using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using System;
 using System.Collections.Generic;
@@ -14,6 +15,8 @@ namespace BlobRPG.Input
         static KeyboardState keyboardState;
         static MouseState mouseState;
 
+        static MouseRay mouseRay;
+
         static float scroll;
 
         public static float X { get; private set; } = 0;
@@ -28,12 +31,18 @@ namespace BlobRPG.Input
         public static bool IsMouseRightDown { get; private set; } = false;
         public static bool IsMouseMiddleDown { get; private set; } = false;
 
+        public static vec3 Ray { get => mouseRay.CurrentRay; }
+
         public static void Init(GameWindow window)
         {
             keysDown = new List<Keys>();
             window.CursorGrabbed = true;
 
             Update(window);
+        }
+        public static void InitMouseRay(MainComponents.Window window)
+        {
+            mouseRay = new MouseRay(window.Camera, window, ref window.Renderer.ProjectionMatrix);
         }
 
         public static void ToggleMouse(GameWindow window)
@@ -72,6 +81,10 @@ namespace BlobRPG.Input
             IsMouseLeftDown = mouseState.IsButtonDown(MouseButton.Left);
             IsMouseRightDown = mouseState.IsButtonDown(MouseButton.Right);
             IsMouseMiddleDown = mouseState.IsButtonDown(MouseButton.Middle);
+        }
+        public static void UpdateMouseRay()
+        {
+            mouseRay.Update();
         }
         public static bool IsKeyDown(Keys key)
         {
