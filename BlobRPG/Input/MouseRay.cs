@@ -11,7 +11,6 @@ namespace BlobRPG.Input
     {
         public vec3 CurrentRay { get; private set; }
 
-        private readonly mat4 ProjectionMatrix;
         private readonly mat4 InvertedProjectionMatrix;
         private readonly Camera Camera;
         private readonly Window Window;
@@ -19,7 +18,6 @@ namespace BlobRPG.Input
 
         internal MouseRay(Camera camera, Window window, ref mat4 projectionMatrix)
         {
-            ProjectionMatrix = projectionMatrix;
             Camera = camera;
             Window = window;
 

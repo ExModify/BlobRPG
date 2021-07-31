@@ -33,7 +33,8 @@ namespace BlobRPG.MainComponents
         Player Player;
         List<Light> Lights;
 
-
+        List<Entity> Entities;
+        List<Entity> NormalEntities;
         List<Terrain> Terrains;
         Fog Fog;
 
@@ -55,24 +56,25 @@ namespace BlobRPG.MainComponents
 
             Renderer = new Renderer(this);
 
-            RawModel rm = OBJLoader.LoadOBJ("starter/model/blob.obj");
+            RawModel rm = OBJLoader.LoadSimpleOBJ("starter/model/blob.obj");
             ModelTexture mt = new ModelTexture(Loader.LoadTexture("starter/texture/blobTextureAtlas.png"))
             {
                 ShineDamper = 10,
                 Reflectivity = 1,
                 NumberOfRows = 2
             };
-            Player = new Player(new TexturedModel(rm, mt), new vec3(153, 5, -274), this, textureIndex: 1);
+            Player = new Player(new TexturedModel(rm, mt), new vec3(153, 5, -274), this, textureIndex: 0);
 
             Camera = new Camera(Player, this);
             Lights = new List<Light>()
             {
                 new Light(new vec3(0, 1000, -7000), new vec3(.8f, .8f, .8f)),
-                new Light(new vec3(185, 10, -293), new vec3(0, 2, 2), new vec3(1f, 0.01f, 0.002f))
             };
 
             InputManager.InitMouseRay(this);
 
+            Entities = new List<Entity>();
+            NormalEntities = new List<Entity>();
             Terrains = new List<Terrain>();
 
             TerrainTexture backgroundTexture = new TerrainTexture(Loader.LoadTexture("starter/texture/grass.png"));
@@ -147,6 +149,12 @@ namespace BlobRPG.MainComponents
             if (Player.Render)
                 Renderer.ProcessObject(Player);
 
+            foreach (Entity t in Entities)
+                Renderer.ProcessObject(t);
+
+            foreach (Entity t in NormalEntities)
+                Renderer.ProcessNormalObject(t);
+
             foreach (Terrain t in Terrains)
                 Renderer.ProcessTerrain(t);
 
@@ -157,7 +165,8 @@ namespace BlobRPG.MainComponents
 
         protected override void OnRenderFrame(FrameEventArgs args)
         {
-            Renderer.Render(Camera, Lights, Fog);
+            vec4 clipPlane = new vec4(0);
+            Renderer.Render(Camera, Lights, Fog, clipPlane);
 
             SwapBuffers();
             base.OnRenderFrame(args);

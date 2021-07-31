@@ -20,16 +20,19 @@ namespace BlobRPG.Render
         private const float FAR = 1000f;
 
         internal readonly EntityRenderer EntityRenderer;
-        internal readonly EntityShader EntityShader;
+        internal readonly NormalRenderer NormalRenderer;
+        readonly TerrainRenderer TerrainRenderer;
         internal readonly GUIRenderer GUIRenderer;
         internal readonly SkyboxRenderer SkyboxRenderer;
 
-        readonly TerrainRenderer TerrainRenderer;
+        readonly EntityShader EntityShader;
+        readonly NormalShader NormalShader;
         readonly TerrainShader TerrainShader;
         readonly GUIShader GUIShader;
         readonly SkyboxShader SkyboxShader;
 
         readonly Dictionary<TexturedModel, List<Entity>> Entities;
+        readonly Dictionary<TexturedModel, List<Entity>> NormalEntities;
         readonly List<Terrain> Terrains;
         readonly List<GUITexture> GUIs;
 
@@ -63,6 +66,7 @@ namespace BlobRPG.Render
             Window = window;
 
             Entities = new Dictionary<TexturedModel, List<Entity>>();
+            NormalEntities = new Dictionary<TexturedModel, List<Entity>>();
             Terrains = new List<Terrain>();
             GUIs = new List<GUITexture>();
 
@@ -80,6 +84,9 @@ namespace BlobRPG.Render
             EntityShader = new EntityShader();
             EntityRenderer = new EntityRenderer(EntityShader, ref ProjectionMatrix);
 
+            NormalShader = new NormalShader();
+            NormalRenderer = new NormalRenderer(NormalShader, ref ProjectionMatrix);
+
             TerrainShader = new TerrainShader();
             TerrainRenderer = new TerrainRenderer(TerrainShader, ref ProjectionMatrix);
 
@@ -94,11 +101,13 @@ namespace BlobRPG.Render
             SkyboxRenderer.Update();
         }
         
-        public void Render(Camera camera, List<Light> lights, Fog fog)
+        public void Render(Camera camera, List<Light> lights, Fog fog, vec4 clipPlane)
         {
             Prepare();
 
             EntityRenderer.Render(Entities, camera, lights, fog);
+
+            NormalRenderer.Render(NormalEntities, clipPlane, camera, lights, fog);
 
             TerrainRenderer.Render(Terrains, camera, lights, fog);
 
@@ -108,12 +117,15 @@ namespace BlobRPG.Render
 
             Terrains.Clear();
             Entities.Clear();
+            NormalEntities.Clear();
         }
         public void CleanUp()
         {
             EntityShader.CleanUp();
+            NormalShader.CleanUp();
             TerrainShader.CleanUp();
             GUIShader.CleanUp();
+            SkyboxShader.CleanUp();
         }
         
         public void AddGUI(GUITexture texture)
@@ -136,6 +148,17 @@ namespace BlobRPG.Render
                 Entities.Add(entity.Model, new List<Entity>() { entity });
             }
         }
+        public void ProcessNormalObject(Entity entity)
+        {
+            if (NormalEntities.Keys.Contains(entity.Model))
+            {
+                NormalEntities[entity.Model].Add(entity);
+            }
+            else
+            {
+                NormalEntities.Add(entity.Model, new List<Entity>() { entity });
+            }
+        }
 
         private void Prepare()
         {
@@ -154,6 +177,10 @@ namespace BlobRPG.Render
             EntityShader.Start();
             EntityShader.LoadProjectionMatrix(ProjectionMatrix);
             EntityShader.Stop();
+
+            NormalShader.Start();
+            NormalShader.LoadProjectionMatrix(ProjectionMatrix);
+            NormalShader.Stop();
 
             TerrainShader.Start();
             TerrainShader.LoadProjectionMatrix(ProjectionMatrix);

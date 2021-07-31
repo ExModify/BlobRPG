@@ -10,6 +10,7 @@ namespace BlobRPG
 {
     public class Program
     {
+        /* Change this variable in the shaders as well */
         public const int MAX_LIGHTS = 8;
         static void Main(string[] args)
         {
