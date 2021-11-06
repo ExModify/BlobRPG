@@ -104,13 +104,13 @@ namespace BlobRPG.Render
             SkyboxShader = new SkyboxShader(window);
             SkyboxRenderer = new SkyboxRenderer(SkyboxShader, window, ref ProjectionMatrix);
 
-            WaterShader = new WaterShader();
-            WaterRenderer = new WaterRenderer(WaterShader, ref ProjectionMatrix);
 
             WaterFrameBuffers = new WaterFrameBuffers(window);
+            int waterDUDVTexture = Loader.LoadTexture("starter/texture/wassa.png");
+            int waterNormalTexture = Loader.LoadTexture("starter/texture/wassaNormal.png");
 
-            GUIs.Add(new GUITexture(WaterFrameBuffers.RefractionTexture, new vec2(.5f, .5f), new vec2(0.25f)));
-            GUIs.Add(new GUITexture(WaterFrameBuffers.ReflectionTexture, new vec2(-.5f, .5f), new vec2(0.25f)));
+            WaterShader = new WaterShader();
+            WaterRenderer = new WaterRenderer(WaterShader, ref ProjectionMatrix, NEAR, FAR, window, WaterFrameBuffers, waterDUDVTexture, waterNormalTexture);
         }
         public void Update()
         {
@@ -135,7 +135,7 @@ namespace BlobRPG.Render
 
                 WaterFrameBuffers.UnbindCurrentFB();
 
-                WaterRenderer.Render(WaterTiles[i], camera);
+                WaterRenderer.Render(WaterTiles[i], camera, lights[0]);
             }
 
             GL.Disable(EnableCap.ClipDistance0);
@@ -237,6 +237,7 @@ namespace BlobRPG.Render
 
             WaterShader.Start();
             WaterShader.LoadProjectionMatrix(ref ProjectionMatrix);
+            WaterShader.LoadPlaneVariables(NEAR, FAR);
             WaterShader.Stop();
         }
     }

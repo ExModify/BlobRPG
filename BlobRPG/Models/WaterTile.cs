@@ -22,7 +22,7 @@ namespace BlobRPG.Models
             Z = centerZ;
             Height = height;
 
-            ReflectionClipPlane = new(0, 1, 0, -height);
+            ReflectionClipPlane = new(0, 1, 0, -height + 0.5f);
             RefractionClipPlane = new(0, -1, 0, height);
         }
     }

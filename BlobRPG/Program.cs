@@ -12,6 +12,8 @@ namespace BlobRPG
     {
         /* Change this variable in the shaders as well */
         public const int MAX_LIGHTS = 8;
+        public const float WAVE_SPEED = 0.03f;
+
         static void Main(string[] args)
         {
             GameWindowSettings gameWindowSettings = new GameWindowSettings()
