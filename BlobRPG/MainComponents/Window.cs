@@ -36,6 +36,7 @@ namespace BlobRPG.MainComponents
         List<Entity> Entities;
         List<Entity> NormalEntities;
         List<Terrain> Terrains;
+        List<WaterTile> WaterTiles;
         Fog Fog;
 
         protected override void OnLoad()
@@ -76,6 +77,7 @@ namespace BlobRPG.MainComponents
             Entities = new List<Entity>();
             NormalEntities = new List<Entity>();
             Terrains = new List<Terrain>();
+            WaterTiles = new List<WaterTile>();
 
             TerrainTexture backgroundTexture = new TerrainTexture(Loader.LoadTexture("starter/texture/grass.png"));
             TerrainTexture rTexture = new TerrainTexture(Loader.LoadTexture("starter/texture/mud.png"));
@@ -116,6 +118,8 @@ namespace BlobRPG.MainComponents
 
             Loader.CloseStreams(dayStreams);
             Loader.CloseStreams(nightStreams);
+
+            WaterTiles.Add(new WaterTile(176.06757f, -249.94972f, 1.3233751f));
 
             //Renderer.AddGUI(new GUITexture(Loader.LoadTexture("starter/texture/grass.png"), new vec2(0.5f, 0.5f), new vec2(0.25f, 0.25f)));
         }
@@ -158,6 +162,9 @@ namespace BlobRPG.MainComponents
             foreach (Terrain t in Terrains)
                 Renderer.ProcessTerrain(t);
 
+            foreach (WaterTile w in WaterTiles)
+                Renderer.ProcessWater(w);
+
             Renderer.Update();
 
             base.OnUpdateFrame(args);
@@ -165,8 +172,7 @@ namespace BlobRPG.MainComponents
 
         protected override void OnRenderFrame(FrameEventArgs args)
         {
-            vec4 clipPlane = new vec4(0);
-            Renderer.Render(Camera, Lights, Fog, clipPlane);
+            Renderer.Render(Camera, Lights, Fog);
 
             SwapBuffers();
             base.OnRenderFrame(args);

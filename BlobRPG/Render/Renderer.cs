@@ -1,6 +1,7 @@
 ﻿using BlobRPG.Entities;
 using BlobRPG.MainComponents;
 using BlobRPG.Models;
+using BlobRPG.Render.Water;
 using BlobRPG.Shaders;
 using BlobRPG.Textures;
 using GlmSharp;
@@ -18,23 +19,29 @@ namespace BlobRPG.Render
         private const float FOV = 70;
         private const float NEAR = 0.1f;
         private const float FAR = 1000f;
+        private static readonly vec4 SafetyClipPlane = new(0, -1, 0, 100000000000);
 
         internal readonly EntityRenderer EntityRenderer;
         internal readonly NormalRenderer NormalRenderer;
         readonly TerrainRenderer TerrainRenderer;
         internal readonly GUIRenderer GUIRenderer;
         internal readonly SkyboxRenderer SkyboxRenderer;
+        internal readonly WaterRenderer WaterRenderer;
 
         readonly EntityShader EntityShader;
         readonly NormalShader NormalShader;
         readonly TerrainShader TerrainShader;
         readonly GUIShader GUIShader;
         readonly SkyboxShader SkyboxShader;
+        readonly WaterShader WaterShader;
 
         readonly Dictionary<TexturedModel, List<Entity>> Entities;
         readonly Dictionary<TexturedModel, List<Entity>> NormalEntities;
+        readonly List<WaterTile> WaterTiles;
         readonly List<Terrain> Terrains;
         readonly List<GUITexture> GUIs;
+
+        readonly WaterFrameBuffers WaterFrameBuffers;
 
         readonly Window Window;
 
@@ -69,6 +76,7 @@ namespace BlobRPG.Render
             NormalEntities = new Dictionary<TexturedModel, List<Entity>>();
             Terrains = new List<Terrain>();
             GUIs = new List<GUITexture>();
+            WaterTiles = new List<WaterTile>();
 
             EnableCulling();
 
@@ -95,44 +103,71 @@ namespace BlobRPG.Render
 
             SkyboxShader = new SkyboxShader(window);
             SkyboxRenderer = new SkyboxRenderer(SkyboxShader, window, ref ProjectionMatrix);
+
+            WaterShader = new WaterShader();
+            WaterRenderer = new WaterRenderer(WaterShader, ref ProjectionMatrix);
+
+            WaterFrameBuffers = new WaterFrameBuffers(window);
+
+            GUIs.Add(new GUITexture(WaterFrameBuffers.RefractionTexture, new vec2(.5f, .5f), new vec2(0.25f)));
+            GUIs.Add(new GUITexture(WaterFrameBuffers.ReflectionTexture, new vec2(-.5f, .5f), new vec2(0.25f)));
         }
         public void Update()
         {
             SkyboxRenderer.Update();
         }
-        
-        public void Render(Camera camera, List<Light> lights, Fog fog, vec4 clipPlane)
+
+        public void Render(Camera camera, List<Light> lights, Fog fog)
         {
-            Prepare();
+            Render3DObjects(camera, lights, fog, SafetyClipPlane);
 
-            EntityRenderer.Render(Entities, camera, lights, fog);
+            GL.Enable(EnableCap.ClipDistance0);
 
-            NormalRenderer.Render(NormalEntities, clipPlane, camera, lights, fog);
+            for (int i = 0; i < WaterTiles.Count; i++)
+            {
+                WaterFrameBuffers.BindReflectionFB();
+                camera.MoveUnderWaterTile(WaterTiles[i]);
+                Render3DObjects(camera, lights, fog, WaterTiles[i].ReflectionClipPlane);
+                camera.RevertWaterTileMove();
 
-            TerrainRenderer.Render(Terrains, camera, lights, fog);
+                WaterFrameBuffers.BindRefractionFB();
+                Render3DObjects(camera, lights, fog, WaterTiles[i].RefractionClipPlane);
 
-            SkyboxRenderer.Render(camera, fog);
+                WaterFrameBuffers.UnbindCurrentFB();
+
+                WaterRenderer.Render(WaterTiles[i], camera);
+            }
+
+            GL.Disable(EnableCap.ClipDistance0);
+            WaterFrameBuffers.UnbindCurrentFB();
+
 
             GUIRenderer.Render(GUIs);
 
             Terrains.Clear();
             Entities.Clear();
             NormalEntities.Clear();
+            WaterTiles.Clear();
         }
         public void CleanUp()
         {
+            WaterFrameBuffers.CleanUp();
             EntityShader.CleanUp();
             NormalShader.CleanUp();
             TerrainShader.CleanUp();
             GUIShader.CleanUp();
             SkyboxShader.CleanUp();
+            WaterShader.CleanUp();
         }
         
         public void AddGUI(GUITexture texture)
         {
             GUIs.Add(texture);
         }
-
+        public void ProcessWater(WaterTile tile)
+        {
+            WaterTiles.Add(tile);
+        }
         public void ProcessTerrain(Terrain terrain)
         {
             Terrains.Add(terrain);
@@ -158,6 +193,16 @@ namespace BlobRPG.Render
             {
                 NormalEntities.Add(entity.Model, new List<Entity>() { entity });
             }
+        }
+
+        private void Render3DObjects(Camera camera, List<Light> lights, Fog fog, vec4 clipPlane)
+        {
+            Prepare();
+
+            EntityRenderer.Render(Entities, camera, lights, fog, clipPlane);
+            NormalRenderer.Render(NormalEntities, camera, lights, fog, clipPlane);
+            TerrainRenderer.Render(Terrains, camera, lights, fog, clipPlane);
+            SkyboxRenderer.Render(camera, fog, clipPlane);
         }
 
         private void Prepare()
@@ -189,6 +234,10 @@ namespace BlobRPG.Render
             SkyboxShader.Start();
             SkyboxShader.LoadProjectionMatrix(ref ProjectionMatrix);
             SkyboxShader.Stop();
+
+            WaterShader.Start();
+            WaterShader.LoadProjectionMatrix(ref ProjectionMatrix);
+            WaterShader.Stop();
         }
     }
 }

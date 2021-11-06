@@ -31,6 +31,8 @@ namespace BlobRPG.Shaders
         private int BTextureLocation;
         private int BlendTextureLocation;
 
+        private int ClipPlaneLocation;
+
         public TerrainShader() : base("terrain")
         {
 
@@ -73,6 +75,8 @@ namespace BlobRPG.Shaders
             GTextureLocation = GetUniformLocation("gTexture");
             BTextureLocation = GetUniformLocation("bTexture");
             BlendTextureLocation = GetUniformLocation("blendTexture");
+
+            ClipPlaneLocation = GetUniformLocation("clipPlane");
         }
         public void ConnectTextureUnits()
         {
@@ -83,6 +87,10 @@ namespace BlobRPG.Shaders
             LoadInt(BlendTextureLocation, 4);
         }
 
+        public void LoadClipPlane(vec4 clipPlane)
+        {
+            LoadVector(ClipPlaneLocation, clipPlane);
+        }
         public void LoadTransformationMatrix(mat4 matrix)
         {
             LoadMatrix(TransformationMatrixLocation, matrix);

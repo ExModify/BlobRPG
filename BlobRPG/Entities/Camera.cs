@@ -1,5 +1,6 @@
 ﻿using BlobRPG.Input;
 using BlobRPG.MainComponents;
+using BlobRPG.Models;
 using BlobRPG.Tools;
 using GlmSharp;
 using OpenTK.Mathematics;
@@ -15,6 +16,7 @@ namespace BlobRPG.Entities
         private float AngleAroundPlayer = 0;
 
         private vec3 position;
+        private float WaterTileDistance { get; set; }
 
         internal vec3 Position { get => position; private set => position = value; }
         internal float Pitch { get; private set; }
@@ -39,7 +41,19 @@ namespace BlobRPG.Entities
             UpdateViewMatrix();
         }
 
-
+        public void MoveUnderWaterTile(WaterTile tile)
+        {
+            WaterTileDistance = 2 * (position.y - tile.Height);
+            position.y -= WaterTileDistance;
+            Pitch = -Pitch;
+            UpdateViewMatrix();
+        }
+        public void RevertWaterTileMove()
+        {
+            position.y += WaterTileDistance;
+            Pitch = -Pitch;
+            UpdateViewMatrix();
+        }
         internal void Move()
         {
             CalculateZoom();

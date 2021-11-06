@@ -113,7 +113,7 @@ namespace BlobRPG.MainComponents
                 map.UnlockBits(data);
 
             }
-
+            
             GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
             GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
 

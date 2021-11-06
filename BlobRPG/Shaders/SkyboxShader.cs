@@ -18,6 +18,8 @@ namespace BlobRPG.Shaders
         private int CubeMap2Location;
         private int BlendFactorLocation;
 
+        private int ClipPlaneLocation;
+
         readonly Window Window;
 
         float Rotation;
@@ -43,6 +45,13 @@ namespace BlobRPG.Shaders
             CubeMapLocation = GetUniformLocation("cubeMap");
             CubeMap2Location = GetUniformLocation("cubeMap2");
             BlendFactorLocation = GetUniformLocation("blendFactor");
+
+            ClipPlaneLocation = GetUniformLocation("clipPlane");
+        }
+
+        public void LoadClipPlane(vec4 clipPlane)
+        {
+            LoadVector(ClipPlaneLocation, clipPlane);
         }
 
         public void LoadProjectionMatrix(ref mat4 matrix)

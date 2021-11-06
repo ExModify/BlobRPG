@@ -55,7 +55,6 @@ namespace BlobRPG.Shaders
             ReflectivityLocation = GetUniformLocation("reflectivity");
             ShineDamperLocation = GetUniformLocation("shineDamper");
             UseFakeLightingLocation = GetUniformLocation("useFakeLighting");
-            ClipPlaneLocation = GetUniformLocation("clipPlane");
             ModelTextureLocation = GetUniformLocation("modelTexture");
 
             GradientLocation = GetUniformLocation("gradient");
@@ -72,14 +71,16 @@ namespace BlobRPG.Shaders
 
             TextureOffsetLocation = GetUniformLocation("textureOffset");
             NumberOfRowsLocation = GetUniformLocation("numberOfRows");
+
+            ClipPlaneLocation = GetUniformLocation("clipPlane");
         }
         public void ConnectTextureUnits()
         {
             LoadInt(ModelTextureLocation, 0);
         }
-        public void LoadClipPlane(vec4 plane)
+        public void LoadClipPlane(vec4 clipPlane)
         {
-            LoadVector(ClipPlaneLocation, plane);
+            LoadVector(ClipPlaneLocation, clipPlane);
         }
         public void LoadNumberOfRows(int numberOfRows)
         {

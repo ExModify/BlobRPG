@@ -108,11 +108,12 @@ namespace BlobRPG.Render
 			NightTextureId = Loader.LoadCubeMap(streams);
 		}
 
-		public void Render(Camera camera, Fog fog)
+		public void Render(Camera camera, Fog fog, vec4 clipPlane)
 		{
 			Shader.Start();
 			Shader.LoadViewMatrix(camera);
 			Shader.LoadFog(fog);
+			Shader.LoadClipPlane(clipPlane);
 			GL.BindVertexArray(Model.VaoId);
 			GL.EnableVertexAttribArray(0);
 			BindTextures();

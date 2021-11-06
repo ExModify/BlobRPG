@@ -23,9 +23,9 @@ namespace BlobRPG.Render
             shader.Stop();
         }
 
-        public void Render(List<Terrain> terrains, Camera camera, List<Light> lights, Fog fog)
+        public void Render(List<Terrain> terrains, Camera camera, List<Light> lights, Fog fog, vec4 clipPlane)
         {
-            Prepare(camera, lights, fog);
+            Prepare(camera, lights, fog, clipPlane);
             foreach (Terrain terrain in terrains)
             {
                 PrepareTerrain(terrain);
@@ -36,12 +36,13 @@ namespace BlobRPG.Render
                 FinishTexturedModel();
             }
         }
-        private void Prepare(Camera camera, List<Light> lights, Fog fog)
+        private void Prepare(Camera camera, List<Light> lights, Fog fog, vec4 clipPlane)
         {
             Shader.Start();
             Shader.LoadViewMatrix(camera);
             Shader.LoadLights(lights);
             Shader.LoadFog(fog);
+            Shader.LoadClipPlane(clipPlane);
         }
 
         private void PrepareTerrain(Terrain terrain)

@@ -16,6 +16,7 @@ namespace BlobRPG.Shaders
 
         public ShaderCore(string name)
         {
+            Console.WriteLine("Compiling shader: " + name);
             VertexShaderId = LoadShader(name, ShaderType.VertexShader);
             FragmentShaderId = LoadShader(name, ShaderType.FragmentShader);
             ProgramId = GL.CreateProgram();

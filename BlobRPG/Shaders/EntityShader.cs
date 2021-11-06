@@ -27,6 +27,8 @@ namespace BlobRPG.Shaders
         private int TextureOffsetLocation;
         private int NumberOfRowsLocation;
 
+        private int ClipPlaneLocation;
+
         public EntityShader() : base("entity")
         {
             
@@ -66,6 +68,12 @@ namespace BlobRPG.Shaders
 
             TextureOffsetLocation = GetUniformLocation("textureOffset");
             NumberOfRowsLocation = GetUniformLocation("numberOfRows");
+
+            ClipPlaneLocation = GetUniformLocation("clipPlane");
+        }
+        public void LoadClipPlane(vec4 clipPlane)
+        {
+            LoadVector(ClipPlaneLocation, clipPlane);
         }
         public void LoadNumberOfRows(int numberOfRows)
         {

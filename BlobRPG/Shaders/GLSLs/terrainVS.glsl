@@ -21,9 +21,13 @@ uniform float gradient;
 
 uniform int lightCount;
 
+uniform vec4 clipPlane;
+
 void main(void)
 {
 	vec4 worldPosition = transformationMatrix * vec4(position, 1.0);
+	gl_ClipDistance[0] = dot(worldPosition, clipPlane);
+
 	vec4 positionRelativeToCam = viewMatrix * worldPosition;
 	gl_Position =  projectionMatrix * positionRelativeToCam;
 

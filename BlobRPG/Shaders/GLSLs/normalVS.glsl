@@ -27,9 +27,11 @@ uniform vec4 clipPlane;
 
 uniform int lightCount;
 
+
 void main(void){
 
 	vec4 worldPosition = transformationMatrix * vec4(position,1.0);
+
 	gl_ClipDistance[0] = dot(worldPosition, clipPlane);
 	mat4 modelViewMatrix = viewMatrix * transformationMatrix;
 	vec4 positionRelativeToCam = modelViewMatrix * vec4(position,1.0);
