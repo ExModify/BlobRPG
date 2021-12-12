@@ -55,7 +55,6 @@ namespace BlobRPG.Shaders
             ReflectivityLocation = GetUniformLocation("reflectivity");
             ShineDamperLocation = GetUniformLocation("shineDamper");
             UseFakeLightingLocation = GetUniformLocation("useFakeLighting");
-            ModelTextureLocation = GetUniformLocation("modelTexture");
 
             GradientLocation = GetUniformLocation("gradient");
             DensityLocation = GetUniformLocation("density");

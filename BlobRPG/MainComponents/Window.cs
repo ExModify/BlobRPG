@@ -121,6 +121,17 @@ namespace BlobRPG.MainComponents
 
             WaterTiles.Add(new WaterTile(176.06757f, -249.94972f, 1.3233751f));
 
+
+            RawModel barrelModel = OBJLoader.LoadOBJ("starter/model/barrel.obj");
+            ModelTexture barrelTexture = new(Loader.LoadTexture("starter/texture/barrelTexture.png"))
+            {
+                ShineDamper = 10,
+                Reflectivity = 1
+            };
+            Entity barrel = new(new TexturedModel(barrelModel, barrelTexture), new vec3(153, 5, -274));
+
+            NormalEntities.Add(barrel);
+
             //Renderer.AddGUI(new GUITexture(Loader.LoadTexture("starter/texture/grass.png"), new vec2(0.5f, 0.5f), new vec2(0.25f, 0.25f)));
         }
 

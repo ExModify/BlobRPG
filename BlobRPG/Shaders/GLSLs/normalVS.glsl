@@ -17,7 +17,7 @@ uniform mat4 viewMatrix;
 uniform vec3 lightPositionEyeSpace[MAX_LIGHTS];
 uniform vec2 textureOffset;
 
-uniform float numberOfRows;
+uniform int numberOfRows;
 
 uniform float useFakeLighting;
 uniform float density;
