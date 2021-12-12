@@ -126,9 +126,10 @@ namespace BlobRPG.MainComponents
             ModelTexture barrelTexture = new(Loader.LoadTexture("starter/texture/barrelTexture.png"))
             {
                 ShineDamper = 10,
-                Reflectivity = 1
+                Reflectivity = 1,
+                NormalMap = Loader.LoadTexture("starter/texture/barrelNormal.png")
             };
-            Entity barrel = new(new TexturedModel(barrelModel, barrelTexture), new vec3(153, 5, -274));
+            Entity barrel = new(new TexturedModel(barrelModel, barrelTexture), new vec3(153, 15, -274));
 
             NormalEntities.Add(barrel);
 

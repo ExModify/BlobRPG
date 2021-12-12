@@ -15,7 +15,9 @@ namespace BlobRPG.Shaders
         private int ShineDamperLocation;
         private int UseFakeLightingLocation;
 
-        private int ModelTextureLocation;
+
+        private int TextureSamplerLocation;
+        private int NormalMapLocation;
 
         private int ClipPlaneLocation;
 
@@ -41,6 +43,7 @@ namespace BlobRPG.Shaders
             BindAttribute(0, "position");
             BindAttribute(1, "textureCoords");
             BindAttribute(2, "normal");
+            BindAttribute(3, "tangent");
         }
 
         protected override void GetAllUniformLocations()
@@ -55,6 +58,9 @@ namespace BlobRPG.Shaders
             ReflectivityLocation = GetUniformLocation("reflectivity");
             ShineDamperLocation = GetUniformLocation("shineDamper");
             UseFakeLightingLocation = GetUniformLocation("useFakeLighting");
+
+            TextureSamplerLocation = GetUniformLocation("textureSampler");
+            NormalMapLocation = GetUniformLocation("normalMap");
 
             GradientLocation = GetUniformLocation("gradient");
             DensityLocation = GetUniformLocation("density");
@@ -75,7 +81,8 @@ namespace BlobRPG.Shaders
         }
         public void ConnectTextureUnits()
         {
-            LoadInt(ModelTextureLocation, 0);
+            LoadInt(TextureSamplerLocation, 0);
+            LoadInt(NormalMapLocation, 1);
         }
         public void LoadClipPlane(vec4 clipPlane)
         {

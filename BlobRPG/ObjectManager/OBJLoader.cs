@@ -84,7 +84,7 @@ namespace BlobRPG.ObjectManager
             float furthest = ConvertDataToArrays(vertices, textures, normals, ref verticesArray, ref texturesArray, ref normalsArray, ref tangentsArray);
             int[] indicesArray = indices.ToArray();
 
-            return Loader.LoadToVao(verticesArray, texturesArray, normalsArray, indicesArray);
+            return Loader.LoadToVao(verticesArray, texturesArray, normalsArray, tangentsArray, indicesArray);
         }
         private static void CalculateTangents(Vertex v0, Vertex v1, Vertex v2, List<vec2> textures)
         {

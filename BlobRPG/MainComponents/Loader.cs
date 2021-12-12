@@ -54,6 +54,17 @@ namespace BlobRPG.MainComponents
             UnbindVao();
             return new RawModel(vao, indices.Length);
         }
+        public static RawModel LoadToVao(float[] positions, float[] textureCoords, float[] normals, float[] tangents, int[] indices)
+        {
+            int vao = CreateVao();
+            BindIndicesBuffer(indices);
+            StoreDataInAttributeList(0, 3, positions);
+            StoreDataInAttributeList(1, 2, textureCoords);
+            StoreDataInAttributeList(2, 3, normals);
+            StoreDataInAttributeList(3, 3, tangents);
+            UnbindVao();
+            return new RawModel(vao, indices.Length);
+        }
         public static RawModel LoadToVao(float[] positions, int dimension = 2)
         {
             int vao = CreateVao();

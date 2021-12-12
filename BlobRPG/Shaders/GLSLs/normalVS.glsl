@@ -4,9 +4,9 @@
 in vec3 position;
 in vec2 textureCoords;
 in vec3 normal;
+in vec3 tangent;
 
 out vec2 pass_textureCoords;
-out vec3 surfaceNormal;
 out vec3 toLightVector[MAX_LIGHTS];
 out vec3 toCameraVector;
 out float visibility;
@@ -27,6 +27,14 @@ uniform vec4 clipPlane;
 
 uniform int lightCount;
 
+vec3 NormalizeIfGreaterThanZero(vec3 result)
+{
+	if(result.x != 0 || result.y != 0 || result.z != 0)
+	{
+		result = normalize(result);
+	}
+	return result;
+}
 
 void main(void){
 
@@ -45,11 +53,21 @@ void main(void){
 		actualNormal = vec3(0.0, 1.0, 0.0);
 	}
 
-	surfaceNormal = (modelViewMatrix * vec4(actualNormal, 0.0)).xyz;
+	vec3 surfaceNormal = (modelViewMatrix * vec4(actualNormal, 0.0)).xyz;
+
+	vec3 norm = NormalizeIfGreaterThanZero(surfaceNormal);
+	vec3 tang = NormalizeIfGreaterThanZero((modelViewMatrix * vec4(tangent, 0.0)).xyz);
+	vec3 bitang = NormalizeIfGreaterThanZero(cross(norm, tang));
+	mat3 toTangentSpace = mat3(
+		tang.x, bitang.x, norm.x,
+		tang.y, bitang.y, norm.y,
+		tang.z, bitang.z, norm.z
+	);
+
 	for(int i = 0; i < lightCount; i++){
-		toLightVector[i] = lightPositionEyeSpace[i] - positionRelativeToCam.xyz;
+		toLightVector[i] = toTangentSpace * (lightPositionEyeSpace[i] - positionRelativeToCam.xyz);
 	}
-	toCameraVector = -positionRelativeToCam.xyz;
+	toCameraVector = toTangentSpace * (-positionRelativeToCam.xyz);
 	
 	float distance = length(positionRelativeToCam.xyz);
 	visibility = exp(-pow((distance * density),gradient));
