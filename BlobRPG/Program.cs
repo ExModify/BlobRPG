@@ -1,4 +1,5 @@
-﻿using BlobRPG.MainComponents;
+﻿using BlobRPG.LoggerComponents;
+using BlobRPG.MainComponents;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using System;
@@ -13,15 +14,16 @@ namespace BlobRPG
         /* Change this variable in the shaders as well */
         public const int MAX_LIGHTS = 8;
         public const float WAVE_SPEED = 0.03f;
+        public static LogSeverity LogSeverity { get; set; } = LogSeverity.Debug;
 
         static void Main(string[] args)
         {
-            GameWindowSettings gameWindowSettings = new GameWindowSettings()
+            GameWindowSettings gameWindowSettings = new()
             {
                 RenderFrequency = 240,
                 UpdateFrequency = 240
             };
-            NativeWindowSettings nativeWindowSettings = new NativeWindowSettings()
+            NativeWindowSettings nativeWindowSettings = new()
             {
                 API = ContextAPI.OpenGL,
                 APIVersion = new Version(3, 2),
@@ -38,7 +40,7 @@ namespace BlobRPG
             if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
                 nativeWindowSettings.Flags |= ContextFlags.ForwardCompatible;
 
-            using Window game = new Window(gameWindowSettings, nativeWindowSettings);
+            using Window game = new(gameWindowSettings, nativeWindowSettings);
             game.Run();
             Loader.CleanUp();
         }

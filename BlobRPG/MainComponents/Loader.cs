@@ -1,4 +1,5 @@
-﻿using BlobRPG.Models;
+﻿using BlobRPG.LoggerComponents;
+using BlobRPG.Models;
 using OpenTK.Graphics.OpenGL;
 using System;
 using System.Collections.Generic;
@@ -10,8 +11,10 @@ using System.Text;
 
 namespace BlobRPG.MainComponents
 {
-    public static class Loader
+    public class Loader : ILogger
     {
+        private static new readonly LogModule Module = LogModule.Loader;
+
         private static List<int> Vaos;
         private static List<int> Vbos;
         private static List<int> Textures;
@@ -27,6 +30,7 @@ namespace BlobRPG.MainComponents
         }
         public static void Load()
         {
+            Log(Debug, "Loading shaders...");
             string[] shaders = Directory.EnumerateFiles("Shaders/GLSLs").ToArray();
             foreach (string shader in shaders)
             {
@@ -188,6 +192,11 @@ namespace BlobRPG.MainComponents
             {
                 (s as FileStream).Close();
             }
+        }
+
+        protected static new void Log(LogSeverity severity, string message)
+        {
+            Log(Module, severity, message);
         }
     }
 }

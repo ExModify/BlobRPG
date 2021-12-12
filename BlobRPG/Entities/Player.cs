@@ -90,9 +90,26 @@ namespace BlobRPG.Entities
 
         private void ProcessInput()
         {
+            ProcessMovementInput();
+
+
+            if (InputManager.IsKeyDown(Keys.Space))
+            {
+                Jump();
+            }
+
+            if (!InputManager.IsMouseLeftDown && !InputManager.IsMouseRightDown)
+            {
+                Rotate(0, -InputManager.XDelta * 0.2f, 0);
+            }
+        }
+
+
+        private void ProcessMovementInput()
+        {
             if (InputManager.IsKeyDown(Keys.W))
             {
-                if (InputManager.IsKeyDown(Keys.LeftShift) && !InAir)
+                if (InputManager.IsKeyDown(Keys.LeftShift))
                 {
                     CurrentVerticalSpeed = RunSpeed;
                 }
@@ -101,7 +118,7 @@ namespace BlobRPG.Entities
                     CurrentVerticalSpeed = WalkSpeed;
                 }
             }
-            else if (InputManager.IsKeyDown(Keys.S) && !InAir)
+            else if (InputManager.IsKeyDown(Keys.S))
             {
                 if (InputManager.IsKeyDown(Keys.LeftShift))
                 {
@@ -144,16 +161,6 @@ namespace BlobRPG.Entities
                 CurrentHorizontalSpeed = 0;
             }
 
-
-            if (InputManager.IsKeyDown(Keys.Space))
-            {
-                Jump();
-            }
-
-            if (!InputManager.IsMouseLeftDown && !InputManager.IsMouseRightDown)
-            {
-                Rotate(0, -InputManager.XDelta * 0.2f, 0);
-            }
         }
     }
 }

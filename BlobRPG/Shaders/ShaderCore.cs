@@ -1,4 +1,5 @@
-﻿using BlobRPG.MainComponents;
+﻿using BlobRPG.LoggerComponents;
+using BlobRPG.MainComponents;
 using GlmSharp;
 using OpenTK.Graphics.OpenGL;
 using System;
@@ -7,7 +8,7 @@ using System.Text;
 
 namespace BlobRPG.Shaders
 {
-    public abstract class ShaderCore
+    public abstract class ShaderCore : ILogger
     {
         private int ProgramId { get; set; }
         private int VertexShaderId { get; set; }
@@ -16,7 +17,8 @@ namespace BlobRPG.Shaders
 
         public ShaderCore(string name)
         {
-            Console.WriteLine("Compiling shader: " + name);
+            Log(Debug, "Compiling shader: " + name);
+
             VertexShaderId = LoadShader(name, ShaderType.VertexShader);
             FragmentShaderId = LoadShader(name, ShaderType.FragmentShader);
             ProgramId = GL.CreateProgram();
