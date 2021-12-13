@@ -23,6 +23,12 @@
     <None Update="Shaders\GLSLs\entityVS.glsl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Shaders\GLSLs\fontFS.glsl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Shaders\GLSLs\fontVS.glsl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Shaders\GLSLs\guiFS.glsl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

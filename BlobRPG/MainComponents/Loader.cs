@@ -1,5 +1,7 @@
-﻿using BlobRPG.LoggerComponents;
+﻿using BlobRPG.Font;
+using BlobRPG.LoggerComponents;
 using BlobRPG.Models;
+using GlmSharp;
 using OpenTK.Graphics.OpenGL;
 using System;
 using System.Collections.Generic;
@@ -15,10 +17,14 @@ namespace BlobRPG.MainComponents
     {
         private static new readonly LogModule Module = LogModule.Loader;
 
+        private static Window Window;
+
         private static List<int> Vaos;
         private static List<int> Vbos;
         private static List<int> Textures;
         private static Dictionary<string, string> Shaders;
+
+        public static Dictionary<string, FontType> Fonts { get; private set; }
 
         public static void Init()
         {
@@ -27,9 +33,11 @@ namespace BlobRPG.MainComponents
             Textures = new List<int>();
 
             Shaders = new Dictionary<string, string>();
+            Fonts = new Dictionary<string, FontType>();
         }
-        public static void Load()
+        public static void Load(Window window)
         {
+            Window = window;
             Log(Debug, "Loading shaders...");
             string[] shaders = Directory.EnumerateFiles("Shaders/GLSLs").ToArray();
             foreach (string shader in shaders)
@@ -38,12 +46,33 @@ namespace BlobRPG.MainComponents
                 string key = Path.GetFileNameWithoutExtension(shader);
                 Shaders.Add(key, data);
             }
+            Log(Debug, "Loading fonts...");
+            Fonts.Add("Meiryo", new FontType(LoadTexture("starter/font/meiryoTexture.png"), "starter/font/meiryo.fnt", window));
+            Fonts.Add("Candara", new FontType(LoadTexture("starter/font/candara.png"), "starter/font/candara.fnt", window));
+        }
+        public static GUIText AddText(string text, vec2 position, string fontFamily = "Meiryo", int fontSize = 8, float maxLineLength = 1f, bool centered = false)
+        {
+            GUIText txt = new(text, fontSize, Fonts[fontFamily], position, maxLineLength, centered);
+            Window.Renderer.AddText(txt);
+            return txt;
+        }
+        public static void RemoveText(GUIText text)
+        {
+            Window.Renderer.RemoveText(text);
         }
         public static string GetShader(string name, ShaderType type)
         {
             return Shaders[name + (type == ShaderType.VertexShader ? "VS" : "FS")];
         }
 
+        public static int LoadToVao(float[] positions, float[] textures, int dimension = 2)
+        {
+            int vao = CreateVao();
+            StoreDataInAttributeList(0, dimension, positions);
+            StoreDataInAttributeList(1, dimension, textures);
+            UnbindVao();
+            return vao;
+        }
         public static RawModel LoadToVao(float[] positions, float[] textureCoords, float[] normals, int[] indices)
         {
             int vao = CreateVao();
@@ -124,16 +153,13 @@ namespace BlobRPG.MainComponents
 
                 GL.TexImage2D(TextureTarget.TextureCubeMapPositiveX + i, 0, PixelInternalFormat.Rgba, data.Width, data.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
 
-
                 map.UnlockBits(data);
-
             }
             
             GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
             GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
 
             GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
-
 
             return textureId;
         }

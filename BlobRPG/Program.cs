@@ -42,6 +42,7 @@ namespace BlobRPG
 
             using Window game = new(gameWindowSettings, nativeWindowSettings);
             game.Run();
+
             Loader.CleanUp();
         }
     }

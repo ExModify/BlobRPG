@@ -53,7 +53,7 @@ namespace BlobRPG.MainComponents
             InputManager.Init(this);
 
             Loader.Init();
-            Loader.Load();
+            Loader.Load(this);
 
             Renderer = new Renderer(this);
 
@@ -132,7 +132,8 @@ namespace BlobRPG.MainComponents
             Entity barrel = new(new TexturedModel(barrelModel, barrelTexture), new vec3(153, 15, -274));
 
             NormalEntities.Add(barrel);
-
+            Loader.AddText("Meiryo", new vec2(0.0f, 0.5f), "Meiryo");
+            Loader.AddText("Candara", new vec2(0.5f, 0.5f), "Candara");
             //Renderer.AddGUI(new GUITexture(Loader.LoadTexture("starter/texture/grass.png"), new vec2(0.5f, 0.5f), new vec2(0.25f, 0.25f)));
         }
 

@@ -1,4 +1,5 @@
 ﻿using BlobRPG.Entities;
+using BlobRPG.Font;
 using BlobRPG.MainComponents;
 using BlobRPG.Models;
 using BlobRPG.Render.Water;
@@ -25,6 +26,7 @@ namespace BlobRPG.Render
         internal readonly NormalRenderer NormalRenderer;
         readonly TerrainRenderer TerrainRenderer;
         internal readonly GUIRenderer GUIRenderer;
+        internal readonly TextRenderer TextRenderer;
         internal readonly SkyboxRenderer SkyboxRenderer;
         internal readonly WaterRenderer WaterRenderer;
 
@@ -32,11 +34,13 @@ namespace BlobRPG.Render
         readonly NormalShader NormalShader;
         readonly TerrainShader TerrainShader;
         readonly GUIShader GUIShader;
+        readonly TextShader TextShader;
         readonly SkyboxShader SkyboxShader;
         readonly WaterShader WaterShader;
 
         readonly Dictionary<TexturedModel, List<Entity>> Entities;
         readonly Dictionary<TexturedModel, List<Entity>> NormalEntities;
+        readonly Dictionary<FontType, List<GUIText>> Texts;
         readonly List<WaterTile> WaterTiles;
         readonly List<Terrain> Terrains;
         readonly List<GUITexture> GUIs;
@@ -76,6 +80,7 @@ namespace BlobRPG.Render
             NormalEntities = new Dictionary<TexturedModel, List<Entity>>();
             Terrains = new List<Terrain>();
             GUIs = new List<GUITexture>();
+            Texts = new Dictionary<FontType, List<GUIText>>();
             WaterTiles = new List<WaterTile>();
 
             EnableCulling();
@@ -100,6 +105,9 @@ namespace BlobRPG.Render
 
             GUIShader = new GUIShader();
             GUIRenderer = new GUIRenderer(GUIShader);
+
+            TextShader = new TextShader();
+            TextRenderer = new TextRenderer(TextShader);
 
             SkyboxShader = new SkyboxShader(window);
             SkyboxRenderer = new SkyboxRenderer(SkyboxShader, window, ref ProjectionMatrix);
@@ -141,8 +149,8 @@ namespace BlobRPG.Render
             GL.Disable(EnableCap.ClipDistance0);
             WaterFrameBuffers.UnbindCurrentFB();
 
-
             GUIRenderer.Render(GUIs);
+            TextRenderer.Render(Texts);
 
             Terrains.Clear();
             Entities.Clear();
@@ -156,6 +164,7 @@ namespace BlobRPG.Render
             NormalShader.CleanUp();
             TerrainShader.CleanUp();
             GUIShader.CleanUp();
+            TextShader.CleanUp();
             SkyboxShader.CleanUp();
             WaterShader.CleanUp();
         }
@@ -164,6 +173,29 @@ namespace BlobRPG.Render
         {
             GUIs.Add(texture);
         }
+        public void RemoveGUI(GUITexture texture)
+        {
+            GUIs.Remove(texture);
+        }
+
+        public void AddText(GUIText text)
+        {
+            if (Texts.Keys.Contains(text.Font))
+            {
+                Texts[text.Font].Add(text);
+            }
+            else
+            {
+                Texts.Add(text.Font, new List<GUIText>() { text });
+            }
+        }
+        public void RemoveText(GUIText text)
+        {
+            Texts[text.Font].Remove(text);
+            if (Texts[text.Font].Count == 0)
+                Texts.Remove(text.Font);
+        }
+
         public void ProcessWater(WaterTile tile)
         {
             WaterTiles.Add(tile);
