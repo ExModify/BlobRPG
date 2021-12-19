@@ -66,6 +66,35 @@ namespace BlobRPG.MainComponents
             return Shaders[name + (type == ShaderType.VertexShader ? "VS" : "FS")];
         }
 
+
+        public static int CreateEmptyVbo(int floatCount)
+        {
+            int vbo = GL.GenBuffer();
+            Vbos.Add(vbo);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);
+            GL.BufferData(BufferTarget.ArrayBuffer, floatCount * 4, IntPtr.Zero, BufferUsageHint.StreamDraw);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+            return vbo;
+        }
+
+        public static void AddInstancedAttribute(int vao, int vbo, int attribute, int size, int dateLength, int offset)
+        {
+            GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);
+            GL.BindVertexArray(vao);
+
+            GL.VertexAttribPointer(attribute, size, VertexAttribPointerType.Float, false, dateLength * 4, offset * 4);
+            GL.VertexAttribDivisor(attribute, 1);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+            GL.BindVertexArray(0);
+        }
+
+        public static void UpdateVBO(int vbo, float[] data)
+        {
+            GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);
+            GL.BufferData(BufferTarget.ArrayBuffer, data.Length * 4, data, BufferUsageHint.StreamDraw);
+            GL.BufferSubData(BufferTarget.ArrayBuffer, IntPtr.Zero, data.Length * 4, data);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+        }
         public static int LoadToVao(float[] positions, float[] textures, int dimension = 2)
         {
             int vao = CreateVao();

@@ -13,6 +13,7 @@ using BlobRPG.Entities;
 using BlobRPG.WavefrontOBJ;
 using GlmSharp;
 using System.IO;
+using BlobRPG.Particles;
 
 namespace BlobRPG.MainComponents
 {
@@ -22,6 +23,7 @@ namespace BlobRPG.MainComponents
 
         public Renderer Renderer;
         public Camera Camera;
+        public ParticleSystem ParticleSystem;
 
         Player Player;
         List<Light> Lights;
@@ -125,6 +127,9 @@ namespace BlobRPG.MainComponents
             Loader.AddText("Meiryo", new vec2(0.0f, 0.5f), "Meiryo");
             Loader.AddText("Candara", new vec2(0.5f, 0.5f), "Candara");
             //Renderer.AddGUI(new GUITexture(Loader.LoadTexture("starter/texture/grass.png"), new vec2(0.5f, 0.5f), new vec2(0.25f, 0.25f)));
+
+            ParticleTexture particleTexture = new ParticleTexture(Loader.LoadTexture("starter/texture/smokeParticle.png"), 8);
+            ParticleSystem = new ParticleSystem(particleTexture, 1, 0.02f, 0, 700, 1);
         }
 
         protected override void OnClosed()
@@ -153,6 +158,12 @@ namespace BlobRPG.MainComponents
             Camera.Move();
             InputManager.UpdateMouseRay();
 
+            if (Player.Accelerator == 1)
+            {
+                ParticleSystem.Scale = 1.2f * Math.Clamp((float)Player.Accelerator / 20, 0.3f, 1f);
+                ParticleSystem.GenerateParticles(Player.Position);
+            }
+
             if (Player.Render)
                 Renderer.ProcessObject(Player);
 
@@ -169,6 +180,7 @@ namespace BlobRPG.MainComponents
                 Renderer.ProcessWater(w);
 
             Renderer.Update();
+            ParticleHandler.Update(Camera);
 
             base.OnUpdateFrame(args);
         }

@@ -2,6 +2,7 @@
 using BlobRPG.Font;
 using BlobRPG.MainComponents;
 using BlobRPG.Models;
+using BlobRPG.Particles;
 using BlobRPG.Render.Water;
 using BlobRPG.Shaders;
 using BlobRPG.Textures;
@@ -26,6 +27,7 @@ namespace BlobRPG.Render
         internal readonly TextRenderer TextRenderer;
         internal readonly SkyboxRenderer SkyboxRenderer;
         internal readonly WaterRenderer WaterRenderer;
+        internal readonly ParticleRenderer ParticleRenderer;
 
         readonly EntityShader EntityShader;
         readonly NormalShader NormalShader;
@@ -34,6 +36,7 @@ namespace BlobRPG.Render
         readonly TextShader TextShader;
         readonly SkyboxShader SkyboxShader;
         readonly WaterShader WaterShader;
+        readonly ParticleShader ParticleShader;
 
         readonly Dictionary<TexturedModel, List<Entity>> Entities;
         readonly Dictionary<TexturedModel, List<Entity>> NormalEntities;
@@ -43,6 +46,7 @@ namespace BlobRPG.Render
         readonly List<GUITexture> GUIs;
 
         readonly WaterFrameBuffers WaterFrameBuffers;
+        readonly ParticleHandler Particles;
 
 
         public mat4 ProjectionMatrix;
@@ -106,6 +110,9 @@ namespace BlobRPG.Render
             SkyboxShader = new SkyboxShader();
             SkyboxRenderer = new SkyboxRenderer(SkyboxShader, ref ProjectionMatrix);
 
+            ParticleShader = new ParticleShader();
+            ParticleRenderer = new ParticleRenderer(ParticleShader, ref ProjectionMatrix);
+
 
             WaterFrameBuffers = new WaterFrameBuffers(window);
             int waterDUDVTexture = Loader.LoadTexture("starter/texture/wassa.png");
@@ -143,6 +150,8 @@ namespace BlobRPG.Render
             GL.Disable(EnableCap.ClipDistance0);
             WaterFrameBuffers.UnbindCurrentFB();
 
+            ParticleRenderer.Render(ParticleHandler.Particles, camera);
+
             GUIRenderer.Render(GUIs);
             TextRenderer.Render(Texts);
 
@@ -162,7 +171,7 @@ namespace BlobRPG.Render
             SkyboxShader.CleanUp();
             WaterShader.CleanUp();
         }
-        
+
         public void AddGUI(GUITexture texture)
         {
             GUIs.Add(texture);

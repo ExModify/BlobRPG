@@ -8,7 +8,7 @@ namespace BlobRPG.Shaders
     public class ParticleShader : ShaderCore
     {
         private int ProjectionMatrixLocation;
-        private int ModelViewMatrixLocation;
+        private int NumberOfRowsLocation;
 
         public ParticleShader() : base("particle")
         {
@@ -17,19 +17,22 @@ namespace BlobRPG.Shaders
         protected override void GetAllUniformLocations()
         {
             ProjectionMatrixLocation = GetUniformLocation("projectionMatrix");
-            ModelViewMatrixLocation = GetUniformLocation("modelViewMatrix");
+            NumberOfRowsLocation = GetUniformLocation("numberOfRows");
         }
         protected override void BindAttributes()
         {
             BindAttribute(0, "position");
+            BindAttribute(1, "modelViewMatrix");
+            BindAttribute(5, "textureOffsets");
+            BindAttribute(6, "blendFactor");
         }
         public void LoadProjectionMatrix(ref mat4 matrix)
         {
             LoadMatrix(ProjectionMatrixLocation, matrix);
         }
-        public void LoadModelViewMatrix(mat4 matrix)
+        public void LoadNumberOfRows(float numberOfRows)
         {
-            LoadMatrix(ModelViewMatrixLocation, matrix);
+            LoadFloat(NumberOfRowsLocation, numberOfRows);
         }
     }
 }
