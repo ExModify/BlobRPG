@@ -1,5 +1,4 @@
 ﻿using BlobRPG.Font;
-using BlobRPG.Models;
 using OpenTK;
 using System;
 using System.Collections.Generic;
@@ -11,7 +10,7 @@ using GlmSharp;
 using BlobRPG.MainComponents;
 using BlobRPG.Render;
 
-namespace BlobRPG.Models
+namespace BlobRPG.Entities
 {
     public class GUIText
     {

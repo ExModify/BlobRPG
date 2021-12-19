@@ -1,4 +1,5 @@
-﻿using BlobRPG.Models;
+﻿using BlobRPG.Entities;
+using BlobRPG.Models;
 using GlmSharp;
 using System;
 using System.Collections.Generic;

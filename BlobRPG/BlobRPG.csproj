@@ -41,6 +41,12 @@
     <None Update="Shaders\GLSLs\normalVS.glsl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Shaders\GLSLs\particleFS.glsl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Shaders\GLSLs\particleVS.glsl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Shaders\GLSLs\skyboxFS.glsl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

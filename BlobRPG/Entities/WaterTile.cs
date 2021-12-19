@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BlobRPG.Models
+namespace BlobRPG.Entities
 {
     public class WaterTile
     {

@@ -1,4 +1,5 @@
-﻿using BlobRPG.Font;
+﻿using BlobRPG.Entities;
+using BlobRPG.Font;
 using BlobRPG.LoggerComponents;
 using BlobRPG.Models;
 using GlmSharp;

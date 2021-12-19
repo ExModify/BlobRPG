@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using OpenTK.Graphics.OpenGL;
 using BlobRPG.Shaders;
 using BlobRPG.Models;
+using BlobRPG.Entities;
 
 namespace BlobRPG.Render
 {
