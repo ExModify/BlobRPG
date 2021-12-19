@@ -1,6 +1,6 @@
 ﻿using BlobRPG.MainComponents;
 using BlobRPG.Models;
-using BlobRPG.ObjectManager.Models;
+using BlobRPG.WavefrontOBJ.Models;
 using GlmSharp;
 using System;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace BlobRPG.ObjectManager
+namespace BlobRPG.WavefrontOBJ
 {
     public static class OBJLoader
     {

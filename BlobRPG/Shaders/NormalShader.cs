@@ -48,9 +48,9 @@ namespace BlobRPG.Shaders
 
         protected override void GetAllUniformLocations()
         {
-            LightPositionLocation = new int[Program.MAX_LIGHTS];
-            LightColorLocation = new int[Program.MAX_LIGHTS];
-            LightAttenuationLocation = new int[Program.MAX_LIGHTS];
+            LightPositionLocation = new int[Settings.MAX_LIGHTS];
+            LightColorLocation = new int[Settings.MAX_LIGHTS];
+            LightAttenuationLocation = new int[Settings.MAX_LIGHTS];
 
             TransformationMatrixLocation = GetUniformLocation("transformationMatrix");
             ProjectionMatrixLocation = GetUniformLocation("projectionMatrix");
@@ -67,7 +67,7 @@ namespace BlobRPG.Shaders
             FogColor = GetUniformLocation("fogColor");
 
             LightCountLocation = GetUniformLocation("lightCount");
-            for (int i = 0; i < Program.MAX_LIGHTS; i++)
+            for (int i = 0; i < Settings.MAX_LIGHTS; i++)
             {
                 LightPositionLocation[i] = GetUniformLocation("lightPositionEyeSpace[" + i + "]");
                 LightColorLocation[i] = GetUniformLocation("lightColor[" + i + "]");
@@ -111,7 +111,7 @@ namespace BlobRPG.Shaders
         public void LoadLights(List<Light> lights, Camera camera)
         {
             LoadInt(LightCountLocation, lights.Count);
-            int count = Math.Min(lights.Count, Program.MAX_LIGHTS);
+            int count = Math.Min(lights.Count, Settings.MAX_LIGHTS);
             for (int i = 0; i < count; i++)
             {
                 LoadVector(LightPositionLocation[i], new vec3(camera.ViewMatrix * new vec4(lights[i].Position, 1f)));

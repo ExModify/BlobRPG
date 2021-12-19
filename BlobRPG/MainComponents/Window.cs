@@ -10,7 +10,7 @@ using BlobRPG.Models;
 using BlobRPG.Shaders;
 using BlobRPG.Textures;
 using BlobRPG.Entities;
-using BlobRPG.ObjectManager;
+using BlobRPG.WavefrontOBJ;
 using GlmSharp;
 using System.IO;
 
@@ -18,13 +18,6 @@ namespace BlobRPG.MainComponents
 {
     public class Window : GameWindow
     {
-        public vec3 SkyColor;
-        public vec3 NightColor;
-
-        public double DeltaTime { get; private set; } = 0;
-        public double Gravity { get; private set; } = -10;
-        public float SkyboxRotation { get; private set; } = 1f;
-
         public Window(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings) { }
 
         public Renderer Renderer;
@@ -45,10 +38,7 @@ namespace BlobRPG.MainComponents
 
             GL.Viewport(0, 0, ClientSize.X, ClientSize.Y);
 
-            SkyColor = new vec3(0.529f, 0.807f, 0.921f);
-            NightColor = new vec3(SkyColor * 0.5f);
-
-            Fog = new Fog(this);
+            Fog = new Fog();
 
             InputManager.Init(this);
 
@@ -64,12 +54,12 @@ namespace BlobRPG.MainComponents
                 Reflectivity = 1,
                 NumberOfRows = 2
             };
-            Player = new Player(new TexturedModel(rm, mt), new vec3(153, 5, -274), this, textureIndex: 0);
+            Player = new Player(new TexturedModel(rm, mt), new vec3(153, 5, -274), textureIndex: 0);
 
-            Camera = new Camera(Player, this);
+            Camera = new Camera(Player);
             Lights = new List<Light>()
             {
-                new Light(new vec3(0, 1000, -7000), new vec3(.8f, .8f, .8f)),
+                Settings.Sun
             };
 
             InputManager.InitMouseRay(this);
@@ -145,7 +135,7 @@ namespace BlobRPG.MainComponents
 
         protected override void OnUpdateFrame(FrameEventArgs args)
         {
-            DeltaTime = args.Time;
+            Settings.DeltaTime = args.Time;
 
             InputManager.Update(this);
 

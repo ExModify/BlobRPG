@@ -17,9 +17,6 @@ namespace BlobRPG.Render
 {
     public class Renderer
     {
-        private const float FOV = 70;
-        private const float NEAR = 0.1f;
-        private const float FAR = 1000f;
         private static readonly vec4 SafetyClipPlane = new(0, -1, 0, 100000000000);
 
         internal readonly EntityRenderer EntityRenderer;
@@ -47,8 +44,6 @@ namespace BlobRPG.Render
 
         readonly WaterFrameBuffers WaterFrameBuffers;
 
-        readonly Window Window;
-
 
         public mat4 ProjectionMatrix;
 
@@ -74,7 +69,6 @@ namespace BlobRPG.Render
 
         public Renderer(Window window)
         {
-            Window = window;
 
             Entities = new Dictionary<TexturedModel, List<Entity>>();
             NormalEntities = new Dictionary<TexturedModel, List<Entity>>();
@@ -87,12 +81,12 @@ namespace BlobRPG.Render
 
             window.Resize += (s) =>
             {
-                CreateProjectionMatrix(FOV, s.Width, s.Height, NEAR, FAR);
+                CreateProjectionMatrix(Settings.FieldOfView, s.Width, s.Height, Settings.NEAR, Settings.FAR);
                 UpdateProjectionMatrix();
             };
 
 
-            CreateProjectionMatrix(FOV, window.ClientSize.X, window.ClientSize.Y, NEAR, FAR);
+            CreateProjectionMatrix(Settings.FieldOfView, window.ClientSize.X, window.ClientSize.Y, Settings.NEAR, Settings.FAR);
 
             EntityShader = new EntityShader();
             EntityRenderer = new EntityRenderer(EntityShader, ref ProjectionMatrix);
@@ -109,8 +103,8 @@ namespace BlobRPG.Render
             TextShader = new TextShader();
             TextRenderer = new TextRenderer(TextShader);
 
-            SkyboxShader = new SkyboxShader(window);
-            SkyboxRenderer = new SkyboxRenderer(SkyboxShader, window, ref ProjectionMatrix);
+            SkyboxShader = new SkyboxShader();
+            SkyboxRenderer = new SkyboxRenderer(SkyboxShader, ref ProjectionMatrix);
 
 
             WaterFrameBuffers = new WaterFrameBuffers(window);
@@ -118,7 +112,7 @@ namespace BlobRPG.Render
             int waterNormalTexture = Loader.LoadTexture("starter/texture/wassaNormal.png");
 
             WaterShader = new WaterShader();
-            WaterRenderer = new WaterRenderer(WaterShader, ref ProjectionMatrix, NEAR, FAR, window, WaterFrameBuffers, waterDUDVTexture, waterNormalTexture);
+            WaterRenderer = new WaterRenderer(WaterShader, ref ProjectionMatrix, WaterFrameBuffers, waterDUDVTexture, waterNormalTexture);
         }
         public void Update()
         {
@@ -241,7 +235,7 @@ namespace BlobRPG.Render
         {
             GL.Enable(EnableCap.DepthTest);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-            GL.ClearColor(Window.SkyColor.x, Window.SkyColor.y, Window.SkyColor.z, 1);
+            GL.ClearColor(Settings.SkyColor.x, Settings.SkyColor.y, Settings.SkyColor.z, 1);
         }
 
         private void CreateProjectionMatrix(float fov, int width, int height, float near, float far)
@@ -269,7 +263,7 @@ namespace BlobRPG.Render
 
             WaterShader.Start();
             WaterShader.LoadProjectionMatrix(ref ProjectionMatrix);
-            WaterShader.LoadPlaneVariables(NEAR, FAR);
+            WaterShader.LoadPlaneVariables(Settings.NEAR, Settings.FAR);
             WaterShader.Stop();
         }
     }

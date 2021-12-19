@@ -12,28 +12,17 @@ namespace BlobRPG.Entities
 {
     public class Player : Entity
     {
-        const float WalkSpeed = 10;
-        const float RunSpeed = 20;
-
-        const float JumpHeight = 8;
-
-        private MainComponents.Window Window;
-
         public double CurrentVerticalSpeed { get; private set; }
         public double CurrentHorizontalSpeed { get; private set; }
         public double Accelerator { get; private set; }
         public double UpwardSpeed { get; private set; }
 
-        public bool AllowFlight { get; set; } = false;
-
         public bool Render { get; set; } = false;
         bool InAir { get; set; } = false;
 
 
-        public Player(TexturedModel model, vec3 position, MainComponents.Window window, float rx = 0, float ry = 0, float rz = 0, float scale = 1, int textureIndex = 1) : base(model, position, rx, ry, rz, scale, textureIndex)
+        public Player(TexturedModel model, vec3 position, float rx = 0, float ry = 0, float rz = 0, float scale = 1, int textureIndex = 1) : base(model, position, rx, ry, rz, scale, textureIndex)
         {
-            Window = window;
-
             CurrentVerticalSpeed = 0;
             CurrentHorizontalSpeed = 0;
             Accelerator = 1;
@@ -44,20 +33,20 @@ namespace BlobRPG.Entities
         {
             ProcessInput();
 
-            double d = CurrentVerticalSpeed * Accelerator * Window.DeltaTime;
+            double d = CurrentVerticalSpeed * Accelerator * Settings.DeltaTime;
 
             float dX = (float)(d * Math.Sin(MathHelper.DegreesToRadians(RotationY)));
             float dZ = (float)(d * Math.Cos(MathHelper.DegreesToRadians(RotationY)));
 
-            d = CurrentHorizontalSpeed * Accelerator * Window.DeltaTime;
+            d = CurrentHorizontalSpeed * Accelerator * Settings.DeltaTime;
 
             dX += (float)(d * Math.Sin(MathHelper.DegreesToRadians(RotationY + 90)));
             dZ += (float)(d * Math.Cos(MathHelper.DegreesToRadians(RotationY + 90)));
 
-            UpwardSpeed += Window.Gravity * Window.DeltaTime;
+            UpwardSpeed += Settings.Gravity * Settings.DeltaTime;
 
 
-            float dY = (float)(UpwardSpeed * Window.DeltaTime);
+            float dY = (float)(UpwardSpeed * Settings.DeltaTime);
 
             float terrainHeight = 0;
             for (int i = 0; i < terrains.Count; i++)
@@ -82,8 +71,8 @@ namespace BlobRPG.Entities
         {
             if (!InAir)
             {
-                UpwardSpeed = JumpHeight;
-                if (!AllowFlight)
+                UpwardSpeed = Settings.JumpHeight;
+                if (!Settings.AllowFlight)
                     InAir = true;
             }
         }
@@ -111,22 +100,22 @@ namespace BlobRPG.Entities
             {
                 if (InputManager.IsKeyDown(Keys.LeftShift))
                 {
-                    CurrentVerticalSpeed = RunSpeed;
+                    CurrentVerticalSpeed = Settings.RunSpeed;
                 }
                 else
                 {
-                    CurrentVerticalSpeed = WalkSpeed;
+                    CurrentVerticalSpeed = Settings.WalkSpeed;
                 }
             }
             else if (InputManager.IsKeyDown(Keys.S))
             {
                 if (InputManager.IsKeyDown(Keys.LeftShift))
                 {
-                    CurrentVerticalSpeed = -RunSpeed;
+                    CurrentVerticalSpeed = -Settings.RunSpeed;
                 }
                 else
                 {
-                    CurrentVerticalSpeed = -WalkSpeed;
+                    CurrentVerticalSpeed = -Settings.WalkSpeed;
                 }
             }
             else if (!InputManager.IsKeyDown(Keys.Space))
@@ -138,22 +127,22 @@ namespace BlobRPG.Entities
             {
                 if (InputManager.IsKeyDown(Keys.LeftShift))
                 {
-                    CurrentHorizontalSpeed = RunSpeed;
+                    CurrentHorizontalSpeed = Settings.RunSpeed;
                 }
                 else
                 {
-                    CurrentHorizontalSpeed = WalkSpeed;
+                    CurrentHorizontalSpeed = Settings.WalkSpeed;
                 }
             }
             else if (InputManager.IsKeyDown(Keys.D))
             {
                 if (InputManager.IsKeyDown(Keys.LeftShift))
                 {
-                    CurrentHorizontalSpeed = -RunSpeed;
+                    CurrentHorizontalSpeed = -Settings.RunSpeed;
                 }
                 else
                 {
-                    CurrentHorizontalSpeed = -WalkSpeed;
+                    CurrentHorizontalSpeed = -Settings.WalkSpeed;
                 }
             }
             else

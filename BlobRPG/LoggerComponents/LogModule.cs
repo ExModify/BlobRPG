@@ -9,11 +9,12 @@ namespace BlobRPG.LoggerComponents
     public enum LogModule
     {
         Main = 0,
-        Loader = 1,
-        OBJLoader = 2,
-        Texture = 3,
-        Shader = 4,
-        Renderer = 5,
-        Input = 6
+        Settings = 1,
+        Loader = 2,
+        OBJLoader = 3,
+        Texture = 4,
+        Shader = 5,
+        Renderer = 6,
+        Input = 7
     }
 }

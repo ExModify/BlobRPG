@@ -1,5 +1,6 @@
 ﻿using BlobRPG.LoggerComponents;
 using BlobRPG.MainComponents;
+using BlobRPG.SettingsComponents;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using System;
@@ -11,17 +12,18 @@ namespace BlobRPG
 {
     public class Program
     {
-        /* Change this variable in the shaders as well */
-        public const int MAX_LIGHTS = 8;
-        public const float WAVE_SPEED = 0.03f;
-        public static LogSeverity LogSeverity { get; set; } = LogSeverity.Debug;
-
+        private static Window Game;
         static void Main(string[] args)
         {
+            Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo("en-US");
+            Thread.CurrentThread.CurrentUICulture = CultureInfo.GetCultureInfo("en-US");
+
+            SettingsLoader.LoadSettings();
+
             GameWindowSettings gameWindowSettings = new()
             {
-                RenderFrequency = 240,
-                UpdateFrequency = 240
+                RenderFrequency = Settings.RenderFPS,
+                UpdateFrequency = Settings.UpdateFPS
             };
             NativeWindowSettings nativeWindowSettings = new()
             {
@@ -30,20 +32,26 @@ namespace BlobRPG
                 AutoLoadBindings = true,
                 Flags = ContextFlags.Default,
                 Profile = ContextProfile.Core,
-                Size = new OpenTK.Mathematics.Vector2i(1280, 720),
+                Size = new OpenTK.Mathematics.Vector2i(Settings.Width, Settings.Height),
+                WindowState = Settings.WindowState,
                 Title = "BlobRPG"
             };
 
-            Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo("en-US");
-            Thread.CurrentThread.CurrentUICulture = CultureInfo.GetCultureInfo("en-US");
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
                 nativeWindowSettings.Flags |= ContextFlags.ForwardCompatible;
 
-            using Window game = new(gameWindowSettings, nativeWindowSettings);
-            game.Run();
+            Game = new(gameWindowSettings, nativeWindowSettings);
+            Game.Run();
+            Game.Dispose();
 
             Loader.CleanUp();
+        }
+
+        public static void Halt()
+        {
+            Game.Close();
+            Environment.Exit(-1);
         }
     }
 }

@@ -73,15 +73,13 @@ namespace BlobRPG.Render
 		public SkyboxShader Shader { get; private set; }
 
 		private float Time;
-		private readonly Window Window;
 
 		private int Texture1;
 		private int Texture2;
 
-		public SkyboxRenderer(SkyboxShader shader, Window window, ref mat4 projectionMatrix)
+		public SkyboxRenderer(SkyboxShader shader, ref mat4 projectionMatrix)
         {
 			Shader = shader;
-			Window = window;
 
 			Model = Loader.LoadToVao(Vertices, 3);
 
@@ -124,7 +122,7 @@ namespace BlobRPG.Render
 		}
 		public void Update()
 		{
-			Time += (float)Window.DeltaTime * 1000;
+			Time += (float)Settings.DeltaTime * 1000;
 			Time %= 24000;
 
 			//float reflectivity;
@@ -135,8 +133,8 @@ namespace BlobRPG.Render
 				Texture2 = NightTextureId;
 				BlendFactor = (Time - 0) / (5000 - 0);
 
-				//Window.SkyColor = new vec3(0, 0, 0);
-				Window.SkyColor = NightLight;
+				//Settings.SkyColor = new vec3(0, 0, 0);
+				Settings.SkyColor = NightLight;
 				//reflectivity = NightReflectivity;
 			}
 			else if (Time >= 5000 && Time < 8000)
@@ -145,9 +143,9 @@ namespace BlobRPG.Render
 				Texture2 = DayTextureId;
 				BlendFactor = (Time - 5000) / (8000 - 5000);
 
-				//Window.SkyColor = new Color4(DayColor.R * BlendFactor, DayColor.G * BlendFactor, DayColor.B * BlendFactor, 1.0f);
+				//Settings.SkyColor = new Color4(DayColor.R * BlendFactor, DayColor.G * BlendFactor, DayColor.B * BlendFactor, 1.0f);
 
-				Window.SkyColor = new vec3(DayLight - (DayLight - NightLight) * (1 - BlendFactor));
+				Settings.SkyColor = new vec3(DayLight - (DayLight - NightLight) * (1 - BlendFactor));
 				//reflectivity = DayReflectivity - (DayReflectivity - NightReflectivity) * (1 - BlendFactor);
 			}
 			else if (Time >= 8000 && Time < 21000)
@@ -156,7 +154,7 @@ namespace BlobRPG.Render
 				Texture2 = DayTextureId;
 				BlendFactor = (Time - 8000) / (21000 - 8000);
 
-				Window.SkyColor = DayLight;
+				Settings.SkyColor = DayLight;
 				//reflectivity = DayReflectivity;
 			}
 			else
@@ -165,9 +163,9 @@ namespace BlobRPG.Render
 				Texture2 = NightTextureId;
 				BlendFactor = (Time - 21000) / (24000 - 21000);
 
-				//Window.SkyColor = new vec3(DayLight.x * (1 - BlendFactor), DayLight.y * (1 - BlendFactor), DayLight.z * (1 - BlendFactor));
+				//Settings.SkyColor = new vec3(DayLight.x * (1 - BlendFactor), DayLight.y * (1 - BlendFactor), DayLight.z * (1 - BlendFactor));
 
-				Window.SkyColor = new vec3(DayLight - (DayLight - NightLight) * (BlendFactor));
+				Settings.SkyColor = new vec3(DayLight - (DayLight - NightLight) * (BlendFactor));
 				//reflectivity = DayReflectivity - (DayReflectivity - NightReflectivity) * BlendFactor;
 			}
 

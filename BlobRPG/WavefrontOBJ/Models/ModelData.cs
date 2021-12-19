@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace BlobRPG.ObjectManager.Models
+namespace BlobRPG.WavefrontOBJ.Models
 {
     public class ModelData
     {

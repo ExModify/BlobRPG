@@ -19,20 +19,18 @@ namespace BlobRPG.Render
         readonly RawModel BaseQuad;
         readonly int DUDVTexture;
         readonly int NormalTexture;
-        readonly Window Window;
         WaterFrameBuffers FBOs;
 
         private float MoveFactor = 0;
 
 
-
-        public WaterRenderer(WaterShader shader, ref mat4 projectionMatrix, float nearPlane, float farPlane, Window window, WaterFrameBuffers fbos, int dudvTexture, int normalTexture)
+        public WaterRenderer(WaterShader shader, ref mat4 projectionMatrix, WaterFrameBuffers fbos, int dudvTexture, int normalTexture)
         {
             Shader = shader;
 
             shader.Start();
             shader.ConnectTextureUnits();
-            shader.LoadPlaneVariables(nearPlane, farPlane);
+            shader.LoadPlaneVariables(Settings.NEAR, Settings.FAR);
             shader.LoadWaveStrength(0.04f);
             shader.LoadTiling(4);
             shader.LoadShineVariables(20, 0.5f);
@@ -41,7 +39,6 @@ namespace BlobRPG.Render
 
             BaseQuad = Loader.LoadToVao(new float[] { -1, -1, -1, 1, 1, -1, 1, -1, -1, 1, 1, 1 });
 
-            Window = window;
             FBOs = fbos;
             DUDVTexture = dudvTexture;
             NormalTexture = normalTexture;
@@ -62,7 +59,7 @@ namespace BlobRPG.Render
         {
             Shader.Start();
             Shader.LoadViewMatrix(camera);
-            MoveFactor += (float)(Program.WAVE_SPEED * Window.DeltaTime);
+            MoveFactor += (float)(Settings.WAVE_SPEED * Settings.DeltaTime);
             MoveFactor %= 1;
             Shader.LoadMoveFactor(MoveFactor);
             Shader.LoadSun(sun);

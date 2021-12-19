@@ -26,12 +26,10 @@ namespace BlobRPG.Entities
         internal mat4 ViewMatrix { get; private set; }
 
         private readonly Player Player;
-        private readonly Window Window;
 
-        public Camera(Player player, Window window, vec3 position = new vec3(), float pitch = 20, float yaw = 0, float roll = 0)
+        public Camera(Player player, vec3 position = new vec3(), float pitch = 20, float yaw = 0, float roll = 0)
         {
             Player = player;
-            Window = window;
 
             Position = position;
             Pitch = pitch;
@@ -98,7 +96,7 @@ namespace BlobRPG.Entities
         }
         private void CalculatePitch()
         {
-            float pitchChange = (float)(InputManager.YDelta * Window.DeltaTime * 20);
+            float pitchChange = (float)(InputManager.YDelta * Settings.DeltaTime * 20);
             Pitch += pitchChange;
             Pitch = MathHelper.Clamp(Pitch, 5, 60);
 

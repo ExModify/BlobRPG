@@ -20,13 +20,10 @@ namespace BlobRPG.Shaders
 
         private int ClipPlaneLocation;
 
-        readonly Window Window;
-
         float Rotation;
 
-        public SkyboxShader(Window window) : base("skybox")
+        public SkyboxShader() : base("skybox")
         {
-            Window = window;
         }
 
         protected override void BindAttributes()
@@ -76,7 +73,7 @@ namespace BlobRPG.Shaders
             matrix.m31 = 0;
             matrix.m32 = 0;
 
-            Rotation += (float)(Window.SkyboxRotation * Window.DeltaTime);
+            Rotation += (float)(Settings.SkyboxRotation * Settings.DeltaTime);
             matrix *= mat4.RotateY(MathHelper.DegreesToRadians(Rotation));
 
             LoadMatrix(ViewMatrixLocation, matrix);
