@@ -42,6 +42,7 @@ namespace BlobRPG
                 nativeWindowSettings.Flags |= ContextFlags.ForwardCompatible;
 
             Game = new(gameWindowSettings, nativeWindowSettings);
+            Game.VSync = Settings.VSync;
             Game.Run();
             Game.Dispose();
 

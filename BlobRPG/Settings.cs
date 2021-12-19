@@ -62,7 +62,7 @@ namespace BlobRPG
         [Savable("Video"), Min(30)]
         public static int UpdateFPS { get; set; } = 240;
         [Savable("Video")]
-        public static bool VSync { get; set; } = false;
+        public static VSyncMode VSync { get; set; } = VSyncMode.Off;
         [Savable("Video")]
         public static WindowState WindowState { get; set; } = WindowState.Normal;
         [Savable("Video"), Min(40), Max(200)]
