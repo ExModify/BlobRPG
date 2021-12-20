@@ -8,6 +8,7 @@ using BlobRPG.Shaders;
 using BlobRPG.Textures;
 using GlmSharp;
 using OpenTK.Graphics.OpenGL;
+using OpenTK.Mathematics;
 using OpenTK.Windowing.Desktop;
 using System;
 using System.Collections.Generic;
@@ -249,7 +250,20 @@ namespace BlobRPG.Render
 
         private void CreateProjectionMatrix(float fov, int width, int height, float near, float far)
         {
-            ProjectionMatrix = mat4.PerspectiveFov(fov, width, height, near, far);
+            //ProjectionMatrix = mat4.PerspectiveFov(fov, width, height, near, far);
+
+            ProjectionMatrix = mat4.Identity;
+            float aspectRatio = (float)width / (float)height;
+            float y_scale = (float)((1f / Math.Tan(MathHelper.DegreesToRadians(fov/ 2f))));
+            float x_scale = y_scale / aspectRatio;
+            float frustum_length = far - near;
+
+            ProjectionMatrix.m00 = x_scale;
+            ProjectionMatrix.m11 = y_scale;
+            ProjectionMatrix.m22 = -((far + near) / frustum_length);
+            ProjectionMatrix.m23 = -1;
+            ProjectionMatrix.m32 = -((2 * near * far) / frustum_length);
+            ProjectionMatrix.m33 = 0;
         }
 
         private void UpdateProjectionMatrix()
