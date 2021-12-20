@@ -51,7 +51,6 @@ namespace BlobRPG.Render
         {
             mat4 ViewMatrix = camera.ViewMatrix;
             Prepare();
-            int c = 0;
             foreach (ParticleTexture texture in particlesBundle.Keys)
             {
                 List<Particle> particles = particlesBundle[texture];
@@ -64,7 +63,6 @@ namespace BlobRPG.Render
                 {
                     UpdateModelViewMatrix(particle.Position, particle.Rotation, particle.Scale, ViewMatrix, ref vboData);
                     UpdateTextureCoordsInfo(particle, ref vboData);
-                    c++;
                 }
 
                 Loader.UpdateVBO(VBO, vboData);
@@ -73,7 +71,6 @@ namespace BlobRPG.Render
             }
 
             EndRendering();
-            Console.WriteLine(c);
         }
 
         private void BindTexture(ParticleTexture Texture)
@@ -104,13 +101,10 @@ namespace BlobRPG.Render
             modelMatrix.m21 = viewMatrix.m12;
             modelMatrix.m22 = viewMatrix.m22;
 
-
             mat4 modelViewMatrix = viewMatrix * modelMatrix;
-
 
             modelViewMatrix *= mat4.RotateZ(MathHelper.DegreesToRadians(rotation));
             modelViewMatrix *= mat4.Scale(Scale);
-
 
             StoreMatrixData(modelViewMatrix, ref vboData);
         }
@@ -145,11 +139,6 @@ namespace BlobRPG.Render
             vboData[Pointer++] = matrix.m31;
             vboData[Pointer++] = matrix.m32;
             vboData[Pointer++] = matrix.m33;
-        }
-
-        public void Clean()
-        {
-            Shader.CleanUp();
         }
 
         private void Prepare()
