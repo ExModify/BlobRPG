@@ -25,7 +25,11 @@ namespace BlobRPG.MainComponents
         private static List<int> Textures;
         private static Dictionary<string, string> Shaders;
 
+        private static bool? AnisotropicFiltering { get; set; } = null;
+
         public static Dictionary<string, FontType> Fonts { get; private set; }
+
+
 
         public static void Init()
         {
@@ -157,10 +161,33 @@ namespace BlobRPG.MainComponents
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
 
-                if (lodBias)
+                if (!AnisotropicFiltering.HasValue)
+                {
+                    AnisotropicFiltering = Settings.CheckExtension("gl_ext_texture_filter_anisotropic");
+                    if (AnisotropicFiltering.Value)
+                    {
+                        Log(Debug, "Anisotropic filtering is supported.");
+                    }
+                    else
+                    {
+                        Log(Debug, "Anisotropic filtering is NOT supported.");
+                    }
+                }
+                if (AnisotropicFiltering.Value)
+                {
+                    float amount = Math.Min(4f, GL.GetFloat((GetPName)All.MaxTextureMaxAnisotropyExt));
+                    GL.TexParameter(TextureTarget.Texture2D, (TextureParameterName)All.TextureMaxAnisotropyExt, amount);
+                }
+
+                if (lodBias && !AnisotropicFiltering.Value)
                 {
                     GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureLodBias, -0.4f);
                 }
+                else
+                {
+                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureLodBias, 0f);
+                }
+                
                 GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
 
                 map.UnlockBits(data);

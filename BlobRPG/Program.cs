@@ -1,6 +1,7 @@
 ﻿using BlobRPG.LoggerComponents;
 using BlobRPG.MainComponents;
 using BlobRPG.SettingsComponents;
+using OpenTK.Graphics.OpenGL;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using System;
@@ -34,7 +35,8 @@ namespace BlobRPG
                 Profile = ContextProfile.Core,
                 Size = new OpenTK.Mathematics.Vector2i(Settings.Width, Settings.Height),
                 WindowState = Settings.WindowState,
-                Title = "BlobRPG"
+                Title = "BlobRPG",
+                NumberOfSamples = Settings.MSAA
             };
 
 

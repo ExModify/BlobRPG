@@ -3,6 +3,7 @@ using BlobRPG.LoggerComponents;
 using BlobRPG.SettingsComponents;
 using BlobRPG.SettingsComponents.Attributes;
 using GlmSharp;
+using OpenTK.Graphics.OpenGL;
 using OpenTK.Windowing.Common;
 using System;
 using System.Collections.Generic;
@@ -15,10 +16,18 @@ namespace BlobRPG
     public static class Settings
     {
         /* 
-         * Internal variables
+         * Internal variables and methods
          */
-
-
+        private static List<string> Extensions;
+        internal static void InitExtensions()
+        {
+            Extensions = new List<string>(GL.GetString(StringName.Extensions).ToLower().Split(' '));
+        }
+        public static bool CheckExtension(string extension)
+        {
+            return Extensions.Contains(extension.ToLower());
+        }
+        
         // Player related
         public static double DeltaTime { get; set; } = 0;
         public static double Gravity { get; set; } = -10;
@@ -73,6 +82,8 @@ namespace BlobRPG
         public static WindowState WindowState { get; set; } = WindowState.Normal;
         [Savable("Video"), Min(40), Max(200)]
         public static int FieldOfView { get; set; } = 70;
+        [Savable("Video")]
+        public static int MSAA { get; set; } = 8;
 
         [Savable("Account")]
         public static string Username { get; set; } = "";

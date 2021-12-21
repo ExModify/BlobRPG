@@ -38,12 +38,17 @@ namespace BlobRPG.MainComponents
         {
             base.OnLoad();
 
+            GL.Enable(EnableCap.Multisample);
+
+            Settings.InitExtensions();
+
             GL.Viewport(0, 0, ClientSize.X, ClientSize.Y);
             Settings.AspectRatio = (float)ClientSize.X / ClientSize.Y;
 
             Fog = new Fog();
 
             InputManager.Init(this);
+
 
             Loader.Init();
             Loader.Load(this);
@@ -131,6 +136,7 @@ namespace BlobRPG.MainComponents
 
             ParticleTexture particleTexture = new ParticleTexture(Loader.LoadTexture("starter/texture/smokeParticle.png"), 8);
             ParticleSystem = new ParticleSystem(particleTexture, 1, 0.02f, 0, 700, 1);
+
         }
 
         protected override void OnClosed()
