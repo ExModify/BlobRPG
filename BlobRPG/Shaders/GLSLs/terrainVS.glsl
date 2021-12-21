@@ -23,9 +23,16 @@ uniform int lightCount;
 
 uniform vec4 clipPlane;
 
-void main(void)
-{
+
+uniform mat4 toShadowMapSpace;
+uniform float shadowDistance;
+const float transitionDistance = 10.0;
+out vec4 shadowCoords;
+
+void main(void) {
+
 	vec4 worldPosition = transformationMatrix * vec4(position, 1.0);
+
 	gl_ClipDistance[0] = dot(worldPosition, clipPlane);
 
 	vec4 positionRelativeToCam = viewMatrix * worldPosition;
@@ -45,4 +52,9 @@ void main(void)
 	float distance = length(positionRelativeToCam.xyz);
 	visibility = exp(-pow((distance * density), gradient));
 	visibility = clamp(visibility, 0.0, 1.0);
+	
+	shadowCoords = toShadowMapSpace * worldPosition;
+	distance = distance - (shadowDistance - transitionDistance);
+	distance = distance / transitionDistance;
+	shadowCoords.w = clamp(1.0 - distance, 0.0, 1.0);
 }

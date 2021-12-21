@@ -83,7 +83,7 @@ namespace BlobRPG.Entities
         {
             float zoomLevel = InputManager.ScrollDelta * 5f;
             DistanceFromPlayer -= zoomLevel;
-            DistanceFromPlayer = Math.Clamp(DistanceFromPlayer, 0, 20);
+            DistanceFromPlayer = Math.Clamp(DistanceFromPlayer, 0, Settings.MaxZoom);
 
             if (DistanceFromPlayer == 0)
             {

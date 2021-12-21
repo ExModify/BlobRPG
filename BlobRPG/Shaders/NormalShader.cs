@@ -33,6 +33,12 @@ namespace BlobRPG.Shaders
         private int TextureOffsetLocation;
         private int NumberOfRowsLocation;
 
+        private int ShadowMapLocation;
+        private int ToShadowMapSpaceLocation;
+        private int ShadowDistanceLocation;
+        private int ShadowMapSizeLocation;
+        private int PCFCountLocation;
+
         public NormalShader() : base("normal")
         {
 
@@ -78,11 +84,18 @@ namespace BlobRPG.Shaders
             NumberOfRowsLocation = GetUniformLocation("numberOfRows");
 
             ClipPlaneLocation = GetUniformLocation("clipPlane");
+
+            ToShadowMapSpaceLocation = GetUniformLocation("toShadowMapSpace");
+            ShadowDistanceLocation = GetUniformLocation("shadowDistance");
+            ShadowMapSizeLocation = GetUniformLocation("shadowMapSize");
+            PCFCountLocation = GetUniformLocation("pcfCount");
+            ShadowMapLocation = GetUniformLocation("shadowMap");
         }
         public void ConnectTextureUnits()
         {
             LoadInt(TextureSamplerLocation, 0);
             LoadInt(NormalMapLocation, 1);
+            LoadInt(ShadowMapLocation, 5);
         }
         public void LoadClipPlane(vec4 clipPlane)
         {
@@ -133,6 +146,16 @@ namespace BlobRPG.Shaders
             LoadFloat(GradientLocation, fog.Gradient);
             LoadFloat(DensityLocation, fog.Density);
             LoadVector(FogColor, fog.FogColor);
+        }
+        public void LoadShadowMapSpace(ref mat4 matrix)
+        {
+            LoadMatrix(ToShadowMapSpaceLocation, matrix);
+        }
+        public void LoadShadowVariables(float distance, float size, int pcfCount)
+        {
+            LoadFloat(ShadowDistanceLocation, distance);
+            LoadFloat(ShadowMapSizeLocation, size);
+            LoadInt(PCFCountLocation, pcfCount);
         }
     }
 }

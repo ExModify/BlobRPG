@@ -30,8 +30,14 @@ namespace BlobRPG.Shaders
         private int GTextureLocation;
         private int BTextureLocation;
         private int BlendTextureLocation;
+        private int ShadowMapLocation;
 
         private int ClipPlaneLocation;
+
+        private int ToShadowMapSpaceLocation;
+        private int ShadowDistanceLocation;
+        private int ShadowMapSizeLocation;
+        private int PCFCountLocation;
 
         public TerrainShader() : base("terrain")
         {
@@ -75,8 +81,13 @@ namespace BlobRPG.Shaders
             GTextureLocation = GetUniformLocation("gTexture");
             BTextureLocation = GetUniformLocation("bTexture");
             BlendTextureLocation = GetUniformLocation("blendTexture");
+            ShadowMapLocation = GetUniformLocation("shadowMap");
 
             ClipPlaneLocation = GetUniformLocation("clipPlane");
+            ToShadowMapSpaceLocation = GetUniformLocation("toShadowMapSpace");
+            ShadowDistanceLocation = GetUniformLocation("shadowDistance");
+            ShadowMapSizeLocation = GetUniformLocation("shadowMapSize");
+            PCFCountLocation = GetUniformLocation("pcfCount");
         }
         public void ConnectTextureUnits()
         {
@@ -85,6 +96,7 @@ namespace BlobRPG.Shaders
             LoadInt(GTextureLocation, 2);
             LoadInt(BTextureLocation, 3);
             LoadInt(BlendTextureLocation, 4);
+            LoadInt(ShadowMapLocation, 5);
         }
 
         public void LoadClipPlane(vec4 clipPlane)
@@ -125,6 +137,17 @@ namespace BlobRPG.Shaders
         {
             LoadFloat(ReflectivityLocation, reflectivity);
             LoadFloat(ShineDamperLocation, shineDamper);
+        }
+
+        public void LoadShadowMapSpace(ref mat4 matrix)
+        {
+            LoadMatrix(ToShadowMapSpaceLocation, matrix);
+        }
+        public void LoadShadowVariables(float distance, float size, int pcfCount)
+        {
+            LoadFloat(ShadowDistanceLocation, distance);
+            LoadFloat(ShadowMapSizeLocation, size);
+            LoadInt(PCFCountLocation, pcfCount);
         }
 
     }

@@ -64,7 +64,7 @@ namespace BlobRPG.Shaders
         }
         protected void LoadBool(int location, bool value)
         {
-            GL.Uniform1(location, value ? 1 : 0);
+            GL.Uniform1(location, value ? 1.0f : 0.0f);
         }
         protected void LoadVector(int location, vec2 vector)
         {

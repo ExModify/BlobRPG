@@ -39,6 +39,7 @@ namespace BlobRPG.MainComponents
             base.OnLoad();
 
             GL.Viewport(0, 0, ClientSize.X, ClientSize.Y);
+            Settings.AspectRatio = (float)ClientSize.X / ClientSize.Y;
 
             Fog = new Fog();
 
@@ -47,7 +48,6 @@ namespace BlobRPG.MainComponents
             Loader.Init();
             Loader.Load(this);
 
-            Renderer = new Renderer(this);
 
             RawModel rm = OBJLoader.LoadSimpleOBJ("starter/model/blob.obj");
             ModelTexture mt = new ModelTexture(Loader.LoadTexture("starter/texture/blobTextureAtlas.png"))
@@ -63,6 +63,7 @@ namespace BlobRPG.MainComponents
             {
                 Settings.Sun
             };
+            Renderer = new Renderer(this, Camera);
 
             InputManager.InitMouseRay(this);
 
@@ -124,9 +125,9 @@ namespace BlobRPG.MainComponents
             Entity barrel = new(new TexturedModel(barrelModel, barrelTexture), new vec3(153, 15, -274));
 
             NormalEntities.Add(barrel);
-            Loader.AddText("Meiryo", new vec2(0.0f, 0.5f), "Meiryo");
-            Loader.AddText("Candara", new vec2(0.5f, 0.5f), "Candara");
-            //Renderer.AddGUI(new GUITexture(Loader.LoadTexture("starter/texture/grass.png"), new vec2(0.5f, 0.5f), new vec2(0.25f, 0.25f)));
+            //Loader.AddText("Meiryo", new vec2(0.0f, 0.5f), "Meiryo");
+            //Loader.AddText("Candara", new vec2(0.5f, 0.5f), "Candara");
+            //Renderer.AddGUI(new GUITexture(Renderer.ShadowMapTexture, new vec2(0.5f, 0.5f), new vec2(0.5f, 0.5f)));
 
             ParticleTexture particleTexture = new ParticleTexture(Loader.LoadTexture("starter/texture/smokeParticle.png"), 8);
             ParticleSystem = new ParticleSystem(particleTexture, 1, 0.02f, 0, 700, 1);
@@ -158,12 +159,6 @@ namespace BlobRPG.MainComponents
             Camera.Move();
             InputManager.UpdateMouseRay();
 
-            if (Player.Accelerator == 1)
-            {
-                ParticleSystem.Scale = 1.2f * Math.Clamp((float)Player.Accelerator / 20, 0.3f, 1f);
-                ParticleSystem.GenerateParticles(Player.Position);
-            }
-
             if (Player.Render)
                 Renderer.ProcessObject(Player);
 
@@ -188,9 +183,10 @@ namespace BlobRPG.MainComponents
         protected override void OnRenderFrame(FrameEventArgs args)
         {
             Renderer.Render(Camera, Lights, Fog);
+            base.OnRenderFrame(args);
+            
 
             SwapBuffers();
-            base.OnRenderFrame(args);
         }
 
     }

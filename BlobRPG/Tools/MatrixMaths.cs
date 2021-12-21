@@ -44,5 +44,15 @@ namespace BlobRPG.Tools
 
             return matrix;
         }
+
+        public static string MatToString(this mat4 mat)
+        {
+            return "--------------" + Environment.NewLine
+                + mat.Row0.ToString(" ") + Environment.NewLine
+                + mat.Row0.ToString(" ") + Environment.NewLine
+                + mat.Row0.ToString(" ") + Environment.NewLine
+                + mat.Row0.ToString(" ") + Environment.NewLine
+                + "--------------";
+        }
     }
 }

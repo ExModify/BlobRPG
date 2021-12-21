@@ -20,14 +20,15 @@ namespace BlobRPG.Render
             Shader = shader;
 
             shader.Start();
+            shader.LoadShadowVariables(Settings.ShadowDistance, Settings.ShadowMapSize, Settings.PCFCount);
             shader.LoadProjectionMatrix(projectionMatrix);
             shader.ConnectTextureUnits();
             shader.Stop();
         }
 
-        public void Render(Dictionary<TexturedModel, List<Entity>> entities, Camera camera, List<Light> lights, Fog fog, vec4 clipPlane)
+        public void Render(Dictionary<TexturedModel, List<Entity>> entities, Camera camera, List<Light> lights, Fog fog, vec4 clipPlane, ref mat4 toShadowSpace)
         {
-            Prepare(camera, lights, fog, clipPlane);
+            Prepare(camera, lights, fog, clipPlane, ref toShadowSpace);
             foreach (TexturedModel model in entities.Keys)
             {
                 PrepareTexturedModel(model);
@@ -43,9 +44,10 @@ namespace BlobRPG.Render
 
             Shader.Stop();
         }
-        private void Prepare(Camera camera, List<Light> lights, Fog fog, vec4 clipPlane)
+        private void Prepare(Camera camera, List<Light> lights, Fog fog, vec4 clipPlane, ref mat4 toShadowSpace)
         {
             Shader.Start();
+            Shader.LoadShadowMapSpace(ref toShadowSpace);
             Shader.LoadViewMatrix(camera);
             Shader.LoadLights(lights, camera);
             Shader.LoadFog(fog);

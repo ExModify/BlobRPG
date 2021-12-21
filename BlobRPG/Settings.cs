@@ -27,6 +27,7 @@ namespace BlobRPG
         public const float WalkSpeed = 10;
         public const float RunSpeed = 20;
         public const float JumpHeight = 8;
+        public const float MaxZoom = 100;
 
         public static bool AllowFlight { get; set; } = false;
 
@@ -39,13 +40,18 @@ namespace BlobRPG
         public static vec3 SkyColor { get; set; } = new vec3(0.529f, 0.807f, 0.921f);
         public static vec3 NightColor { get; set; } = new vec3(0.529f, 0.807f, 0.921f) * 0.5f;
 
-        public static Light Sun { get; set; } = new Light(new vec3(0, 1000, -7000), new vec3(.8f, .8f, .8f));
+        public static Light Sun { get; set; } = new Light(new vec3(1000000, 1500000, -1000000), new vec3(.8f, .8f, .8f));
+
+        public static float AspectRatio { get; set; } = Width / (float)Height;
 
         
         // Shader variables
         public const int MAX_LIGHTS = 8;
         public const float WAVE_SPEED = 0.03f;
-
+        public const float ShadowDistance = 100;
+        public const float ShadowOffset = 10;
+        public const int ShadowMapSize = 4096;
+        public const int PCFCount = 2;
 
         /* 
          * Configurable settings 

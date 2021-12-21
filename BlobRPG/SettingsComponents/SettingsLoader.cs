@@ -169,6 +169,7 @@ namespace BlobRPG.SettingsComponents
 
                     case "LogSeverity": /* Or any other enum */
                     case "WindowState":
+                    case "VSyncMode":
                         info.SetValue(null, Enum.Parse(info.PropertyType, value));
                         break;
 

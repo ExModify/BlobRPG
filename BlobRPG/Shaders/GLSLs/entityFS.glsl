@@ -18,6 +18,12 @@ uniform vec3 fogColor;
 
 uniform int lightCount;
 
+
+in vec4 shadowCoords;
+uniform sampler2D shadowMap;
+uniform float shadowMapSize;
+uniform int pcfCount;
+
 out vec4 out_Color;
 
 vec3 NormalizeIfGreaterThanZero(vec3 result)
@@ -29,8 +35,25 @@ vec3 NormalizeIfGreaterThanZero(vec3 result)
 	return result;
 }
 
-void main(void)
-{
+void main(void) {
+	float totalTexels = (pcfCount * 2.0 + 1.0);
+	totalTexels = totalTexels * totalTexels;
+	float texelSize = 1.0 / shadowMapSize;
+	float total = 0.0;
+
+	for (int x = -pcfCount; x <= pcfCount; x++) {
+		for (int y = -pcfCount; y <= pcfCount; y++) {
+			float objectNearestLight = texture(shadowMap, shadowCoords.xy + vec2(x, y) * texelSize).r;
+			if (shadowCoords.z > objectNearestLight + 0.002) {
+				total += 1.0;
+			}
+		}
+	}
+	total /= totalTexels;
+
+	float lightFactor = 1.0 - (total * shadowCoords.w);
+
+
 	vec3 unitNormal = NormalizeIfGreaterThanZero(surfaceNormal);
 	vec3 unitVectorToCamera = NormalizeIfGreaterThanZero(toCameraVector);
 
@@ -58,7 +81,7 @@ void main(void)
 		totalDiffuse = totalDiffuse + (brightness * lightColor[i]) / attFactor;
 		totalSpecular = totalSpecular + (dampedFactor * reflectivity * lightColor[i]) / attFactor;
 	}
-	totalDiffuse = max(totalDiffuse, 0.1);
+	totalDiffuse = max(totalDiffuse * lightFactor, 0.1);
 
 	vec4 textureColor = texture(textureSampler, pass_textureCoords);
 

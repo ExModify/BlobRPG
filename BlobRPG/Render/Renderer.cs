@@ -3,6 +3,7 @@ using BlobRPG.Font;
 using BlobRPG.MainComponents;
 using BlobRPG.Models;
 using BlobRPG.Particles;
+using BlobRPG.Render.Shadows;
 using BlobRPG.Render.Water;
 using BlobRPG.Shaders;
 using BlobRPG.Textures;
@@ -23,12 +24,14 @@ namespace BlobRPG.Render
 
         internal readonly EntityRenderer EntityRenderer;
         internal readonly NormalRenderer NormalRenderer;
-        readonly TerrainRenderer TerrainRenderer;
+        internal readonly TerrainRenderer TerrainRenderer;
         internal readonly GUIRenderer GUIRenderer;
         internal readonly TextRenderer TextRenderer;
         internal readonly SkyboxRenderer SkyboxRenderer;
         internal readonly WaterRenderer WaterRenderer;
         internal readonly ParticleRenderer ParticleRenderer;
+
+        internal readonly ShadowRenderer ShadowRenderer;
 
         readonly EntityShader EntityShader;
         readonly NormalShader NormalShader;
@@ -39,19 +42,27 @@ namespace BlobRPG.Render
         readonly WaterShader WaterShader;
         readonly ParticleShader ParticleShader;
 
+        readonly Dictionary<TexturedModel, List<Entity>> AllEntities;
+
         readonly Dictionary<TexturedModel, List<Entity>> Entities;
         readonly Dictionary<TexturedModel, List<Entity>> NormalEntities;
+
         readonly Dictionary<FontType, List<GUIText>> Texts;
         readonly List<WaterTile> WaterTiles;
         readonly List<Terrain> Terrains;
         readonly List<GUITexture> GUIs;
 
         readonly WaterFrameBuffers WaterFrameBuffers;
-        readonly ParticleHandler Particles;
 
+        public int ShadowMapTexture
+        {
+            get
+            {
+                return ShadowRenderer.ShadowMap;
+            }
+        }
 
         public mat4 ProjectionMatrix;
-
 
         public static void EnableCulling()
         {
@@ -72,9 +83,9 @@ namespace BlobRPG.Render
             GL.Disable(EnableCap.Blend);
         }
 
-        public Renderer(Window window)
+        public Renderer(Window window, Camera camera)
         {
-
+            AllEntities = new Dictionary<TexturedModel, List<Entity>>();
             Entities = new Dictionary<TexturedModel, List<Entity>>();
             NormalEntities = new Dictionary<TexturedModel, List<Entity>>();
             Terrains = new List<Terrain>();
@@ -86,6 +97,7 @@ namespace BlobRPG.Render
 
             window.Resize += (s) =>
             {
+                Settings.AspectRatio = (float)s.Width / s.Height;
                 CreateProjectionMatrix(Settings.FieldOfView, s.Width, s.Height, Settings.NEAR, Settings.FAR);
                 UpdateProjectionMatrix();
             };
@@ -114,6 +126,8 @@ namespace BlobRPG.Render
             ParticleShader = new ParticleShader();
             ParticleRenderer = new ParticleRenderer(ParticleShader, ref ProjectionMatrix);
 
+            ShadowRenderer = new ShadowRenderer(camera);
+
 
             WaterFrameBuffers = new WaterFrameBuffers(window);
             int waterDUDVTexture = Loader.LoadTexture("starter/texture/wassa.png");
@@ -129,6 +143,7 @@ namespace BlobRPG.Render
 
         public void Render(Camera camera, List<Light> lights, Fog fog)
         {
+            RenderShadowMap(lights[0]);
             Render3DObjects(camera, lights, fog, SafetyClipPlane);
 
             GL.Enable(EnableCap.ClipDistance0);
@@ -171,6 +186,7 @@ namespace BlobRPG.Render
             TextShader.CleanUp();
             SkyboxShader.CleanUp();
             WaterShader.CleanUp();
+            ShadowRenderer.CleanUp();
         }
 
         public void AddGUI(GUITexture texture)
@@ -213,10 +229,12 @@ namespace BlobRPG.Render
             if (Entities.Keys.Contains(entity.Model))
             {
                 Entities[entity.Model].Add(entity);
+                AllEntities[entity.Model].Add(entity);
             }
             else
             {
                 Entities.Add(entity.Model, new List<Entity>() { entity });
+                AllEntities.Add(entity.Model, new List<Entity>() { entity });
             }
         }
         public void ProcessNormalObject(Entity entity)
@@ -224,21 +242,29 @@ namespace BlobRPG.Render
             if (NormalEntities.Keys.Contains(entity.Model))
             {
                 NormalEntities[entity.Model].Add(entity);
+                AllEntities[entity.Model].Add(entity);
             }
             else
             {
                 NormalEntities.Add(entity.Model, new List<Entity>() { entity });
+                AllEntities.Add(entity.Model, new List<Entity>() { entity });
             }
         }
 
         private void Render3DObjects(Camera camera, List<Light> lights, Fog fog, vec4 clipPlane)
         {
             Prepare();
+            mat4 toShadowSpace = ShadowRenderer.ToShadowMapSpaceMatrix;
 
-            EntityRenderer.Render(Entities, camera, lights, fog, clipPlane);
-            NormalRenderer.Render(NormalEntities, camera, lights, fog, clipPlane);
-            TerrainRenderer.Render(Terrains, camera, lights, fog, clipPlane);
+            EntityRenderer.Render(Entities, camera, lights, fog, clipPlane, ref toShadowSpace);
+            NormalRenderer.Render(NormalEntities, camera, lights, fog, clipPlane, ref toShadowSpace);
+            TerrainRenderer.Render(Terrains, camera, lights, fog, clipPlane, ref toShadowSpace);
             SkyboxRenderer.Render(camera, fog, clipPlane);
+        }
+        public void RenderShadowMap(Light sun)
+        {
+            ShadowRenderer.Render(AllEntities, sun);
+            AllEntities.Clear();
         }
 
         private void Prepare()
@@ -246,6 +272,9 @@ namespace BlobRPG.Render
             GL.Enable(EnableCap.DepthTest);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             GL.ClearColor(Settings.SkyColor.x, Settings.SkyColor.y, Settings.SkyColor.z, 1);
+
+            GL.ActiveTexture(TextureUnit.Texture5);
+            GL.BindTexture(TextureTarget.Texture2D, ShadowMapTexture);
         }
 
         private void CreateProjectionMatrix(float fov, int width, int height, float near, float far)
