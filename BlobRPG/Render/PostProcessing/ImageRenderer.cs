@@ -10,9 +10,10 @@ namespace BlobRPG.Render.PostProcessing
 {
     public class ImageRenderer
     {
+        public int Width { get; set; }
+        public int Height { get; set; }
+
         private Fbo Fbo;
-        private readonly int Width;
-        private readonly int Height;
         private readonly Window Window;
         private readonly FboDepthType FboDepthType;
 
@@ -27,6 +28,8 @@ namespace BlobRPG.Render.PostProcessing
         public ImageRenderer(Window window, FboDepthType fboDepthType = FboDepthType.None)
         {
             Window = window;
+            Width = window.ClientSize.X;
+            Height = window.ClientSize.Y;
             FboDepthType = fboDepthType;
         }
         public ImageRenderer(int width, int height, FboDepthType fboDepthType = FboDepthType.None)
@@ -44,7 +47,7 @@ namespace BlobRPG.Render.PostProcessing
             }
             else
             {
-                Fbo = new Fbo(Window, FboDepthType);
+                Fbo = new Fbo(Window, this, FboDepthType);
             }
         }
         public void DestroyFBO()

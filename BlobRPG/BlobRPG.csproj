@@ -29,6 +29,15 @@
     <None Update="Shaders\GLSLs\entityVS.glsl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Shaders\GLSLs\Filters\gaussianBlurFS.glsl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Shaders\GLSLs\Filters\horizontalBlurVS.glsl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Shaders\GLSLs\Filters\verticalBlurVS.glsl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Shaders\GLSLs\fontFS.glsl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

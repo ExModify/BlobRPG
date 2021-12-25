@@ -50,6 +50,22 @@ namespace BlobRPG.Render.PostProcessing
 				InitFrameBuffer(depthBufferType);
 			};
 		}
+		public Fbo(Window window, ImageRenderer renderer, FboDepthType depthBufferType = FboDepthType.None)
+		{
+			Width = window.ClientSize.X;
+			Height = window.ClientSize.Y;
+			InitFrameBuffer(depthBufferType);
+
+			window.Resize += e =>
+			{
+				Width = e.Width;
+				Height = e.Height;
+
+				InitFrameBuffer(depthBufferType);
+				renderer.Width = Width;
+				renderer.Height = Height;
+			};
+		}
 		public Fbo(int width, int height, FboDepthType depthBufferType = FboDepthType.None)
 		{
 			Width = width;

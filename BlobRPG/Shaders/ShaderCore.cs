@@ -33,6 +33,26 @@ namespace BlobRPG.Shaders
 
             GetAllUniformLocations();
         }
+        public ShaderCore(string vertexName, string fragmentName)
+        {
+            Log(Debug, "Compiling shader: " + vertexName);
+
+            VertexShaderId = LoadShader(vertexName, ShaderType.VertexShader);
+
+            Log(Debug, "Compiling shader: " + vertexName);
+            FragmentShaderId = LoadShader(fragmentName, ShaderType.FragmentShader);
+            ProgramId = GL.CreateProgram();
+
+            GL.AttachShader(ProgramId, VertexShaderId);
+            GL.AttachShader(ProgramId, FragmentShaderId);
+
+            BindAttributes();
+
+            GL.LinkProgram(ProgramId);
+            GL.ValidateProgram(ProgramId);
+
+            GetAllUniformLocations();
+        }
 
         public void Start()
         {
