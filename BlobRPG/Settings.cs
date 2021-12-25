@@ -21,7 +21,14 @@ namespace BlobRPG
         private static List<string> Extensions;
         internal static void InitExtensions()
         {
-            Extensions = new List<string>(GL.GetString(StringName.Extensions).ToLower().Split(' '));
+            Extensions = new List<string>();
+            int n = GL.GetInteger(GetPName.NumExtensions);
+            for (int i = 0; i < n; i++)
+            {
+                Extensions.Add(GL.GetString(StringNameIndexed.Extensions, i).ToLower());
+            }
+            if (n == 0)
+                Extensions = new List<string>(GL.GetString(StringName.Extensions).ToLower().Split(' '));
         }
         public static bool CheckExtension(string extension)
         {
@@ -40,7 +47,6 @@ namespace BlobRPG
 
         public static bool AllowFlight { get; set; } = false;
 
-
         // Rendering related
         public const float NEAR = 0.1f;
         public const float FAR = 1000f;
@@ -57,7 +63,7 @@ namespace BlobRPG
         // Shader variables
         public const int MAX_LIGHTS = 8;
         public const float WAVE_SPEED = 0.03f;
-        public const float ShadowDistance = 100;
+        public const float ShadowDistance = 150;
         public const float ShadowOffset = 10;
         public const int ShadowMapSize = 4096;
         public const int PCFCount = 2;
@@ -68,22 +74,32 @@ namespace BlobRPG
         [Savable("Main")]
         public static LogSeverity LogSeverity { get; set; } = LogSeverity.Debug;
 
+
+
         [Savable("Video"), Min(0)]
         public static int Width { get; set; } = 1280;
         [Savable("Video"), Min(0)]
+
         public static int Height { get; set; } = 720;
-        [Savable("Video"), Min(30)]
+        [Savable("Video"), Min(30), ExcludeValue(0)]
         public static int RenderFPS { get; set; } = 240;
-        [Savable("Video"), Min(30)]
+        [Savable("Video"), Min(30), ExcludeValue(0)]
         public static int UpdateFPS { get; set; } = 240;
+
         [Savable("Video")]
         public static VSyncMode VSync { get; set; } = VSyncMode.Off;
+
         [Savable("Video")]
         public static WindowState WindowState { get; set; } = WindowState.Normal;
         [Savable("Video"), Min(40), Max(200)]
         public static int FieldOfView { get; set; } = 70;
-        [Savable("Video")]
-        public static int MSAA { get; set; } = 8;
+        [Savable("Video"), Min(0), Max(8)]
+        public static int MSAA { get; set; } = 4;
+
+        [Savable("Effects")]
+        public static bool PostProcessing { get; set; } = true;
+        [Savable("Effects"), Min(-1), Max(1)]
+        public static float Contrast { get; set; } = 0f;
 
         [Savable("Account")]
         public static string Username { get; set; } = "";

@@ -3,6 +3,7 @@ using BlobRPG.Font;
 using BlobRPG.MainComponents;
 using BlobRPG.Models;
 using BlobRPG.Particles;
+using BlobRPG.Render.PostProcessing;
 using BlobRPG.Render.Shadows;
 using BlobRPG.Render.Water;
 using BlobRPG.Shaders;
@@ -100,6 +101,7 @@ namespace BlobRPG.Render
                 Settings.AspectRatio = (float)s.Width / s.Height;
                 CreateProjectionMatrix(Settings.FieldOfView, s.Width, s.Height, Settings.NEAR, Settings.FAR);
                 UpdateProjectionMatrix();
+
             };
 
 
@@ -144,7 +146,6 @@ namespace BlobRPG.Render
         public void Render(Camera camera, List<Light> lights, Fog fog)
         {
             RenderShadowMap(lights[0]);
-            Render3DObjects(camera, lights, fog, SafetyClipPlane);
 
             GL.Enable(EnableCap.ClipDistance0);
 
@@ -164,9 +165,17 @@ namespace BlobRPG.Render
             }
 
             GL.Disable(EnableCap.ClipDistance0);
-            WaterFrameBuffers.UnbindCurrentFB();
+
+            PostProcessor.StartSceneRendering();
+
+            Render3DObjects(camera, lights, fog, SafetyClipPlane);
+            for (int i = 0; i < WaterTiles.Count; i++)
+                WaterRenderer.Render(WaterTiles[i], camera, Settings.Sun);
 
             ParticleRenderer.Render(ParticleHandler.Particles, camera);
+
+            PostProcessor.FinishSceneRendering();
+            PostProcessor.PostProcess();
 
             GUIRenderer.Render(GUIs);
             TextRenderer.Render(Texts);
@@ -176,6 +185,31 @@ namespace BlobRPG.Render
             NormalEntities.Clear();
             WaterTiles.Clear();
         }
+        private void Prepare()
+        {
+            GL.Enable(EnableCap.DepthTest);
+            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+            GL.ClearColor(Settings.SkyColor.x, Settings.SkyColor.y, Settings.SkyColor.z, 1);
+
+            GL.ActiveTexture(TextureUnit.Texture5);
+            GL.BindTexture(TextureTarget.Texture2D, ShadowMapTexture);
+        }
+        private void Render3DObjects(Camera camera, List<Light> lights, Fog fog, vec4 clipPlane)
+        {
+            Prepare();
+            mat4 toShadowSpace = ShadowRenderer.ToShadowMapSpaceMatrix;
+
+            EntityRenderer.Render(Entities, camera, lights, fog, clipPlane, ref toShadowSpace);
+            NormalRenderer.Render(NormalEntities, camera, lights, fog, clipPlane, ref toShadowSpace);
+            TerrainRenderer.Render(Terrains, camera, lights, fog, clipPlane, ref toShadowSpace);
+            SkyboxRenderer.Render(camera, fog, clipPlane);
+        }
+        private void RenderShadowMap(Light sun)
+        {
+            ShadowRenderer.Render(AllEntities, sun);
+            AllEntities.Clear();
+        }
+
         public void CleanUp()
         {
             WaterFrameBuffers.CleanUp();
@@ -251,31 +285,7 @@ namespace BlobRPG.Render
             }
         }
 
-        private void Render3DObjects(Camera camera, List<Light> lights, Fog fog, vec4 clipPlane)
-        {
-            Prepare();
-            mat4 toShadowSpace = ShadowRenderer.ToShadowMapSpaceMatrix;
 
-            EntityRenderer.Render(Entities, camera, lights, fog, clipPlane, ref toShadowSpace);
-            NormalRenderer.Render(NormalEntities, camera, lights, fog, clipPlane, ref toShadowSpace);
-            TerrainRenderer.Render(Terrains, camera, lights, fog, clipPlane, ref toShadowSpace);
-            SkyboxRenderer.Render(camera, fog, clipPlane);
-        }
-        public void RenderShadowMap(Light sun)
-        {
-            ShadowRenderer.Render(AllEntities, sun);
-            AllEntities.Clear();
-        }
-
-        private void Prepare()
-        {
-            GL.Enable(EnableCap.DepthTest);
-            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-            GL.ClearColor(Settings.SkyColor.x, Settings.SkyColor.y, Settings.SkyColor.z, 1);
-
-            GL.ActiveTexture(TextureUnit.Texture5);
-            GL.BindTexture(TextureTarget.Texture2D, ShadowMapTexture);
-        }
 
         private void CreateProjectionMatrix(float fov, int width, int height, float near, float far)
         {

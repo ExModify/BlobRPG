@@ -39,6 +39,9 @@ namespace BlobRPG.Render.Water
 
 				ReflectionWidth = RefractionWidth / 4;
 				ReflectionHeight = RefractionHeight / 4;
+
+				InitReflectionFB();
+				InitReferactionFB();
 			};
 
 			InitReflectionFB();
@@ -66,7 +69,7 @@ namespace BlobRPG.Render.Water
 		public void UnbindCurrentFB()
 		{
 			GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
-			GL.Viewport(0, 0, RefractionWidth, RefractionHeight);
+			GL.Viewport(0, 0, Settings.Width, Settings.Height);
 		}
 
 		private void InitReflectionFB()

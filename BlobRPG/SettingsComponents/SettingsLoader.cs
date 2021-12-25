@@ -190,6 +190,7 @@ namespace BlobRPG.SettingsComponents
         private static double CheckLimit(PropertyInfo info, double value)
         {
             double? min = null, max = null;
+            List<double> exclude = new List<double>();
 
             if (info.CustomAttributes.Any())
             {
@@ -205,8 +206,14 @@ namespace BlobRPG.SettingsComponents
                     {
                         max = maxAttr.Value;
                     }
+                    else if (attribGeneric is ExcludeValue exclAttr)
+                    {
+                        exclude.AddRange(exclAttr.Values);
+                    }
                 }
             }
+            if (exclude.Contains(value))
+                return value;
 
             if (min.HasValue && value < min.Value)
                 return min.Value;

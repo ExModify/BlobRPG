@@ -18,24 +18,25 @@ namespace BlobRPG.Render
             Shader = shader;
 
             shader.Start();
+            shader.ConnectTextureUnits();
             shader.LoadShadowVariables(Settings.ShadowDistance, Settings.ShadowMapSize, Settings.PCFCount);
             shader.LoadProjectionMatrix(projectionMatrix);
-            shader.ConnectTextureUnits();
             shader.Stop();
         }
 
         public void Render(List<Terrain> terrains, Camera camera, List<Light> lights, Fog fog, vec4 clipPlane, ref mat4 toShadowSpace)
         {
             Prepare(camera, lights, fog, clipPlane, ref toShadowSpace);
-            foreach (Terrain terrain in terrains)
+            for (int i = 0; i < terrains.Count; i++)
             {
-                PrepareTerrain(terrain);
-                LoadModelMatrix(terrain);
+                PrepareTerrain(terrains[i]);
 
-                GL.DrawElements(PrimitiveType.Triangles, terrain.Model.VertexCount, DrawElementsType.UnsignedInt, 0);
+                GL.DrawElements(PrimitiveType.Triangles, terrains[i].Model.VertexCount, DrawElementsType.UnsignedInt, 0);
 
                 FinishTexturedModel();
             }
+
+            Shader.Stop();
         }
         private void Prepare(Camera camera, List<Light> lights, Fog fog, vec4 clipPlane, ref mat4 toShadowSpace)
         {
@@ -71,9 +72,6 @@ namespace BlobRPG.Render
             GL.BindTexture(TextureTarget.Texture2D, terrain.BlendMap.TextureId);
 
             Shader.LoadShineVariables(0, 1);
-        }
-        private void LoadModelMatrix(Terrain terrain)
-        {
             Shader.LoadTransformationMatrix(terrain.TransformationMatrix);
         }
         private void FinishTexturedModel()

@@ -14,6 +14,9 @@ using BlobRPG.WavefrontOBJ;
 using GlmSharp;
 using System.IO;
 using BlobRPG.Particles;
+using BlobRPG.SettingsComponents;
+using BlobRPG.Render.PostProcessing;
+using BlobRPG.Render.PostProcessing.Filters;
 
 namespace BlobRPG.MainComponents
 {
@@ -34,6 +37,22 @@ namespace BlobRPG.MainComponents
         List<WaterTile> WaterTiles;
         Fog Fog;
 
+        protected override void OnResize(ResizeEventArgs e)
+        {
+            base.OnResize(e);
+
+            Settings.Width = e.Width;
+            Settings.Height = e.Height;
+
+            SettingsLoader.SaveSettings();
+        }
+        protected override void OnMaximized(MaximizedEventArgs e)
+        {
+            base.OnMaximized(e);
+
+            Settings.WindowState = WindowState;
+            SettingsLoader.SaveSettings();
+        }
         protected override void OnLoad()
         {
             base.OnLoad();
@@ -137,6 +156,12 @@ namespace BlobRPG.MainComponents
             ParticleTexture particleTexture = new ParticleTexture(Loader.LoadTexture("starter/texture/smokeParticle.png"), 8);
             ParticleSystem = new ParticleSystem(particleTexture, 1, 0.02f, 0, 700, 1);
 
+            PostProcessor.Init(this);
+
+            if (Settings.PostProcessing)
+            {
+                PostProcessor.RegisterFilter(new ContrastFilter(this));
+            }
         }
 
         protected override void OnClosed()

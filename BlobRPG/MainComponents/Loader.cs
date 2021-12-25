@@ -44,7 +44,7 @@ namespace BlobRPG.MainComponents
         {
             Window = window;
             Log(Debug, "Loading shaders...");
-            string[] shaders = Directory.EnumerateFiles("Shaders/GLSLs").ToArray();
+            string[] shaders = Directory.EnumerateFiles("Shaders/GLSLs", "*.glsl", SearchOption.AllDirectories).ToArray();
             foreach (string shader in shaders)
             {
                 string data = File.ReadAllText(shader);
