@@ -28,7 +28,8 @@ uniform sampler2D shadowMap;
 uniform float shadowMapSize;
 uniform int pcfCount;
 
-out vec4 out_Color;
+layout (location = 0) out vec4 out_Color;
+layout (location = 1) out vec4 out_BrightColor;
 
 vec3 NormalizeIfGreaterThanZero(vec3 result)
 {
@@ -101,4 +102,5 @@ void main(void)
 
 	out_Color = vec4(totalDiffuse, 1.0) * totalColor + vec4(totalSpecular, 1.0);
 	out_Color = mix(vec4(fogColor, 1.0), out_Color, visibility);
+	out_BrightColor = vec4(0.0);
 }

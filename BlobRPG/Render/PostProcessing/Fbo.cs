@@ -18,20 +18,24 @@ namespace BlobRPG.Render.PostProcessing
 
 		public bool Multisample { get; private set; }
 
+		private int NumberOfColorAttachments;
+
 		private int Width;
 		private int Height;
 
 		private int FrameBuffer;
 
 		private int DepthBuffer;
-		private int ColorBuffer;
+		private int[] ColorBuffers;
 
-		public Fbo(int width, int height, Window window, FboDepthType depthBufferType = FboDepthType.None, bool multisampled = false)
+		public Fbo(int width, int height, FboDepthType depthBufferType = FboDepthType.None, bool multisampled = false, int numberOfColorAttachmetns = 1)
 		{
 			Width = width;
 			Height = height;
 			DepthBufferType = depthBufferType;
 			Multisample = multisampled;
+			NumberOfColorAttachments = numberOfColorAttachmetns;
+			ColorBuffers = new int[NumberOfColorAttachments];
 
 			if (!DepthBufferType.HasFlag(FboDepthType.DepthRenderBuffer) && multisampled)
             {
@@ -39,21 +43,15 @@ namespace BlobRPG.Render.PostProcessing
 				DepthBufferType |= FboDepthType.DepthRenderBuffer;
 			}
 			InitFrameBuffer(DepthBufferType);
-
-			window.Resize += e =>
-			{
-				Width = e.Width;
-				Height = e.Height;
-
-				InitFrameBuffer(DepthBufferType);
-			};
 		}
-		public Fbo(Window window, FboDepthType depthBufferType = FboDepthType.None, bool multisampled = false)
+		public Fbo(Window window, FboDepthType depthBufferType = FboDepthType.None, bool multisampled = false, int numberOfColorAttachmetns = 1)
 		{
 			Width = window.ClientSize.X;
 			Height = window.ClientSize.Y;
 			DepthBufferType = depthBufferType;
 			Multisample = multisampled;
+			NumberOfColorAttachments = numberOfColorAttachmetns;
+			ColorBuffers = new int[NumberOfColorAttachments];
 
 			if (!DepthBufferType.HasFlag(FboDepthType.DepthRenderBuffer) && multisampled)
 			{
@@ -66,16 +64,19 @@ namespace BlobRPG.Render.PostProcessing
 			{
 				Width = e.Width;
 				Height = e.Height;
+				CleanUp();
 
 				InitFrameBuffer(DepthBufferType);
 			};
 		}
-		public Fbo(Window window, ImageRenderer renderer, FboDepthType depthBufferType = FboDepthType.None, bool multisampled = false)
+		public Fbo(Window window, ImageRenderer renderer, FboDepthType depthBufferType = FboDepthType.None, bool multisampled = false, int numberOfColorAttachmetns = 1)
 		{
 			Width = (int)(window.ClientSize.X * renderer.Multiplier);
 			Height = (int)(window.ClientSize.Y * renderer.Multiplier);
 			DepthBufferType = depthBufferType;
 			Multisample = multisampled;
+			NumberOfColorAttachments = numberOfColorAttachmetns;
+			ColorBuffers = new int[NumberOfColorAttachments];
 
 			if (!DepthBufferType.HasFlag(FboDepthType.DepthRenderBuffer) && multisampled)
 			{
@@ -88,6 +89,8 @@ namespace BlobRPG.Render.PostProcessing
 			{
 				Width = (int)(e.Width * renderer.Multiplier);
 				Height = (int)(e.Height * renderer.Multiplier);
+
+				CleanUp();
 
 				InitFrameBuffer(DepthBufferType);
 				renderer.Width = Width;
@@ -115,7 +118,7 @@ namespace BlobRPG.Render.PostProcessing
 			GL.DeleteTexture(ColorTexture);
 			GL.DeleteTexture(DepthTexture);
 			GL.DeleteRenderbuffer(DepthBuffer);
-			GL.DeleteRenderbuffer(ColorBuffer);
+			GL.DeleteRenderbuffers(ColorBuffers.Length, ColorBuffers);
 		}
 
 		public void BindFrameBuffer()
@@ -137,17 +140,19 @@ namespace BlobRPG.Render.PostProcessing
 			GL.ReadBuffer(ReadBufferMode.ColorAttachment0);
 		}
 
-		public void ResolveToFbo(Fbo output)
+		public void ResolveToFbo(Fbo output, int colorAttachment = 0)
         {
 			GL.BindFramebuffer(FramebufferTarget.DrawFramebuffer, output.FrameBuffer);
 			GL.BindFramebuffer(FramebufferTarget.ReadFramebuffer, FrameBuffer);
+			GL.ReadBuffer(ReadBufferMode.ColorAttachment0 + colorAttachment);
 			GL.BlitFramebuffer(0, 0, Width, Height, 0, 0, output.Width, output.Height, ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit, BlitFramebufferFilter.Nearest);
 			UnbindFrameBuffer();
 		}
-		public void ResolveToScreen()
+		public void ResolveToScreen(int colorAttachment = 0)
 		{
 			GL.BindFramebuffer(FramebufferTarget.DrawFramebuffer, 0);
 			GL.BindFramebuffer(FramebufferTarget.ReadFramebuffer, FrameBuffer);
+			GL.ReadBuffer(ReadBufferMode.ColorAttachment0 + colorAttachment);
 			GL.DrawBuffer(DrawBufferMode.Back);
 			GL.BlitFramebuffer(0, 0, Width, Height, 0, 0, Settings.Width, Settings.Height, ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Nearest);
 			UnbindFrameBuffer();
@@ -179,7 +184,11 @@ namespace BlobRPG.Render.PostProcessing
 		{
 			FrameBuffer = GL.GenFramebuffer();
 			GL.BindFramebuffer(FramebufferTarget.Framebuffer, FrameBuffer);
-			GL.DrawBuffer(DrawBufferMode.ColorAttachment0);
+
+			DrawBuffersEnum[] targets = new DrawBuffersEnum[NumberOfColorAttachments];
+			for (int i = 0; i < NumberOfColorAttachments; i++)
+				targets[i] = DrawBuffersEnum.ColorAttachment0 + i;
+			GL.DrawBuffers(targets.Length, targets);
 		}
 
 		private void CreateTextureAttachment()
@@ -205,10 +214,13 @@ namespace BlobRPG.Render.PostProcessing
 		}
 		private void CreateMultisampleColorAttachment()
         {
-			ColorBuffer = GL.GenRenderbuffer();
-			GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, ColorBuffer);
-			GL.RenderbufferStorageMultisample(RenderbufferTarget.Renderbuffer, Settings.MSAA, RenderbufferStorage.Rgba8, Width, Height);
-			GL.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, RenderbufferTarget.Renderbuffer, ColorBuffer);
+			GL.GenRenderbuffers(NumberOfColorAttachments, ColorBuffers);
+			for (int i = 0; i < NumberOfColorAttachments; i++)
+			{
+				GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, ColorBuffers[i]);
+				GL.RenderbufferStorageMultisample(RenderbufferTarget.Renderbuffer, Settings.MSAA, RenderbufferStorage.Rgba8, Width, Height);
+				GL.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0 + i, RenderbufferTarget.Renderbuffer, ColorBuffers[i]);
+			}
 		}
 		private void CreateDepthBufferAttachment()
 		{

@@ -17,6 +17,9 @@ namespace BlobRPG.Render.PostProcessing.Filters
         public CombineFilter(Window window, float multiplier = 1) : base(window, multiplier)
         {
             Shader = new CombineShader();
+            Shader.Start();
+            Shader.ConnectTextureUnits();
+            Shader.Stop();
         }
 
         public override void Render(int texture)
@@ -24,6 +27,7 @@ namespace BlobRPG.Render.PostProcessing.Filters
             Shader.Start();
             GL.ActiveTexture(TextureUnit.Texture0);
             GL.BindTexture(TextureTarget.Texture2D, PostProcessor.SceneTexture);
+
             GL.ActiveTexture(TextureUnit.Texture1);
             GL.BindTexture(TextureTarget.Texture2D, texture);
             Renderer.Render();

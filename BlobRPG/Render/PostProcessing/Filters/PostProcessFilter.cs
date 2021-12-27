@@ -11,6 +11,7 @@ namespace BlobRPG.Render.PostProcessing.Filters
     {
         protected ImageRenderer Renderer { get; set; }
         public string UniqueName { get; set; }
+        public int ColorAttachment { get; set; } = 0;
 
         public int OutputTexture
         {
@@ -29,7 +30,6 @@ namespace BlobRPG.Render.PostProcessing.Filters
         {
             Renderer = new ImageRenderer(width, height);
         }
-
         public abstract void Render(int texture);
         public abstract void UpdateVariables();
         public abstract void CleanUp();

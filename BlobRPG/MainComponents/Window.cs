@@ -144,7 +144,8 @@ namespace BlobRPG.MainComponents
             {
                 ShineDamper = 10,
                 Reflectivity = 1,
-                NormalMap = Loader.LoadTexture("starter/texture/barrelNormal.png")
+                NormalMap = Loader.LoadTexture("starter/texture/barrelNormal.png"),
+                SpecularMap = Loader.LoadTexture("starter/texture/barrelGlow.png")
             };
             Entity barrel = new(new TexturedModel(barrelModel, barrelTexture), new vec3(153, 15, -274));
 
@@ -160,11 +161,14 @@ namespace BlobRPG.MainComponents
 
             if (Settings.PostProcessing)
             {
-                PostProcessor.RegisterFilter(new BrightFilter(this, 0.5f));
-                PostProcessor.RegisterFilter(new HorizontalBlurFilter(this, 0.2f));
+                //PostProcessor.RegisterFilter(new BrightFilter(this, 0.5f));
+                PostProcessor.RegisterFilter(new HorizontalBlurFilter(this, 0.2f)
+                {
+                    ColorAttachment = 1
+                });
                 PostProcessor.RegisterFilter(new VerticalBlurFilter(this, 0.2f));
                 PostProcessor.RegisterFilter(new CombineFilter(this));
-                PostProcessor.RegisterFilter(new ContrastFilter(this));
+                //PostProcessor.RegisterFilter(new ContrastFilter(this));
             }
         }
 

@@ -17,10 +17,14 @@ namespace BlobRPG.Render.PostProcessing
         private static List<PostProcessFilter> Filters;
         private static RawModel Model;
         private static Window Window;
+
         private static Fbo MultisampledFbo;
         private static Fbo Fbo;
+        private static Fbo BrightFbo;
+        private static int[] ColorAttachments;
 
         public static int SceneTexture { get; private set; }
+        public static int SceneBrightTexture { get; private set; }
 
         public static void Init(Window window)
         {
@@ -28,6 +32,7 @@ namespace BlobRPG.Render.PostProcessing
             Filters = new List<PostProcessFilter>();
             FiltersMap = new Dictionary<string, PostProcessFilter>();
             Window = window;
+            ColorAttachments = new int[2];
 
             CreateInternalFBO();
         }
@@ -85,9 +90,14 @@ namespace BlobRPG.Render.PostProcessing
             {
                 MultisampledFbo.UnbindFrameBuffer();
                 if (Fbo != null)
-                    MultisampledFbo.ResolveToFbo(Fbo);
+                {
+                    MultisampledFbo.ResolveToFbo(Fbo, 0);
+                    MultisampledFbo.ResolveToFbo(BrightFbo, 1);
+                }
                 else
+                {
                     MultisampledFbo.ResolveToScreen();
+                }
             }
             else if (Fbo != null)
             {
@@ -101,8 +111,14 @@ namespace BlobRPG.Render.PostProcessing
             if (Filters.Count > 0)
             {
                 Prepare();
-                int previousTexture = Fbo.ColorTexture;
+
+                ColorAttachments[0] = Fbo.ColorTexture;
+                ColorAttachments[1] = BrightFbo.ColorTexture;
+
                 SceneTexture = Fbo.ColorTexture;
+                SceneBrightTexture = BrightFbo.ColorTexture;
+
+                int previousTexture = ColorAttachments[Filters[0].ColorAttachment];
 
                 for (int i = 0; i < Filters.Count; i++)
                 {
@@ -146,7 +162,10 @@ namespace BlobRPG.Render.PostProcessing
                 Fbo = new Fbo(Window, FboDepthType.DepthRenderBuffer);
 
             if (Settings.MSAA != 0 && MultisampledFbo == null)
-                MultisampledFbo = new Fbo(Window, FboDepthType.DepthRenderBuffer, true);
+            {
+                MultisampledFbo = new Fbo(Window, FboDepthType.DepthRenderBuffer, true, 2);
+                BrightFbo = new Fbo(Window, FboDepthType.DepthRenderBuffer);
+            }
         }
         private static void DestroyInternalFBO()
         {
@@ -159,6 +178,9 @@ namespace BlobRPG.Render.PostProcessing
             {
                 MultisampledFbo.CleanUp();
                 MultisampledFbo = null;
+
+                BrightFbo.CleanUp();
+                BrightFbo = null;
             }
         }
     }
