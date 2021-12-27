@@ -13,6 +13,9 @@ namespace BlobRPG.Render.PostProcessing
         public int Width { get; set; }
         public int Height { get; set; }
 
+        public bool Multisampled { get; private set; }
+        public float Multiplier { get; private set; } = 1;
+
         private Fbo Fbo;
         private readonly Window Window;
         private readonly FboDepthType FboDepthType;
@@ -25,18 +28,21 @@ namespace BlobRPG.Render.PostProcessing
             }
         }
 
-        public ImageRenderer(Window window, FboDepthType fboDepthType = FboDepthType.None)
+        public ImageRenderer(Window window, float multiplier = 1, FboDepthType fboDepthType = FboDepthType.None, bool multisampled = false)
         {
             Window = window;
-            Width = window.ClientSize.X;
-            Height = window.ClientSize.Y;
+            Width = (int)(window.ClientSize.X * multiplier);
+            Height = (int)(window.ClientSize.Y * multiplier);
+            Multiplier = multiplier;
             FboDepthType = fboDepthType;
+            Multisampled = multisampled;
         }
-        public ImageRenderer(int width, int height, FboDepthType fboDepthType = FboDepthType.None)
+        public ImageRenderer(int width, int height, FboDepthType fboDepthType = FboDepthType.None, bool multisampled = false)
         {
             Width = width;
             Height = height;
             FboDepthType = fboDepthType;
+            Multisampled = multisampled;
         }
 
         public void CreateFBO()
@@ -45,11 +51,11 @@ namespace BlobRPG.Render.PostProcessing
             {
                 if (Window == null)
                 {
-                    Fbo = new Fbo(Width, Height, FboDepthType);
+                    Fbo = new Fbo(Width, Height, FboDepthType, Multisampled);
                 }
                 else
                 {
-                    Fbo = new Fbo(Window, this, FboDepthType);
+                    Fbo = new Fbo(Window, this, FboDepthType, Multisampled);
                 }
             }
         }

@@ -1,5 +1,4 @@
 ﻿using BlobRPG.MainComponents;
-using BlobRPG.Shaders;
 using BlobRPG.Shaders.Filters;
 using OpenTK.Graphics.OpenGL;
 using System;
@@ -10,32 +9,24 @@ using System.Threading.Tasks;
 
 namespace BlobRPG.Render.PostProcessing.Filters
 {
-    public class HorizontalBlurFilter : PostProcessFilter
+    public class CombineFilter : PostProcessFilter
     {
-        private readonly HorizontalBlurShader Shader;
 
-        public HorizontalBlurFilter(Window window, float multiplier = 1) : base(window, multiplier)
-        {
-            Shader = new HorizontalBlurShader();
-        }
-        public HorizontalBlurFilter(int width, int height) : base(width, height)
-        {
-            Shader = new HorizontalBlurShader();
-        }
+        private readonly CombineShader Shader;
 
+        public CombineFilter(Window window, float multiplier = 1) : base(window, multiplier)
+        {
+            Shader = new CombineShader();
+        }
 
         public override void Render(int texture)
         {
             Shader.Start();
             GL.ActiveTexture(TextureUnit.Texture0);
+            GL.BindTexture(TextureTarget.Texture2D, PostProcessor.SceneTexture);
+            GL.ActiveTexture(TextureUnit.Texture1);
             GL.BindTexture(TextureTarget.Texture2D, texture);
             Renderer.Render();
-            Shader.Stop();
-        }
-        public override void UpdateVariables()
-        {
-            Shader.Start();
-            Shader.LoadWidth(Renderer.Width);
             Shader.Stop();
         }
         public override void CleanUp()
@@ -43,6 +34,10 @@ namespace BlobRPG.Render.PostProcessing.Filters
             Shader.CleanUp();
             Renderer.CleanUp();
             Renderer.DestroyFBO();
+        }
+        public override void UpdateVariables()
+        {
+
         }
     }
 }

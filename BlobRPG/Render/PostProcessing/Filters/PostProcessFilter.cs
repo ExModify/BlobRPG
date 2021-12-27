@@ -21,9 +21,9 @@ namespace BlobRPG.Render.PostProcessing.Filters
         }
 
 
-        public PostProcessFilter(Window window)
+        public PostProcessFilter(Window window, float multiplier = 1.0f)
         {
-            Renderer = new ImageRenderer(window);
+            Renderer = new ImageRenderer(window, multiplier);
         }
         public PostProcessFilter(int width, int height)
         {

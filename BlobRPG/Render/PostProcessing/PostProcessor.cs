@@ -20,6 +20,8 @@ namespace BlobRPG.Render.PostProcessing
         private static Fbo MultisampledFbo;
         private static Fbo Fbo;
 
+        public static int SceneTexture { get; private set; }
+
         public static void Init(Window window)
         {
             Model = Loader.LoadToVao(Positions);
@@ -100,6 +102,7 @@ namespace BlobRPG.Render.PostProcessing
             {
                 Prepare();
                 int previousTexture = Fbo.ColorTexture;
+                SceneTexture = Fbo.ColorTexture;
 
                 for (int i = 0; i < Filters.Count; i++)
                 {

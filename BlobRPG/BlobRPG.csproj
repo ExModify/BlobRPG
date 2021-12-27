@@ -17,6 +17,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Shaders\GLSLs\brightFS.glsl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Shaders\GLSLs\combineFS.glsl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Shaders\GLSLs\Filters\contrastFS.glsl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

@@ -14,7 +14,7 @@ namespace BlobRPG.Render.PostProcessing.Filters
     {
         private readonly VerticalBlurShader Shader;
 
-        public VerticalBlurFilter(Window window) : base(window)
+        public VerticalBlurFilter(Window window, float multiplier = 1) : base(window, multiplier)
         {
             Shader = new VerticalBlurShader();
         }

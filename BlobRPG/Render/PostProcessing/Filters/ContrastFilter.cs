@@ -13,7 +13,7 @@ namespace BlobRPG.Render.PostProcessing.Filters
     {
         private readonly ContrastShader Shader;
 
-        public ContrastFilter(Window window) : base(window)
+        public ContrastFilter(Window window, float multiplier = 1) : base(window, multiplier)
         {
             Shader = new ContrastShader();
         }

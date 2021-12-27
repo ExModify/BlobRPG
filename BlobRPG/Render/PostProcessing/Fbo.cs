@@ -72,8 +72,8 @@ namespace BlobRPG.Render.PostProcessing
 		}
 		public Fbo(Window window, ImageRenderer renderer, FboDepthType depthBufferType = FboDepthType.None, bool multisampled = false)
 		{
-			Width = window.ClientSize.X;
-			Height = window.ClientSize.Y;
+			Width = (int)(window.ClientSize.X * renderer.Multiplier);
+			Height = (int)(window.ClientSize.Y * renderer.Multiplier);
 			DepthBufferType = depthBufferType;
 			Multisample = multisampled;
 
@@ -86,8 +86,8 @@ namespace BlobRPG.Render.PostProcessing
 
 			window.Resize += e =>
 			{
-				Width = e.Width;
-				Height = e.Height;
+				Width = (int)(e.Width * renderer.Multiplier);
+				Height = (int)(e.Height * renderer.Multiplier);
 
 				InitFrameBuffer(DepthBufferType);
 				renderer.Width = Width;

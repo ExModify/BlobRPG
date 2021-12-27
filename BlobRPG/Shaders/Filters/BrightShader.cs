@@ -6,27 +6,21 @@ using System.Threading.Tasks;
 
 namespace BlobRPG.Shaders.Filters
 {
-    public class ContrastShader : ShaderCore
+    class BrightShader : ShaderCore
     {
-        private int ContrastLocation;
+        private int ColorTextureLocation;
+        private int HighlightTextureLocation;
 
-
-        public ContrastShader() : base("simple", "contrast")
+        public BrightShader() : base("simple", "bright")
         {
-        }
 
+        }
         protected override void GetAllUniformLocations()
         {
-            ContrastLocation = GetUniformLocation("contrast");
         }
         protected override void BindAttributes()
         {
             BindAttribute(0, "position");
-        }
-
-        public void LoadContrast(float contrast)
-        {
-            LoadFloat(ContrastLocation, Math.Clamp(contrast, -1, 1));
         }
     }
 }

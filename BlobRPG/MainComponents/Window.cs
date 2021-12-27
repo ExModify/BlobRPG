@@ -160,6 +160,10 @@ namespace BlobRPG.MainComponents
 
             if (Settings.PostProcessing)
             {
+                PostProcessor.RegisterFilter(new BrightFilter(this, 0.5f));
+                PostProcessor.RegisterFilter(new HorizontalBlurFilter(this, 0.2f));
+                PostProcessor.RegisterFilter(new VerticalBlurFilter(this, 0.2f));
+                PostProcessor.RegisterFilter(new CombineFilter(this));
                 PostProcessor.RegisterFilter(new ContrastFilter(this));
             }
         }
