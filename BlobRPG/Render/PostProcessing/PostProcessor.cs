@@ -17,6 +17,7 @@ namespace BlobRPG.Render.PostProcessing
         private static List<PostProcessFilter> Filters;
         private static RawModel Model;
         private static Window Window;
+        private static Fbo MultisampledFbo;
         private static Fbo Fbo;
 
         public static void Init(Window window)
@@ -25,28 +26,38 @@ namespace BlobRPG.Render.PostProcessing
             Filters = new List<PostProcessFilter>();
             FiltersMap = new Dictionary<string, PostProcessFilter>();
             Window = window;
+
+            CreateInternalFBO();
         }
 
         public static void RegisterFilter(PostProcessFilter filter)
         {
-            if (Filters.Count != 0)
+            filter.UpdateVariables();
+            filter.UniqueName = GenerateUniqueName();
+
+            Filters.Add(filter);
+            FiltersMap.Add(filter.UniqueName, filter);
+
+            if (Filters.Count != 1)
             {
-                Filters[^1].CreateFBO();
+                Filters[^2].EnsureFBO();
             }
             else
             {
                 CreateInternalFBO();
             }
-            filter.UpdateVariables();
-            Filters.Add(filter);
-            FiltersMap.Add(filter.GetType().Name, filter);
         }
         public static void UnregisterFilter(PostProcessFilter filter)
         {
             Filters.Remove(filter);
-            FiltersMap.Remove(filter.GetType().Name);
+            FiltersMap.Remove(filter.UniqueName);
+
             if (Filters.Count != 0)
             {
+                for (int i = Filters.Count - 2; i > -1; i--)
+                {
+                    Filters[i].EnsureFBO();
+                }
                 Filters[^1].DestroyFBO();
             }
             else
@@ -57,17 +68,30 @@ namespace BlobRPG.Render.PostProcessing
 
         public static void StartSceneRendering()
         {
-            if (Fbo != null)
+            if (MultisampledFbo != null)
+            {
+                MultisampledFbo.BindFrameBuffer();
+            }
+            else if (Fbo != null)
             {
                 Fbo.BindFrameBuffer();
             }
         }
         public static void FinishSceneRendering()
         {
-            if (Fbo != null)
+            if (MultisampledFbo != null)
+            {
+                MultisampledFbo.UnbindFrameBuffer();
+                if (Fbo != null)
+                    MultisampledFbo.ResolveToFbo(Fbo);
+                else
+                    MultisampledFbo.ResolveToScreen();
+            }
+            else if (Fbo != null)
             {
                 Fbo.UnbindFrameBuffer();
             }
+            PostProcess();
         }
 
         public static void PostProcess()
@@ -94,7 +118,12 @@ namespace BlobRPG.Render.PostProcessing
                 filter.CleanUp();
             }
         }
-
+        public static string GenerateUniqueName()
+        {
+            string guid;
+            while (FiltersMap.ContainsKey(guid = Guid.NewGuid().ToString("N"))) ;
+            return guid;
+        }
         private static void Prepare()
         {
             GL.BindVertexArray(Model.VaoId);
@@ -110,12 +139,24 @@ namespace BlobRPG.Render.PostProcessing
 
         private static void CreateInternalFBO()
         {
-            Fbo = new Fbo(Window, FboDepthType.DepthRenderBuffer);
+            if (Filters.Count != 0 && Fbo == null)
+                Fbo = new Fbo(Window, FboDepthType.DepthRenderBuffer);
+
+            if (Settings.MSAA != 0 && MultisampledFbo == null)
+                MultisampledFbo = new Fbo(Window, FboDepthType.DepthRenderBuffer, true);
         }
         private static void DestroyInternalFBO()
         {
-            Fbo.CleanUp();
-            Fbo = null;
+            if (Filters.Count == 0 && Fbo != null)
+            {
+                Fbo.CleanUp();
+                Fbo = null;
+            }
+            if (Settings.MSAA == 0 && MultisampledFbo != null)
+            {
+                MultisampledFbo.CleanUp();
+                MultisampledFbo = null;
+            }
         }
     }
 }

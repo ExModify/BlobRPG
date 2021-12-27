@@ -1,5 +1,6 @@
 ﻿using BlobRPG.Entities;
 using BlobRPG.Font;
+using BlobRPG.LoggerComponents;
 using BlobRPG.MainComponents;
 using BlobRPG.Models;
 using BlobRPG.Particles;
@@ -14,12 +15,13 @@ using OpenTK.Mathematics;
 using OpenTK.Windowing.Desktop;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
 namespace BlobRPG.Render
 {
-    public class Renderer
+    public class Renderer : ILogger
     {
         private static readonly vec4 SafetyClipPlane = new(0, -1, 0, 100000000000);
 
@@ -54,6 +56,8 @@ namespace BlobRPG.Render
         readonly List<GUITexture> GUIs;
 
         readonly WaterFrameBuffers WaterFrameBuffers;
+
+        readonly Stopwatch Stopwatch;
 
         public int ShadowMapTexture
         {
@@ -137,14 +141,21 @@ namespace BlobRPG.Render
 
             WaterShader = new WaterShader();
             WaterRenderer = new WaterRenderer(WaterShader, ref ProjectionMatrix, WaterFrameBuffers, waterDUDVTexture, waterNormalTexture);
+
+            Stopwatch = new();
         }
         public void Update()
         {
             SkyboxRenderer.Update();
         }
 
-        public void Render(Camera camera, List<Light> lights, Fog fog)
+        public void Render(Camera camera, List<Light> lights, Fog fog, bool debug = false)
         {
+            if (debug)
+            {
+                RenderDebug(camera, lights, fog);
+                return;
+            }
             RenderShadowMap(lights[0]);
 
             GL.Enable(EnableCap.ClipDistance0);
@@ -157,11 +168,8 @@ namespace BlobRPG.Render
                 camera.RevertWaterTileMove();
 
                 WaterFrameBuffers.BindRefractionFB();
+
                 Render3DObjects(camera, lights, fog, WaterTiles[i].RefractionClipPlane);
-
-                WaterFrameBuffers.UnbindCurrentFB();
-
-                WaterRenderer.Render(WaterTiles[i], camera, lights[0]);
             }
 
             GL.Disable(EnableCap.ClipDistance0);
@@ -175,7 +183,6 @@ namespace BlobRPG.Render
             ParticleRenderer.Render(ParticleHandler.Particles, camera);
 
             PostProcessor.FinishSceneRendering();
-            PostProcessor.PostProcess();
 
             GUIRenderer.Render(GUIs);
             TextRenderer.Render(Texts);
@@ -184,6 +191,81 @@ namespace BlobRPG.Render
             Entities.Clear();
             NormalEntities.Clear();
             WaterTiles.Clear();
+        }
+        public void RenderDebug(Camera camera, List<Light> lights, Fog fog)
+        {
+            Log(Debug, "Starting rendering");
+            Stopwatch.Start();
+            RenderShadowMap(lights[0]);
+            Log(Debug, $"Rendered shadow map: { Stopwatch.ElapsedTicks } ticks, { Stopwatch.ElapsedMilliseconds }ms");
+            Stopwatch.Restart();
+
+            GL.Enable(EnableCap.ClipDistance0);
+            Log(Debug, $"Enabling clip distance: { Stopwatch.ElapsedTicks } ticks, { Stopwatch.ElapsedMilliseconds }ms");
+            Stopwatch.Restart();
+
+            for (int i = 0; i < WaterTiles.Count; i++)
+            {
+                WaterFrameBuffers.BindReflectionFB();
+                Log(Debug, $"Reflection rendered: { Stopwatch.ElapsedTicks } ticks, { Stopwatch.ElapsedMilliseconds }ms");
+                Stopwatch.Restart();
+                camera.MoveUnderWaterTile(WaterTiles[i]);
+                Log(Debug, $"Camera moved: { Stopwatch.ElapsedTicks } ticks, { Stopwatch.ElapsedMilliseconds }ms");
+                Stopwatch.Restart();
+                Render3DObjects(camera, lights, fog, WaterTiles[i].ReflectionClipPlane);
+                Log(Debug, $"Refraction rendered: { Stopwatch.ElapsedTicks } ticks, { Stopwatch.ElapsedMilliseconds }ms");
+                Stopwatch.Restart();
+                camera.RevertWaterTileMove();
+                Log(Debug, $"Camera reverted: { Stopwatch.ElapsedTicks } ticks, { Stopwatch.ElapsedMilliseconds }ms");
+                Stopwatch.Restart();
+
+                WaterFrameBuffers.BindRefractionFB();
+                Log(Debug, $"Bound refraction: { Stopwatch.ElapsedTicks } ticks, { Stopwatch.ElapsedMilliseconds }ms");
+                Stopwatch.Restart();
+
+                Render3DObjects(camera, lights, fog, WaterTiles[i].RefractionClipPlane);
+                Log(Debug, $"Rendering refraction: { Stopwatch.ElapsedTicks } ticks, { Stopwatch.ElapsedMilliseconds }ms");
+                Stopwatch.Restart();
+            }
+
+            GL.Disable(EnableCap.ClipDistance0);
+            Log(Debug, $"Disabling clip distance: { Stopwatch.ElapsedTicks } ticks, { Stopwatch.ElapsedMilliseconds }ms");
+            Stopwatch.Restart();
+
+            PostProcessor.StartSceneRendering();
+            Log(Debug, $"Binding post processing FBO: { Stopwatch.ElapsedTicks } ticks, { Stopwatch.ElapsedMilliseconds }ms");
+            Stopwatch.Restart();
+
+            Render3DObjects(camera, lights, fog, SafetyClipPlane);
+            Log(Debug, $"Main 3D rendering: { Stopwatch.ElapsedTicks } ticks, { Stopwatch.ElapsedMilliseconds }ms");
+            Stopwatch.Restart();
+            for (int i = 0; i < WaterTiles.Count; i++)
+                WaterRenderer.Render(WaterTiles[i], camera, Settings.Sun);
+
+            Log(Debug, $"Rendered water: { Stopwatch.ElapsedTicks } ticks, { Stopwatch.ElapsedMilliseconds }ms");
+            Stopwatch.Restart();
+
+            ParticleRenderer.Render(ParticleHandler.Particles, camera);
+
+            Log(Debug, $"Rendered particles: { Stopwatch.ElapsedTicks } ticks, { Stopwatch.ElapsedMilliseconds }ms");
+            Stopwatch.Restart();
+
+            PostProcessor.FinishSceneRendering();
+
+            Log(Debug, $"Post processing: { Stopwatch.ElapsedTicks } ticks, { Stopwatch.ElapsedMilliseconds }ms");
+            Stopwatch.Restart();
+
+            GUIRenderer.Render(GUIs);
+            TextRenderer.Render(Texts);
+
+            Terrains.Clear();
+            Entities.Clear();
+            NormalEntities.Clear();
+            WaterTiles.Clear();
+
+            Log(Debug, $"Rendering text, GUI and clearing lists: { Stopwatch.ElapsedTicks } ticks, { Stopwatch.ElapsedMilliseconds }ms");
+            Stopwatch.Stop();
+            Log(Debug, "--------------");
         }
         private void Prepare()
         {

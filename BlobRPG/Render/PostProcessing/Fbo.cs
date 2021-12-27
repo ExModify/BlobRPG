@@ -1,4 +1,5 @@
-﻿using BlobRPG.MainComponents;
+﻿using BlobRPG.LoggerComponents;
+using BlobRPG.MainComponents;
 using OpenTK.Graphics.OpenGL;
 using System;
 using System.Collections.Generic;
@@ -8,69 +9,104 @@ using System.Threading.Tasks;
 
 namespace BlobRPG.Render.PostProcessing
 {
-    public class Fbo
+    public class Fbo : ILogger
     {
 		public int ColorTexture { get; private set; }
 		public int DepthTexture { get; private set; }
+
+		public FboDepthType DepthBufferType { get; private set; }
+
+		public bool Multisample { get; private set; }
 
 		private int Width;
 		private int Height;
 
 		private int FrameBuffer;
 
-
 		private int DepthBuffer;
-		/*private int ColorBuffer;*/
+		private int ColorBuffer;
 
-		public Fbo(int width, int height, Window window, FboDepthType depthBufferType = FboDepthType.None)
+		public Fbo(int width, int height, Window window, FboDepthType depthBufferType = FboDepthType.None, bool multisampled = false)
 		{
 			Width = width;
 			Height = height;
-			InitFrameBuffer(depthBufferType);
+			DepthBufferType = depthBufferType;
+			Multisample = multisampled;
+
+			if (!DepthBufferType.HasFlag(FboDepthType.DepthRenderBuffer) && multisampled)
+            {
+				Log(Warning, "Depth render buffer flag wasn't specified when creating the FBO. Automatically adding..");
+				DepthBufferType |= FboDepthType.DepthRenderBuffer;
+			}
+			InitFrameBuffer(DepthBufferType);
 
 			window.Resize += e =>
 			{
 				Width = e.Width;
 				Height = e.Height;
 
-				InitFrameBuffer(depthBufferType);
+				InitFrameBuffer(DepthBufferType);
 			};
 		}
-		public Fbo(Window window, FboDepthType depthBufferType = FboDepthType.None)
+		public Fbo(Window window, FboDepthType depthBufferType = FboDepthType.None, bool multisampled = false)
 		{
 			Width = window.ClientSize.X;
 			Height = window.ClientSize.Y;
-			InitFrameBuffer(depthBufferType);
+			DepthBufferType = depthBufferType;
+			Multisample = multisampled;
+
+			if (!DepthBufferType.HasFlag(FboDepthType.DepthRenderBuffer) && multisampled)
+			{
+				Log(Warning, "Depth render buffer flag wasn't specified when creating the FBO. Automatically adding..");
+				DepthBufferType |= FboDepthType.DepthRenderBuffer;
+			}
+			InitFrameBuffer(DepthBufferType);
 
 			window.Resize += e =>
 			{
 				Width = e.Width;
 				Height = e.Height;
 
-				InitFrameBuffer(depthBufferType);
+				InitFrameBuffer(DepthBufferType);
 			};
 		}
-		public Fbo(Window window, ImageRenderer renderer, FboDepthType depthBufferType = FboDepthType.None)
+		public Fbo(Window window, ImageRenderer renderer, FboDepthType depthBufferType = FboDepthType.None, bool multisampled = false)
 		{
 			Width = window.ClientSize.X;
 			Height = window.ClientSize.Y;
-			InitFrameBuffer(depthBufferType);
+			DepthBufferType = depthBufferType;
+			Multisample = multisampled;
+
+			if (!DepthBufferType.HasFlag(FboDepthType.DepthRenderBuffer) && multisampled)
+			{
+				Log(Warning, "Depth render buffer flag wasn't specified when creating the FBO. Automatically adding..");
+				DepthBufferType |= FboDepthType.DepthRenderBuffer;
+			}
+			InitFrameBuffer(DepthBufferType);
 
 			window.Resize += e =>
 			{
 				Width = e.Width;
 				Height = e.Height;
 
-				InitFrameBuffer(depthBufferType);
+				InitFrameBuffer(DepthBufferType);
 				renderer.Width = Width;
 				renderer.Height = Height;
 			};
 		}
-		public Fbo(int width, int height, FboDepthType depthBufferType = FboDepthType.None)
+		public Fbo(int width, int height, FboDepthType depthBufferType = FboDepthType.None, bool multisampled = false)
 		{
 			Width = width;
 			Height = height;
-			InitFrameBuffer(depthBufferType);
+			DepthBufferType = depthBufferType;
+			Multisample = multisampled;
+
+			if (!DepthBufferType.HasFlag(FboDepthType.DepthRenderBuffer) && multisampled)
+			{
+				Log(Warning, "Depth render buffer flag wasn't specified when creating the FBO. Automatically adding..");
+				DepthBufferType |= FboDepthType.DepthRenderBuffer;
+			}
+			InitFrameBuffer(DepthBufferType);
 		}
 
 		public void CleanUp()
@@ -79,7 +115,7 @@ namespace BlobRPG.Render.PostProcessing
 			GL.DeleteTexture(ColorTexture);
 			GL.DeleteTexture(DepthTexture);
 			GL.DeleteRenderbuffer(DepthBuffer);
-			/*GL.DeleteRenderbuffer(ColorBuffer);*/
+			GL.DeleteRenderbuffer(ColorBuffer);
 		}
 
 		public void BindFrameBuffer()
@@ -101,15 +137,38 @@ namespace BlobRPG.Render.PostProcessing
 			GL.ReadBuffer(ReadBufferMode.ColorAttachment0);
 		}
 
+		public void ResolveToFbo(Fbo output)
+        {
+			GL.BindFramebuffer(FramebufferTarget.DrawFramebuffer, output.FrameBuffer);
+			GL.BindFramebuffer(FramebufferTarget.ReadFramebuffer, FrameBuffer);
+			GL.BlitFramebuffer(0, 0, Width, Height, 0, 0, output.Width, output.Height, ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit, BlitFramebufferFilter.Nearest);
+			UnbindFrameBuffer();
+		}
+		public void ResolveToScreen()
+		{
+			GL.BindFramebuffer(FramebufferTarget.DrawFramebuffer, 0);
+			GL.BindFramebuffer(FramebufferTarget.ReadFramebuffer, FrameBuffer);
+			GL.DrawBuffer(DrawBufferMode.Back);
+			GL.BlitFramebuffer(0, 0, Width, Height, 0, 0, Settings.Width, Settings.Height, ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Nearest);
+			UnbindFrameBuffer();
+		}
+
 		private void InitFrameBuffer(FboDepthType type)
 		{
 			CreateFrameBuffer();
-			CreateTextureAttachment();
-			if (type == FboDepthType.DepthRenderBuffer)
+			if (Multisample)
+            {
+				CreateMultisampleColorAttachment();
+			}
+            else
+			{
+				CreateTextureAttachment();
+			}
+			if (type.HasFlag(FboDepthType.DepthRenderBuffer))
 			{
 				CreateDepthBufferAttachment();
 			}
-			else if (type == FboDepthType.DepthTexture)
+			if (type.HasFlag(FboDepthType.DepthTexture))
 			{
 				CreateDepthTextureAttachment();
 			}
@@ -144,12 +203,21 @@ namespace BlobRPG.Render.PostProcessing
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
 			GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthAttachment, TextureTarget.Texture2D, DepthTexture, 0);
 		}
-
+		private void CreateMultisampleColorAttachment()
+        {
+			ColorBuffer = GL.GenRenderbuffer();
+			GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, ColorBuffer);
+			GL.RenderbufferStorageMultisample(RenderbufferTarget.Renderbuffer, Settings.MSAA, RenderbufferStorage.Rgba8, Width, Height);
+			GL.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, RenderbufferTarget.Renderbuffer, ColorBuffer);
+		}
 		private void CreateDepthBufferAttachment()
 		{
 			DepthBuffer = GL.GenRenderbuffer();
 			GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, DepthBuffer);
-			GL.RenderbufferStorage(RenderbufferTarget.Renderbuffer, RenderbufferStorage.DepthComponent24, Width, Height);
+			if (!Multisample)
+				GL.RenderbufferStorage(RenderbufferTarget.Renderbuffer, RenderbufferStorage.DepthComponent24, Width, Height);
+			else
+				GL.RenderbufferStorageMultisample(RenderbufferTarget.Renderbuffer, Settings.MSAA, RenderbufferStorage.DepthComponent24, Width, Height);
 			GL.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthAttachment, RenderbufferTarget.Renderbuffer, DepthBuffer);
 		}
 	}

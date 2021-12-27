@@ -41,19 +41,25 @@ namespace BlobRPG.Render.PostProcessing
 
         public void CreateFBO()
         {
-            if (Window == null)
+            if (Fbo == null)
             {
-                Fbo = new Fbo(Width, Height, FboDepthType);
-            }
-            else
-            {
-                Fbo = new Fbo(Window, this, FboDepthType);
+                if (Window == null)
+                {
+                    Fbo = new Fbo(Width, Height, FboDepthType);
+                }
+                else
+                {
+                    Fbo = new Fbo(Window, this, FboDepthType);
+                }
             }
         }
         public void DestroyFBO()
         {
-            Fbo.CleanUp();
-            Fbo = null;
+            if (Fbo != null)
+            {
+                Fbo.CleanUp();
+                Fbo = null;
+            }
         }
 
         public void Render()

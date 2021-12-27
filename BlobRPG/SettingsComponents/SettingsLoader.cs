@@ -54,6 +54,9 @@ namespace BlobRPG.SettingsComponents
             {
                 SaveSettings();
             }
+
+            Settings.LogFileStream = new FileStream("runtime.log", FileMode.Create);
+            Settings.LogFile = new StreamWriter(Settings.LogFileStream);
         }
         public static void SaveSettings()
         {

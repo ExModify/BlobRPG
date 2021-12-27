@@ -35,8 +35,7 @@ namespace BlobRPG
                 Profile = ContextProfile.Core,
                 Size = new OpenTK.Mathematics.Vector2i(Settings.Width, Settings.Height),
                 WindowState = Settings.WindowState,
-                Title = "BlobRPG",
-                NumberOfSamples = Settings.MSAA
+                Title = "BlobRPG"
             };
 
 
@@ -49,6 +48,8 @@ namespace BlobRPG
             Game.Dispose();
 
             Loader.CleanUp();
+            Settings.LogFile.Flush();
+            Settings.LogFile.Close();
         }
 
         public static void Halt()

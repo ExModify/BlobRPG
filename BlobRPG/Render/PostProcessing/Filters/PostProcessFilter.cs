@@ -10,6 +10,8 @@ namespace BlobRPG.Render.PostProcessing.Filters
     public abstract class PostProcessFilter
     {
         protected ImageRenderer Renderer { get; set; }
+        public string UniqueName { get; set; }
+
         public int OutputTexture
         {
             get
@@ -32,7 +34,7 @@ namespace BlobRPG.Render.PostProcessing.Filters
         public abstract void UpdateVariables();
         public abstract void CleanUp();
 
-        public void CreateFBO()
+        public void EnsureFBO()
         {
             Renderer.CreateFBO();
         }

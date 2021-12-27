@@ -7,6 +7,7 @@ using OpenTK.Graphics.OpenGL;
 using OpenTK.Windowing.Common;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -47,6 +48,8 @@ namespace BlobRPG
 
         public static bool AllowFlight { get; set; } = false;
 
+        public static StreamWriter LogFile { get; set; }
+        public static FileStream LogFileStream { get; set; }
         // Rendering related
         public const float NEAR = 0.1f;
         public const float FAR = 1000f;
@@ -71,34 +74,33 @@ namespace BlobRPG
         /* 
          * Configurable settings 
          */
-        [Savable("Main")]
+        [Savable("Main"), Default(LogSeverity.Debug)]
         public static LogSeverity LogSeverity { get; set; } = LogSeverity.Debug;
 
 
 
-        [Savable("Video"), Min(0)]
+        [Savable("Video"), Min(0), Default(1280)]
         public static int Width { get; set; } = 1280;
-        [Savable("Video"), Min(0)]
-
+        [Savable("Video"), Min(0), Default(720)]
         public static int Height { get; set; } = 720;
-        [Savable("Video"), Min(30), ExcludeValue(0)]
-        public static int RenderFPS { get; set; } = 240;
-        [Savable("Video"), Min(30), ExcludeValue(0)]
-        public static int UpdateFPS { get; set; } = 240;
+        [Savable("Video"), Min(30), ExcludeValue(0), Default(120)]
+        public static int RenderFPS { get; set; } = 120;
+        [Savable("Video"), Min(30), ExcludeValue(0), Default(120)]
+        public static int UpdateFPS { get; set; } = 120;
 
-        [Savable("Video")]
+        [Savable("Video"), Default(VSyncMode.Off)]
         public static VSyncMode VSync { get; set; } = VSyncMode.Off;
 
-        [Savable("Video")]
+        [Savable("Video"), Default(WindowState.Normal)]
         public static WindowState WindowState { get; set; } = WindowState.Normal;
-        [Savable("Video"), Min(40), Max(200)]
+        [Savable("Video"), Min(40), Max(200), Default(70)]
         public static int FieldOfView { get; set; } = 70;
-        [Savable("Video"), Min(0), Max(8)]
+        [Savable("Video"), Min(0), Max(8), Default(4)]
         public static int MSAA { get; set; } = 4;
 
-        [Savable("Effects")]
+        [Savable("Effects"), Default(true)]
         public static bool PostProcessing { get; set; } = true;
-        [Savable("Effects"), Min(-1), Max(1)]
+        [Savable("Effects"), Min(-1), Max(1), Default(0)]
         public static float Contrast { get; set; } = 0f;
 
         [Savable("Account")]

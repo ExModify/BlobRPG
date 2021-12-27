@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace BlobRPG.Render.PostProcessing
 {
+    [Flags]
     public enum FboDepthType
     {
         None = 0,

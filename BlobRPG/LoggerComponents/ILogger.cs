@@ -37,8 +37,12 @@ namespace BlobRPG.LoggerComponents
         }
         protected static void Log(LogModule module, LogSeverity severity, string message)
         {
+            string text = $"{ DateTime.Now:yyyy'/'MM'/'dd' 'HH':'mm':'ss} [{ severity }] [{ module }]: { message }";
             if (Settings.LogSeverity <= severity)
-                Console.WriteLine($"{ DateTime.Now:yyyy'/'MM'/'dd' 'HH':'mm':'ss} [{ severity }] [{ module }]: { message }");
+                Console.WriteLine(text);
+
+            Settings.LogFile.WriteLine(text);
+
 
             if (Settings.LogSeverity == LogSeverity.Fatal)
             {
