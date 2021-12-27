@@ -10,7 +10,7 @@ using BlobRPG.Models;
 using BlobRPG.Shaders;
 using BlobRPG.Textures;
 using BlobRPG.Entities;
-using BlobRPG.WavefrontOBJ;
+using BlobRPG.ObjectLoaders;
 using GlmSharp;
 using System.IO;
 using BlobRPG.Particles;

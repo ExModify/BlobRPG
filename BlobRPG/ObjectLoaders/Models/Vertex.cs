@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BlobRPG.WavefrontOBJ.Models
+namespace BlobRPG.ObjectLoaders.Models
 {
     public class Vertex
     {

@@ -1,4 +1,5 @@
-﻿using BlobRPG.Entities;
+﻿using BlobRPG.AnimationComponents.GLObjects;
+using BlobRPG.Entities;
 using BlobRPG.Font;
 using BlobRPG.LoggerComponents;
 using BlobRPG.Models;
@@ -135,14 +136,22 @@ namespace BlobRPG.MainComponents
             UnbindVao();
             return new RawModel(vao, positions.Length / dimension);
         }
-        public static int LoadTexture(string file, bool lodBias = false)
+        public static int LoadTexture(string file)
         {
             FileStream fs = new FileStream(file, FileMode.Open, FileAccess.Read);
-            int id = LoadTexture(fs, lodBias);
+            int id = LoadTexture(fs);
             fs.Close();
             return id;
         }
-        public static int LoadTexture(Stream texture, bool lodBias = false)
+        public static int LoadTexture(Stream texture, bool mipmap = true, bool anisotropic = true, bool nearest = false, bool clampEdge = false)
+        {
+            return LoadTexture(texture, out int _, mipmap, anisotropic, nearest, clampEdge);
+        }
+        public static Texture LoadTextureAsObject(Stream texture, bool mipmap = true, bool anisotropic = true, bool nearest = false, bool clampEdge = false)
+        {
+            return new Texture(LoadTexture(texture, out int size, mipmap, anisotropic, nearest, clampEdge), size);
+        }
+        public static int LoadTexture(Stream texture, out int size, bool mipmap = true, bool anisotropic = true, bool nearest = false, bool clampEdge = false)
         {
             int textureId = GL.GenTexture();
             Textures.Add(textureId);
@@ -150,49 +159,71 @@ namespace BlobRPG.MainComponents
             GL.ActiveTexture(TextureUnit.Texture0);
             GL.BindTexture(TextureTarget.Texture2D, textureId);
 
-            using (Bitmap map = new Bitmap(Image.FromStream(texture)))
+            GL.PixelStore(PixelStoreParameter.UnpackAlignment, 1);
+
+            using (Bitmap map = new(Image.FromStream(texture)))
             {
                 BitmapData data = map.LockBits(new Rectangle(0, 0, map.Width, map.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-
+                size = map.Width;
                 GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, data.Width, data.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
 
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
-
-                if (!AnisotropicFiltering.HasValue)
+                if (mipmap)
                 {
-                    AnisotropicFiltering = Settings.CheckExtension("gl_ext_texture_filter_anisotropic");
-                    if (AnisotropicFiltering.Value)
+                    GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
+
+                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.LinearMipmapLinear);
+
+                    if (!AnisotropicFiltering.HasValue)
                     {
-                        Log(Debug, "Anisotropic filtering is supported.");
+                        AnisotropicFiltering = Settings.CheckExtension("gl_ext_texture_filter_anisotropic");
+                        if (AnisotropicFiltering.Value)
+                        {
+                            Log(Debug, "Anisotropic filtering is supported.");
+                        }
+                        else
+                        {
+                            Log(Debug, "Anisotropic filtering is NOT supported.");
+                        }
+                    }
+
+                    if (anisotropic && AnisotropicFiltering.Value)
+                    {
+                        float amount = Math.Min(4f, GL.GetFloat((GetPName)All.MaxTextureMaxAnisotropyExt));
+
+                        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureLodBias, 0);
+                        GL.TexParameter(TextureTarget.Texture2D, (TextureParameterName)All.TextureMaxAnisotropyExt, amount);
                     }
                     else
                     {
-                        Log(Debug, "Anisotropic filtering is NOT supported.");
+                        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureLodBias, -0.4f);
                     }
                 }
-                if (AnisotropicFiltering.Value)
+                else if (nearest)
                 {
-                    float amount = Math.Min(4f, GL.GetFloat((GetPName)All.MaxTextureMaxAnisotropyExt));
-                    GL.TexParameter(TextureTarget.Texture2D, (TextureParameterName)All.TextureMaxAnisotropyExt, amount);
-                }
-
-                if (lodBias && !AnisotropicFiltering.Value)
-                {
-                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureLodBias, -0.4f);
+                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
+                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
                 }
                 else
                 {
-                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureLodBias, 0f);
+                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
                 }
-                
-                GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
+                if (clampEdge)
+                {
+                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
+                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
+                }
+                else
+                {
+                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
+                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
+                }
+
 
                 map.UnlockBits(data);
             }
-
+            GL.BindTexture(TextureTarget.Texture2D, 0);
             return textureId;
         }
         public static int LoadCubeMap(Stream[] textures)
