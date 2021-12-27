@@ -67,6 +67,12 @@ namespace BlobRPG.Render
             GL.ActiveTexture(TextureUnit.Texture0);
             GL.BindTexture(TextureTarget.Texture2D, model.Texture.Id);
 
+            if (model.Texture.HasSpecularMap)
+            {
+                GL.ActiveTexture(TextureUnit.Texture6);
+                GL.BindTexture(TextureTarget.Texture2D, model.Texture.SpecularMap);
+            }
+            Shader.LoadSpecularMap(model.Texture.HasSpecularMap);
             Shader.LoadShineVariables(model.Texture.Reflectivity, model.Texture.ShineDamper);
             Shader.LoadFakeLighting(model.Texture.UseFakeLighting);
             Shader.LoadNumberOfRows(model.Texture.NumberOfRows);

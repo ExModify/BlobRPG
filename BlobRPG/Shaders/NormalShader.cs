@@ -14,10 +14,12 @@ namespace BlobRPG.Shaders
         private int ReflectivityLocation;
         private int ShineDamperLocation;
         private int UseFakeLightingLocation;
+        private int UseSpecularMapLocation;
 
 
         private int TextureSamplerLocation;
         private int NormalMapLocation;
+        private int SpecularMapLocation;
 
         private int ClipPlaneLocation;
 
@@ -64,9 +66,11 @@ namespace BlobRPG.Shaders
             ReflectivityLocation = GetUniformLocation("reflectivity");
             ShineDamperLocation = GetUniformLocation("shineDamper");
             UseFakeLightingLocation = GetUniformLocation("useFakeLighting");
+            UseSpecularMapLocation = GetUniformLocation("useSpecularMap");
 
             TextureSamplerLocation = GetUniformLocation("textureSampler");
             NormalMapLocation = GetUniformLocation("normalMap");
+            SpecularMapLocation = GetUniformLocation("specularMap");
 
             GradientLocation = GetUniformLocation("gradient");
             DensityLocation = GetUniformLocation("density");
@@ -96,6 +100,7 @@ namespace BlobRPG.Shaders
             LoadInt(TextureSamplerLocation, 0);
             LoadInt(NormalMapLocation, 1);
             LoadInt(ShadowMapLocation, 5);
+            LoadInt(SpecularMapLocation, 6);
         }
         public void LoadClipPlane(vec4 clipPlane)
         {
@@ -135,6 +140,14 @@ namespace BlobRPG.Shaders
         public void LoadFakeLighting(bool fakeLighting)
         {
             LoadBool(UseFakeLightingLocation, fakeLighting);
+        }
+        public void LoadSpecularMap(bool specularMap)
+        {
+            LoadBool(UseSpecularMapLocation, specularMap);
+        }
+        public void HasSpecularMap(bool specularMap)
+        {
+            LoadBool(UseFakeLightingLocation, specularMap);
         }
         public void LoadShineVariables(float reflectivity, float shineDamper)
         {

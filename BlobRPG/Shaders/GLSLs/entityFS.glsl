@@ -10,6 +10,9 @@ in float visibility;
 
 uniform sampler2D textureSampler;
 
+uniform sampler2D specularMap;
+uniform float useSpecularMap;
+
 uniform vec3 lightColor[MAX_LIGHTS];
 uniform vec3 lightAttenuation[MAX_LIGHTS];
 uniform float reflectivity;
@@ -89,6 +92,16 @@ void main(void) {
 	{
 		discard;
 	}
+
+	if (useSpecularMap > 0.5) {
+		vec4 mapInfo = texture(specularMap, pass_textureCoords);
+		totalSpecular *= mapInfo.r;
+
+		if (mapInfo.g > 0.2) {
+			totalDiffuse = vec3(mapInfo.g);
+		}
+	}
+
 
 	out_Color = vec4(totalDiffuse, 1.0) * textureColor + vec4(totalSpecular, 1.0);
 	out_Color = mix(vec4(fogColor, 1.0), out_Color, visibility);

@@ -11,7 +11,7 @@ namespace BlobRPG.Shaders.Filters
         private int ContrastLocation;
 
 
-        public ContrastShader() : base("contrast")
+        public ContrastShader() : base("simple", "contrast")
         {
         }
 

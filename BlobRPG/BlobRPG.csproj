@@ -20,7 +20,7 @@
     <None Update="Shaders\GLSLs\Filters\contrastFS.glsl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Shaders\GLSLs\Filters\contrastVS.glsl">
+    <None Update="Shaders\GLSLs\Filters\simpleVS.glsl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Shaders\GLSLs\entityFS.glsl">
