@@ -9,36 +9,43 @@ namespace BlobRPG.AnimationComponents.Objects
 {
     public class JointTransform
     {
-        public vec3 Position { get; private set; }
-        public Quaternion Rotation { get; private set; }
+        public mat4 OriginalMatrix;
 
         public mat4 LocalTransform
         {
             get
             {
-                mat4 mat = mat4.Identity;
-                mat *= mat4.Translate(Position);
-                return mat * Rotation.RotationMatrix;
+                return OriginalMatrix;
             }
         }
 
-        public JointTransform(vec3 position, Quaternion rotation)
+        public JointTransform(mat4 original)
         {
-            Position = position;
-            Rotation = rotation;
+            OriginalMatrix = original;
         }
         public static JointTransform Interpolate(JointTransform frameA, JointTransform frameB, float progression)
         {
-            vec3 pos = Interpolate(frameA.Position, frameB.Position, progression);
-            Quaternion rot = Quaternion.Interpolate(frameA.Rotation, frameB.Rotation, progression);
-            return new JointTransform(pos, rot);
+            mat4 interpolated = Interpolate(ref frameA.OriginalMatrix, ref frameB.OriginalMatrix, progression);
+            return new JointTransform(interpolated);
         }
-        private static vec3 Interpolate(vec3 start, vec3 end, float progression)
+
+        private static mat4 Interpolate(ref mat4 prevFrame, ref mat4 nextFrame, float interpolation)
         {
-            float x = start.x + (end.x - start.x) * progression;
-            float y = start.y + (end.y - start.y) * progression;
-            float z = start.z + (end.z - start.z) * progression;
-            return new vec3(x, y, z);
+            quat firstQuat = prevFrame.ToQuaternion;
+            quat secondQuat = nextFrame.ToQuaternion;
+            quat finalQuat = quat.SLerp(firstQuat, secondQuat, interpolation);
+            mat4 rotationMatrix = finalQuat.ToMat4;
+
+            vec3 scale = new vec3(prevFrame.m00, prevFrame.m11, prevFrame.m22);
+            vec3 newScale = new vec3(nextFrame.m00, nextFrame.m11, nextFrame.m22);
+
+            vec3 finalTrans = (float)(1.0 - interpolation) * scale + newScale * interpolation;
+
+            rotationMatrix.m00 = finalTrans.x;
+            rotationMatrix.m11 = finalTrans.z;
+            rotationMatrix.m22 = finalTrans.y;
+
+            return rotationMatrix;
         }
     }
 }

@@ -28,6 +28,9 @@ namespace BlobRPG.Shaders
         private int[] LightColorLocation;
         private int[] LightAttenuationLocation;
 
+        private int[] JointTransformsLocation;
+        private int JointTransformCountLocation;
+
         private int TextureOffsetLocation;
         private int NumberOfRowsLocation;
 
@@ -49,6 +52,9 @@ namespace BlobRPG.Shaders
             BindAttribute(0, "position");
             BindAttribute(1, "textureCoords");
             BindAttribute(2, "normal");
+            BindAttribute(3, "tangent");
+            BindAttribute(4, "jointIndices");
+            BindAttribute(5, "weights");
         }
         public void ConnectTextureUnits()
         {
@@ -62,6 +68,7 @@ namespace BlobRPG.Shaders
             LightPositionLocation = new int[Settings.MAX_LIGHTS];
             LightColorLocation = new int[Settings.MAX_LIGHTS];
             LightAttenuationLocation = new int[Settings.MAX_LIGHTS];
+            JointTransformsLocation = new int[Settings.MAX_JOINTS];
 
             TransformationMatrixLocation = GetUniformLocation("transformationMatrix");
             ProjectionMatrixLocation = GetUniformLocation("projectionMatrix");
@@ -79,11 +86,17 @@ namespace BlobRPG.Shaders
             FogColor = GetUniformLocation("fogColor");
 
             LightCountLocation = GetUniformLocation("lightCount");
+            JointTransformCountLocation = GetUniformLocation("jointTransformCount");
+
             for (int i = 0; i < Settings.MAX_LIGHTS; i++)
             {
                 LightPositionLocation[i] = GetUniformLocation("lightPosition[" + i + "]");
                 LightColorLocation[i] = GetUniformLocation("lightColor[" + i + "]");
                 LightAttenuationLocation[i] = GetUniformLocation("lightAttenuation[" + i + "]");
+            }
+            for (int i = 0; i < Settings.MAX_JOINTS; i++)
+            {
+                JointTransformsLocation[i] = GetUniformLocation("jointTransforms[" + i + "]");
             }
 
             TextureOffsetLocation = GetUniformLocation("textureOffset");
@@ -162,6 +175,18 @@ namespace BlobRPG.Shaders
             LoadFloat(ShadowDistanceLocation, distance);
             LoadFloat(ShadowMapSizeLocation, size);
             LoadInt(PCFCountLocation, pcfCount);
+        }
+        public void LoadJointTransforms(mat4[] matrices)
+        {
+            for (int i = 0; i < matrices.Length; i++)
+            {
+                LoadMatrix(JointTransformsLocation[i], matrices[i]);
+            }
+            LoadTransformCount(matrices.Length);
+        }
+        public void LoadTransformCount(int count)
+        {
+            LoadInt(JointTransformCountLocation, count);
         }
     }
 }

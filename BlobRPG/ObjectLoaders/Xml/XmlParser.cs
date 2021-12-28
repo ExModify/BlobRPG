@@ -60,7 +60,7 @@ namespace BlobRPG.ObjectLoaders.Xml
 			Match match = Regex.Match(line, DATA);
 			if (match.Success)
 			{
-				node.Data = match.Groups[1].Value;
+				node.Data = match.Groups[1].Value.Trim();
 			}
 		}
 

@@ -9,6 +9,20 @@ namespace BlobRPG.Models
     {
         public RawModel Model { get; private set; }
         public ModelTexture Texture { get; private set; }
+        private AnimatedModel _Model = null;
+        public AnimatedModel AnimatedModel
+        {
+            get
+            {
+                return _Model;
+            }
+            set
+            {
+                _Model = value;
+                Animated = true;
+            }
+        }
+        public bool Animated { get; private set; }
 
         public TexturedModel(RawModel model, ModelTexture texture)
         {

@@ -49,9 +49,9 @@ namespace BlobRPG.Tools
         {
             return "--------------" + Environment.NewLine
                 + mat.Row0.ToString(" ") + Environment.NewLine
-                + mat.Row0.ToString(" ") + Environment.NewLine
-                + mat.Row0.ToString(" ") + Environment.NewLine
-                + mat.Row0.ToString(" ") + Environment.NewLine
+                + mat.Row1.ToString(" ") + Environment.NewLine
+                + mat.Row2.ToString(" ") + Environment.NewLine
+                + mat.Row3.ToString(" ") + Environment.NewLine
                 + "--------------";
         }
     }

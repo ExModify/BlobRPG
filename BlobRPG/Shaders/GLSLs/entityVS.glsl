@@ -1,15 +1,20 @@
 ﻿#version 400 core
 #define MAX_LIGHTS 8
+#define MAX_JOINTS 50
 
 in vec3 position;
 in vec2 textureCoords;
 in vec3 normal;
+in vec3 tangent;
+in ivec3 jointIndices;
+in vec3 weights;
 
 out vec2 pass_textureCoords;
 out vec3 surfaceNormal;
 out vec3 toLightVector[MAX_LIGHTS];
 out vec3 toCameraVector;
 out float visibility;
+out vec4 shadowCoords;
 
 uniform mat4 transformationMatrix;
 uniform mat4 projectionMatrix;
@@ -27,30 +32,49 @@ uniform int lightCount;
 
 uniform vec4 clipPlane;
 
-
 uniform mat4 toShadowMapSpace;
 uniform float shadowDistance;
+
+uniform mat4 jointTransforms[MAX_JOINTS];
+uniform int jointTransformCount;
+
 const float transitionDistance = 10.0;
-out vec4 shadowCoords;
 
 void main(void)
 {
-	vec4 worldPosition = transformationMatrix * vec4(position, 1.0);
-
-	gl_ClipDistance[0] = dot(worldPosition, clipPlane);
-
-	vec4 positionRelativeToCam = viewMatrix * worldPosition;
-	gl_Position =  projectionMatrix * positionRelativeToCam;
-
-	pass_textureCoords = (textureCoords / numberOfRows) + textureOffset;
-	
 	vec3 actualNormal = normal;
 	if (useFakeLighting > 0.5)
 	{
 		actualNormal = vec3(0.0, 1.0, 0.0);
 	}
 
-	surfaceNormal = (transformationMatrix * vec4(actualNormal, 0.0)).xyz;
+	vec4 totalPosition = vec4(0.0);
+	vec4 totalNormal = vec4(0.0);
+	if (jointTransformCount == 0) {
+		totalPosition = vec4(position, 1.0);
+		totalNormal = vec4(actualNormal, 0.0);
+	}
+	else {
+		for(int i = 0; i < jointTransformCount; i++){
+			mat4 jointTransform = jointTransforms[jointIndices[i]];
+			vec4 posePosition = jointTransform * vec4(position, 1.0);
+			totalPosition += posePosition * weights[i];
+		
+			vec4 worldNormal = jointTransform * vec4(actualNormal, 0.0);
+			totalNormal += worldNormal * weights[i];
+		}
+	}
+
+	vec4 worldPosition = transformationMatrix * totalPosition;
+	vec4 positionRelativeToCam = viewMatrix * worldPosition;
+
+	surfaceNormal = (transformationMatrix * totalNormal).xyz;
+	
+	pass_textureCoords = (textureCoords / numberOfRows) + textureOffset;
+
+	gl_ClipDistance[0] = dot(worldPosition, clipPlane);
+	gl_Position =  projectionMatrix * positionRelativeToCam;
+
 	for (int i = 0; i < lightCount; i++)
 	{
 		toLightVector[i] = lightPosition[i] - worldPosition.xyz;

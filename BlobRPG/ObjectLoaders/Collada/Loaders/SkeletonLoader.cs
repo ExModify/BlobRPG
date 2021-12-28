@@ -43,16 +43,28 @@ namespace BlobRPG.ObjectLoaders.Collada.Loaders
 
 		private JointData ExtractMainJointData(XmlNode jointNode, bool isRoot)
 		{
-			string nameId = jointNode.GetAttribute("id");
-			int index = BoneOrder.IndexOf(nameId);
+			string[] nameId = jointNode.GetAttribute("id").Split("_");
+			string bone, id;
+			if (nameId.Length != 2)
+            {
+				bone = id = jointNode.GetAttribute("id");
+            }
+            else
+			{
+				//bone = id = jointNode.GetAttribute("id");
+				bone = nameId[1];
+				id = nameId[0];
+			}
+			int index = BoneOrder.IndexOf(bone);
 			string[] matrixData = jointNode.GetChild("matrix").Data.Split(" ");
 			mat4 matrix = ConvertData(matrixData);
+			Console.WriteLine(Tools.MatrixMaths.MatToString(matrix));
 			if (isRoot)
 			{
 				matrix = Correction * matrix;
 			}
 			JointCount++;
-			return new JointData(index, nameId, matrix);
+			return new JointData(index, id, matrix);
 		}
 
 		private static mat4 ConvertData(string[] rawData)
@@ -62,8 +74,7 @@ namespace BlobRPG.ObjectLoaders.Collada.Loaders
 			{
 				mat[i] = float.Parse(rawData[i]);
 			}
-			// might have to transpose here
-			return mat;
+			return mat.Transposed;
 		}
 	}
 }

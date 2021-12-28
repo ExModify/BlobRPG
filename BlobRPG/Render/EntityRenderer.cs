@@ -61,6 +61,9 @@ namespace BlobRPG.Render
             GL.EnableVertexAttribArray(0);
             GL.EnableVertexAttribArray(1);
             GL.EnableVertexAttribArray(2);
+            GL.EnableVertexAttribArray(3);
+            GL.EnableVertexAttribArray(4);
+            GL.EnableVertexAttribArray(5);
 
             if (model.Texture.HasTransparency) Renderer.DisableCulling();
 
@@ -76,6 +79,18 @@ namespace BlobRPG.Render
             Shader.LoadShineVariables(model.Texture.Reflectivity, model.Texture.ShineDamper);
             Shader.LoadFakeLighting(model.Texture.UseFakeLighting);
             Shader.LoadNumberOfRows(model.Texture.NumberOfRows);
+
+            if (model.Animated)
+            {
+                // shader.loadjointtransforms
+                // shader.loadanimate true
+                Shader.LoadJointTransforms(model.AnimatedModel.GetJointTransforms());
+            }
+            else
+            {
+                Shader.LoadTransformCount(0);
+                // shader.loadanimate false
+            }
         }
         private void PrepareInstance(Entity entity)
         {
@@ -89,6 +104,9 @@ namespace BlobRPG.Render
             GL.DisableVertexAttribArray(0);
             GL.DisableVertexAttribArray(1);
             GL.DisableVertexAttribArray(2);
+            GL.DisableVertexAttribArray(3);
+            GL.DisableVertexAttribArray(4);
+            GL.DisableVertexAttribArray(5);
 
             GL.BindVertexArray(0);
         }

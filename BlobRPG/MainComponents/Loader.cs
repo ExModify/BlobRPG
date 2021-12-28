@@ -1,5 +1,4 @@
-﻿using BlobRPG.AnimationComponents.GLObjects;
-using BlobRPG.Entities;
+﻿using BlobRPG.Entities;
 using BlobRPG.Font;
 using BlobRPG.LoggerComponents;
 using BlobRPG.Models;
@@ -129,6 +128,19 @@ namespace BlobRPG.MainComponents
             UnbindVao();
             return new RawModel(vao, indices.Length);
         }
+        public static RawModel LoadToVao(float[] positions, float[] textureCoords, float[] normals, float[] tangents, int[] jointIds, float[] vertexWeights, int[] indices)
+        {
+            int vao = CreateVao();
+            BindIndicesBuffer(indices);
+            StoreDataInAttributeList(0, 3, positions);
+            StoreDataInAttributeList(1, 2, textureCoords);
+            StoreDataInAttributeList(2, 3, normals);
+            StoreDataInAttributeList(3, 3, tangents);
+            StoreDataInAttributeList(4, 3, jointIds);
+            StoreDataInAttributeList(5, 3, vertexWeights);
+            UnbindVao();
+            return new RawModel(vao, indices.Length);
+        }
         public static RawModel LoadToVao(float[] positions, int dimension = 2)
         {
             int vao = CreateVao();
@@ -146,10 +158,6 @@ namespace BlobRPG.MainComponents
         public static int LoadTexture(Stream texture, bool mipmap = true, bool anisotropic = true, bool nearest = false, bool clampEdge = false)
         {
             return LoadTexture(texture, out int _, mipmap, anisotropic, nearest, clampEdge);
-        }
-        public static Texture LoadTextureAsObject(Stream texture, bool mipmap = true, bool anisotropic = true, bool nearest = false, bool clampEdge = false)
-        {
-            return new Texture(LoadTexture(texture, out int size, mipmap, anisotropic, nearest, clampEdge), size);
         }
         public static int LoadTexture(Stream texture, out int size, bool mipmap = true, bool anisotropic = true, bool nearest = false, bool clampEdge = false)
         {
@@ -282,6 +290,15 @@ namespace BlobRPG.MainComponents
             GL.BindBuffer(BufferTarget.ArrayBuffer, vboId);
             GL.BufferData(BufferTarget.ArrayBuffer, data.Length * sizeof(float), data, BufferUsageHint.StaticDraw);
             GL.VertexAttribPointer(attributeNumber, size, VertexAttribPointerType.Float, false, size * sizeof(float), 0);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+        }
+        private static void StoreDataInAttributeList(int attributeNumber, int size, int[] data)
+        {
+            int vboId = GL.GenBuffer();
+            Vbos.Add(vboId);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, vboId);
+            GL.BufferData(BufferTarget.ArrayBuffer, data.Length * sizeof(int), data, BufferUsageHint.StaticDraw);
+            GL.VertexAttribPointer(attributeNumber, size, VertexAttribPointerType.Int, false, size * sizeof(int), 0);
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
         }
         private static void UnbindVao()

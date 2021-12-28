@@ -12,10 +12,10 @@ namespace BlobRPG.ObjectLoaders.Collada.Loaders
 {
     public class AnimationLoader
 	{
-		private static readonly mat4 Correction = mat4.Identity * mat4.RotateX((float)MathHelper.DegreesToRadians(-90));
+		private static readonly mat4 Correction = mat4.Identity/* * mat4.RotateX((float)MathHelper.DegreesToRadians(-180))*/;
 	
-		private XmlNode AnimationData;
-		private XmlNode JointHierarchy;
+		private readonly XmlNode AnimationData;
+		private readonly XmlNode JointHierarchy;
 
 		public AnimationLoader(XmlNode animationData, XmlNode jointHierarchy)
 		{
@@ -29,7 +29,11 @@ namespace BlobRPG.ObjectLoaders.Collada.Loaders
 			float[] times = GetKeyTimes();
 			float duration = times[^1];
 			KeyFrameData[] keyFrames = InitKeyFrames(times);
-			List<XmlNode> animationNodes = AnimationData.GetChildren("animation");
+			List<XmlNode> animationNodes = AnimationData.GetChild("animation").GetChildren("animation");
+			if (animationNodes.Count == 0)
+            {
+				animationNodes = AnimationData.GetChildren("animation");
+			}
 			foreach (XmlNode jointNode in animationNodes)
 			{
 				LoadJointTransforms(keyFrames, jointNode, rootNode);
@@ -39,7 +43,13 @@ namespace BlobRPG.ObjectLoaders.Collada.Loaders
 
 		private float[] GetKeyTimes()
 		{
-			XmlNode timeData = AnimationData.GetChild("animation").GetChild("source").GetChild("float_array");
+			XmlNode anim = AnimationData.GetChild("animation");
+			XmlNode src = anim.GetChild("source");
+			if (src == null)
+            {
+				src = anim.GetChild("animation").GetChild("source");
+            }
+			XmlNode timeData = src.GetChild("float_array");
 			string[] rawTimes = timeData.Data.Split(" ");
 			float[] times = new float[rawTimes.Length];
 			for (int i = 0; i < times.Length; i++)
@@ -90,7 +100,7 @@ namespace BlobRPG.ObjectLoaders.Collada.Loaders
 				{
 					transform[j] = float.Parse(rawData[i * 16 + j]);
 				}
-				// might have to transpose here
+				transform = transform.Transposed;
 				if (root)
 				{
 					transform = Correction * transform;

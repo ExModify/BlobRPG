@@ -16,19 +16,39 @@ namespace BlobRPG.AnimationComponents.Utils
         public Animation CurrentAnimation { get; private set; }
         public float AnimationTime { get; private set; } = 0;
 
-        public Animator(AnimatedModel model)
+		public bool LoopAnimation { get; private set; }
+		public bool Active { get; set; }
+
+		private Action Action { get; set; }
+		private int ActionFrame { get; set; } = -1;
+
+		public Animator(AnimatedModel model, bool active = true, bool loopAnimation = false)
         {
             Entity = model;
+			Active = active;
+			LoopAnimation = loopAnimation;
         }
-
-        public void Animate(Animation animation)
+		public void Reset()
+		{
+			AnimationTime = 0;
+		}
+		public void AddAction(Action action, int frame)
         {
-            AnimationTime = 0;
+			Action = action;
+			ActionFrame = frame;
+        }
+		public void RemoveAction()
+        {
+			Action = null;
+			ActionFrame = -1;
+        }
+        public void UseAnimation(Animation animation)
+        {
             CurrentAnimation = animation;
         }
         public void Update()
         {
-            if (CurrentAnimation == null) return;
+            if (CurrentAnimation == null || !Active) return;
 			IncreaseAnimationTime();
 			Dictionary<string, mat4> currentPose = CalculateCurrentAnimationPose();
 			mat4 refmat = mat4.Identity;
@@ -37,10 +57,18 @@ namespace BlobRPG.AnimationComponents.Utils
 
 		private void IncreaseAnimationTime()
 		{
-			AnimationTime += (float)Settings.DeltaTime;
+			AnimationTime += (float)(Settings.DeltaTime);
 			if (AnimationTime > CurrentAnimation.Length)
 			{
-				AnimationTime %= CurrentAnimation.Length;
+				if (LoopAnimation)
+				{
+					AnimationTime %= CurrentAnimation.Length;
+				}
+				else
+                {
+					AnimationTime = 0;
+					Active = false;
+				}
 			}
 		}
 		private Dictionary<string, mat4> CalculateCurrentAnimationPose()
@@ -71,6 +99,11 @@ namespace BlobRPG.AnimationComponents.Utils
 				nextFrame = allFrames[i];
 				if (nextFrame.TimeStamp > AnimationTime)
 				{
+					if (ActionFrame == i)
+                    {
+						Action();
+						RemoveAction();
+                    }
 					break;
 				}
 				previousFrame = allFrames[i];
@@ -93,6 +126,7 @@ namespace BlobRPG.AnimationComponents.Utils
 				JointTransform previousTransform = previousFrame.Pose[jointName];
 				JointTransform nextTransform = nextFrame.Pose[jointName];
 				JointTransform currentTransform = JointTransform.Interpolate(previousTransform, nextTransform, progression);
+				
 				currentPose.Add(jointName, currentTransform.LocalTransform);
 			}
 			return currentPose;

@@ -54,7 +54,6 @@ namespace BlobRPG
         public const float NEAR = 0.1f;
         public const float FAR = 1000f;
 
-
         public static vec3 SkyColor { get; set; } = new vec3(0.529f, 0.807f, 0.921f);
         public static vec3 NightColor { get; set; } = new vec3(0.529f, 0.807f, 0.921f) * 0.5f;
 
@@ -62,10 +61,17 @@ namespace BlobRPG
 
         public static float AspectRatio { get; set; } = Width / (float)Height;
 
-        
+
         // Shader variables
+
+        // Animation
+        public const int MaxWeights = 3;
+        public const int MAX_JOINTS = 50; // change in shader too
+        // Lighting - change in shaders too
         public const int MAX_LIGHTS = 8;
+        // Water
         public const float WAVE_SPEED = 0.03f;
+        // Shadow map
         public const float ShadowDistance = 150;
         public const float ShadowOffset = 10;
         public const int ShadowMapSize = 4096;

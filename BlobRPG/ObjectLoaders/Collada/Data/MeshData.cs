@@ -11,15 +11,17 @@ namespace BlobRPG.ObjectLoaders.Collada.Data
 		public float[] Vertices { get; private set; }
 		public float[] TextureCoords { get; private set; }
 		public float[] Normals { get; private set; }
+		public float[] Tangents { get; private set; }
 		public int[] Indices { get; private set; }
 		public int[] JointIds { get; private set; }
 		public float[] VertexWeights { get; private set; }
 
-		public MeshData(float[] vertices, float[] textureCoords, float[] normals, int[] indices, int[] jointIds, float[] vertexWeights)
+		public MeshData(float[] vertices, float[] textureCoords, float[] normals, float[] tangents, int[] indices, int[] jointIds, float[] vertexWeights)
 		{
 			Vertices = vertices;
 			TextureCoords = textureCoords;
 			Normals = normals;
+			Tangents = tangents;
 			Indices = indices;
 			JointIds = jointIds;
 			VertexWeights = vertexWeights;

@@ -71,6 +71,10 @@ namespace BlobRPG.Entities
         {
             if (!InAir)
             {
+                if (Model.Animated)
+                {
+                    Model.AnimatedModel.ActivateAndResetAnimation();
+                }
                 UpwardSpeed = Settings.JumpHeight;
                 if (!Settings.AllowFlight)
                     InAir = true;
@@ -80,7 +84,6 @@ namespace BlobRPG.Entities
         private void ProcessInput()
         {
             ProcessMovementInput();
-
 
             if (InputManager.IsKeyDown(Keys.Space))
             {

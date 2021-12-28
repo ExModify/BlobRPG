@@ -8,8 +8,8 @@ namespace BlobRPG.ObjectLoaders.Collada.Data
 {
     public class SkeletonData
 	{
-		public int JointCount;
-		public JointData HeadJoint;
+		public int JointCount { get; private set; }
+		public JointData HeadJoint { get; private set; }
 	
 		public SkeletonData(int jointCount, JointData headJoint)
 		{

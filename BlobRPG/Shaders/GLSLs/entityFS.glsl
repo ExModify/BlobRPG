@@ -5,6 +5,7 @@ in vec2 pass_textureCoords;
 in vec3 surfaceNormal;
 in vec3 toLightVector[MAX_LIGHTS];
 in vec3 toCameraVector;
+in vec4 shadowCoords;
 
 in float visibility;
 
@@ -21,8 +22,6 @@ uniform vec3 fogColor;
 
 uniform int lightCount;
 
-
-in vec4 shadowCoords;
 uniform sampler2D shadowMap;
 uniform float shadowMapSize;
 uniform int pcfCount;

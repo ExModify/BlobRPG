@@ -73,6 +73,7 @@ namespace BlobRPG.MainComponents
             Loader.Load(this);
 
 
+            /*
             RawModel rm = OBJLoader.LoadSimpleOBJ("starter/model/blob.obj");
             ModelTexture mt = new ModelTexture(Loader.LoadTexture("starter/texture/blobTextureAtlas.png"))
             {
@@ -81,6 +82,9 @@ namespace BlobRPG.MainComponents
                 NumberOfRows = 2
             };
             Player = new Player(new TexturedModel(rm, mt), new vec3(153, 5, -274), textureIndex: 0);
+            */
+            Player = new Player(AnimatedModel.LoadModel("starter/model/blob.dae", "starter/texture/blobTexture.png", numberOfRows: 1),
+                new vec3(153, 5, -274), textureIndex: 0);
 
             Camera = new Camera(Player);
             Lights = new List<Light>()
@@ -194,6 +198,7 @@ namespace BlobRPG.MainComponents
             }
 
             Player.Move(Terrains);
+            Player.Update();
             
             Camera.Move();
             InputManager.UpdateMouseRay();

@@ -13,7 +13,7 @@ namespace BlobRPG.ObjectLoaders.Collada.Loaders
 {
     class GeometryLoader
 	{
-		private static readonly mat4 Correction = mat4.Identity * mat4.RotateX((float)MathHelper.DegreesToRadians(-90));
+		private static readonly mat4 Correction = mat4.Identity/* * mat4.RotateX((float)MathHelper.DegreesToRadians(-180))*/;
 
 		private readonly XmlNode MeshData;
 
@@ -24,7 +24,8 @@ namespace BlobRPG.ObjectLoaders.Collada.Loaders
 		private float[] TexturesArray;
 		private int[] IndicesArray;
 		private int[] JointIdsArray;
-		private float[] weightsArray;
+		private float[] WeightsArray;
+		private float[] TangentsArray;
 
 		List<VertexData> Vertices;
 		List<vec2> Textures;
@@ -49,7 +50,7 @@ namespace BlobRPG.ObjectLoaders.Collada.Loaders
 			RemoveUnusedVertices();
 			ConvertDataToArrays();
 			IndicesArray = Indices.ToArray();
-			return new MeshData(VerticesArray, TexturesArray, NormalsArray, IndicesArray, JointIdsArray, weightsArray);
+			return new MeshData(VerticesArray, TexturesArray, NormalsArray, TangentsArray, IndicesArray, JointIdsArray, WeightsArray);
 		}
 
 		private void ReadRawData()
@@ -78,7 +79,10 @@ namespace BlobRPG.ObjectLoaders.Collada.Loaders
 
 		private void ReadNormals()
 		{
-			string normalsId = MeshData.GetChild("polylist").GetChildWithAttribute("input", "semantic", "NORMAL").GetAttribute("source").Substring(1);
+			XmlNode baseNode = MeshData.GetChild("polylist");
+			if (baseNode == null)
+				baseNode = MeshData.GetChild("triangles");
+			string normalsId = baseNode.GetChildWithAttribute("input", "semantic", "NORMAL").GetAttribute("source").Substring(1);
 			XmlNode normalsData = MeshData.GetChildWithAttribute("source", "id", normalsId).GetChild("float_array");
 			int count = int.Parse(normalsData.GetAttribute("count"));
 			string[] normData = normalsData.Data.Split(" ");
@@ -95,8 +99,10 @@ namespace BlobRPG.ObjectLoaders.Collada.Loaders
 
 		private void ReadTextureCoords()
 		{
-			string texCoordsId = MeshData.GetChild("polylist").GetChildWithAttribute("input", "semantic", "TEXCOORD")
-					.GetAttribute("source").Substring(1);
+			XmlNode baseNode = MeshData.GetChild("polylist");
+			if (baseNode == null)
+				baseNode = MeshData.GetChild("triangles");
+			string texCoordsId = baseNode.GetChildWithAttribute("input", "semantic", "TEXCOORD").GetAttribute("source").Substring(1);
 			XmlNode texCoordsData = MeshData.GetChildWithAttribute("source", "id", texCoordsId).GetChild("float_array");
 			int count = int.Parse(texCoordsData.GetAttribute("count"));
 			string[] texData = texCoordsData.Data.Split(" ");
@@ -111,7 +117,9 @@ namespace BlobRPG.ObjectLoaders.Collada.Loaders
 		private void AssembleVertices()
 		{
 			XmlNode poly = MeshData.GetChild("polylist");
-			int typeCount = poly.GetChildren("input").Count();
+			if (poly == null)
+				poly = MeshData.GetChild("triangles");
+			int typeCount = poly.GetChildren("input").Count;
 			string[] indexData = poly.GetChild("p").Data.Split(" ");
 			for (int i = 0; i < indexData.Length / typeCount; i++)
 			{
@@ -144,8 +152,9 @@ namespace BlobRPG.ObjectLoaders.Collada.Loaders
 			VerticesArray = new float[Vertices.Count * 3];
 			TexturesArray = new float[Vertices.Count * 2];
 			NormalsArray = new float[Vertices.Count * 3];
+			TangentsArray = new float[Vertices.Count * 3];
 			JointIdsArray = new int[Vertices.Count * 3];
-			weightsArray = new float[Vertices.Count * 3];
+			WeightsArray = new float[Vertices.Count * 3];
 
 			float furthestPoint = 0;
 			for (int i = 0; i < Vertices.Count; i++)
@@ -158,6 +167,7 @@ namespace BlobRPG.ObjectLoaders.Collada.Loaders
 				vec3 position = currentVertex.Position;
 				vec2 textureCoord = Textures[currentVertex.TextureIndex];
 				vec3 normalVector = Normals[currentVertex.NormalIndex];
+				vec3 tangent = currentVertex.AveragedTangent;
 				VerticesArray[i * 3] = position.x;
 				VerticesArray[i * 3 + 1] = position.y;
 				VerticesArray[i * 3 + 2] = position.z;
@@ -170,9 +180,12 @@ namespace BlobRPG.ObjectLoaders.Collada.Loaders
 				JointIdsArray[i * 3] = weights.JointIds[0];
 				JointIdsArray[i * 3 + 1] = weights.JointIds[1];
 				JointIdsArray[i * 3 + 2] = weights.JointIds[2];
-				weightsArray[i * 3] = weights.Weights[0];
-				weightsArray[i * 3 + 1] = weights.Weights[1];
-				weightsArray[i * 3 + 2] = weights.Weights[2];
+				WeightsArray[i * 3] = weights.Weights[0];
+				WeightsArray[i * 3 + 1] = weights.Weights[1];
+				WeightsArray[i * 3 + 2] = weights.Weights[2];
+				TangentsArray[i * 3] = tangent.x;
+				TangentsArray[i * 3 + 1] = tangent.y;
+				TangentsArray[i * 3 + 2] = tangent.z;
 
 			}
 			return furthestPoint;
@@ -194,7 +207,7 @@ namespace BlobRPG.ObjectLoaders.Collada.Loaders
 				}
 				else
 				{
-					VertexData duplicateVertex = new VertexData(Vertices.Count(), previousVertex.Position, previousVertex.WeightsData);
+					VertexData duplicateVertex = new VertexData(Vertices.Count, previousVertex.Position, previousVertex.WeightsData);
 					duplicateVertex.TextureIndex = newTextureIndex;
 					duplicateVertex.NormalIndex = newNormalIndex;
 					previousVertex.DuplicateVertex = duplicateVertex;
