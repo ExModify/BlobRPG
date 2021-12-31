@@ -80,6 +80,12 @@
     <None Update="Shaders\GLSLs\skyboxVS.glsl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Shaders\GLSLs\sunFS.glsl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Shaders\GLSLs\sunVS.glsl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Shaders\GLSLs\terrainFS.glsl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

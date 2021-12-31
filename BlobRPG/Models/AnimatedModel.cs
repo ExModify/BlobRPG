@@ -63,7 +63,7 @@ namespace BlobRPG.Models
             }
         }
 
-        public static AnimatedModel LoadModel(string colladaFile, string textureFile, int shineDamper = 10, int reflectivity = 1, int numberOfRows = 2)
+        public static AnimatedModel LoadModel(string colladaFile, string textureFile, float shineDamper = 1, float reflectivity = 0.2f, int numberOfRows = 2)
         {
             AnimatedModelData entityData = ColladaLoader.LoadColladaModel(colladaFile, Settings.MaxWeights);
             RawModel model = Loader.LoadToVao(entityData.Mesh.Vertices, entityData.Mesh.TextureCoords, entityData.Mesh.Normals, entityData.Mesh.Tangents, entityData.Mesh.JointIds, entityData.Mesh.VertexWeights, entityData.Mesh.Indices);
@@ -85,14 +85,6 @@ namespace BlobRPG.Models
             return m;
         }
 
-        /**
-         * Constructs the joint-hierarchy skeleton from the data extracted from the
-         * collada file.
-         * 
-         * @param data
-         *            - the joints data from the collada file for the head joint.
-         * @return The created joint, with all its descendants added.
-         */
         private static Joint CreateJoints(JointData data)
         {
             Joint joint = new Joint(data.Index, data.NameId, data.BindLocalTransform);

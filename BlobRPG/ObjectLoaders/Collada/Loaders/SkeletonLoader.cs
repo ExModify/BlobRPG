@@ -58,7 +58,6 @@ namespace BlobRPG.ObjectLoaders.Collada.Loaders
 			int index = BoneOrder.IndexOf(bone);
 			string[] matrixData = jointNode.GetChild("matrix").Data.Split(" ");
 			mat4 matrix = ConvertData(matrixData);
-			Console.WriteLine(Tools.MatrixMaths.MatToString(matrix));
 			if (isRoot)
 			{
 				matrix = Correction * matrix;

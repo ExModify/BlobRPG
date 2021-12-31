@@ -67,12 +67,7 @@ namespace BlobRPG.Render
 		public float RotationSpeed { get; private set; }
 		public float BlendFactor { get; private set; }
 
-		public vec3 DayLight { get; private set; }
-		public vec3 NightLight { get; private set; }
-
 		public SkyboxShader Shader { get; private set; }
-
-		private float Time;
 
 		private int Texture1;
 		private int Texture2;
@@ -82,9 +77,6 @@ namespace BlobRPG.Render
 			Shader = shader;
 
 			Model = Loader.LoadToVao(Vertices, 3);
-
-			DayLight = new vec3(0.7f);
-			NightLight = new vec3(0f);
 
 			shader.Start();
 			shader.ConnectTextureUnits();
@@ -122,54 +114,69 @@ namespace BlobRPG.Render
 		}
 		public void Update()
 		{
-			Time += (float)Settings.DeltaTime * 1000;
-			Time %= 24000;
-
-			//float reflectivity;
-
-			if (Time >= 0 && Time < 5000)
-			{
-				Texture1 = NightTextureId;
-				Texture2 = NightTextureId;
-				BlendFactor = (Time - 0) / (5000 - 0);
-
-				//Settings.SkyColor = new vec3(0, 0, 0);
-				Settings.SkyColor = NightLight;
-				//reflectivity = NightReflectivity;
-			}
-			else if (Time >= 5000 && Time < 8000)
+			if (Settings.IngameTime >= Settings.DayPhaseStart && Settings.IngameTime < Settings.DayPhaseEnd)
 			{
 				Texture1 = NightTextureId;
 				Texture2 = DayTextureId;
-				BlendFactor = (Time - 5000) / (8000 - 5000);
 
-				//Settings.SkyColor = new Color4(DayColor.R * BlendFactor, DayColor.G * BlendFactor, DayColor.B * BlendFactor, 1.0f);
-
-				Settings.SkyColor = new vec3(DayLight - (DayLight - NightLight) * (1 - BlendFactor));
-				//reflectivity = DayReflectivity - (DayReflectivity - NightReflectivity) * (1 - BlendFactor);
+				BlendFactor = (Settings.IngameTime - Settings.DayPhaseStart) / Settings.PhaseTime;
 			}
-			else if (Time >= 8000 && Time < 21000)
+			else if (Settings.IngameTime >= Settings.DayPhaseEnd && Settings.IngameTime < Settings.NightPhaseStart)
 			{
 				Texture1 = DayTextureId;
 				Texture2 = DayTextureId;
-				BlendFactor = (Time - 8000) / (21000 - 8000);
+				BlendFactor = 1;
+			}
+			else if (Settings.IngameTime >= Settings.NightPhaseStart && Settings.IngameTime < Settings.NightPhaseEnd)
+			{
+				Texture1 = DayTextureId;
+				Texture2 = NightTextureId;
 
-				Settings.SkyColor = DayLight;
-				//reflectivity = DayReflectivity;
+				BlendFactor = (Settings.IngameTime - Settings.NightPhaseStart) / Settings.PhaseTime;
+			}
+			else
+			{
+				Texture1 = NightTextureId;
+				Texture2 = NightTextureId;
+				BlendFactor = 1;
+			}
+			
+
+			//float reflectivity;
+			
+			if (Settings.IngameTime >= 0 && Settings.IngameTime < 5000)
+			{
+				Texture1 = NightTextureId;
+				Texture2 = NightTextureId;
+				BlendFactor = (Settings.IngameTime - 0) / (5000 - 0);
+
+				//Settings.SkyColor = NightLight;
+			}
+			else if (Settings.IngameTime >= 5000 && Settings.IngameTime < 8000)
+			{
+				Texture1 = NightTextureId;
+				Texture2 = DayTextureId;
+				BlendFactor = (Settings.IngameTime - 5000) / (8000 - 5000);
+
+				//Settings.SkyColor = new vec3(DayLight - (DayLight - NightLight) * (1 - BlendFactor));
+			}
+			else if (Settings.IngameTime >= 8000 && Settings.IngameTime < 21000)
+			{
+				Texture1 = DayTextureId;
+				Texture2 = DayTextureId;
+				BlendFactor = (Settings.IngameTime - 8000) / (21000 - 8000);
+
+				//Settings.SkyColor = DayLight;
 			}
 			else
 			{
 				Texture1 = DayTextureId;
 				Texture2 = NightTextureId;
-				BlendFactor = (Time - 21000) / (24000 - 21000);
+				BlendFactor = (Settings.IngameTime - 21000) / (24000 - 21000);
 
-				//Settings.SkyColor = new vec3(DayLight.x * (1 - BlendFactor), DayLight.y * (1 - BlendFactor), DayLight.z * (1 - BlendFactor));
-
-				Settings.SkyColor = new vec3(DayLight - (DayLight - NightLight) * (BlendFactor));
-				//reflectivity = DayReflectivity - (DayReflectivity - NightReflectivity) * BlendFactor;
+				//Settings.SkyColor = new vec3(DayLight - (DayLight - NightLight) * (BlendFactor));
 			}
-
-			//Program.Game.WaterRenderer.Reflectivity = reflectivity;
+			
 		}
 
 		private void BindTextures()

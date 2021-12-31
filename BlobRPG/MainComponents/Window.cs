@@ -87,6 +87,7 @@ namespace BlobRPG.MainComponents
                 new vec3(153, 5, -274), textureIndex: 0);
 
             Camera = new Camera(Player);
+            Settings.Sun = new Sun(new vec3(1000000, 1500000, -1000000), new vec3(.8f, .8f, .8f), Player);
             Lights = new List<Light>()
             {
                 Settings.Sun
@@ -174,6 +175,8 @@ namespace BlobRPG.MainComponents
                 PostProcessor.RegisterFilter(new CombineFilter(this));
                 //PostProcessor.RegisterFilter(new ContrastFilter(this));
             }
+
+            Settings.Sun.CurrentTexture = new ModelTexture(Loader.LoadTexture("starter/texture/sun.png")); ;
         }
 
         protected override void OnClosed()
@@ -184,7 +187,11 @@ namespace BlobRPG.MainComponents
 
         protected override void OnUpdateFrame(FrameEventArgs args)
         {
+            Renderer.Clear3DObjects();
+
             Settings.DeltaTime = args.Time;
+            Settings.IngameTime += (float)Settings.DeltaTime * Settings.TimeMultiplier;
+            Settings.IngameTime %= Settings.MaxTime;
 
             InputManager.Update(this);
 
@@ -202,6 +209,7 @@ namespace BlobRPG.MainComponents
             
             Camera.Move();
             InputManager.UpdateMouseRay();
+            Settings.Sun.Update();
 
             if (Player.Render)
                 Renderer.ProcessObject(Player);

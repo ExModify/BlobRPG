@@ -31,6 +31,7 @@ namespace BlobRPG.Render
         internal readonly GUIRenderer GUIRenderer;
         internal readonly TextRenderer TextRenderer;
         internal readonly SkyboxRenderer SkyboxRenderer;
+        internal readonly SunRenderer SunRenderer;
         internal readonly WaterRenderer WaterRenderer;
         internal readonly ParticleRenderer ParticleRenderer;
 
@@ -42,6 +43,7 @@ namespace BlobRPG.Render
         readonly GUIShader GUIShader;
         readonly TextShader TextShader;
         readonly SkyboxShader SkyboxShader;
+        readonly SunShader SunShader;
         readonly WaterShader WaterShader;
         readonly ParticleShader ParticleShader;
 
@@ -129,10 +131,15 @@ namespace BlobRPG.Render
             SkyboxShader = new SkyboxShader();
             SkyboxRenderer = new SkyboxRenderer(SkyboxShader, ref ProjectionMatrix);
 
+            SunShader = new SunShader();
+            SunRenderer = new SunRenderer(SunShader, ref ProjectionMatrix);
+
             ParticleShader = new ParticleShader();
             ParticleRenderer = new ParticleRenderer(ParticleShader, ref ProjectionMatrix);
 
             ShadowRenderer = new ShadowRenderer(camera);
+
+
 
 
             WaterFrameBuffers = new WaterFrameBuffers(window);
@@ -186,7 +193,10 @@ namespace BlobRPG.Render
 
             GUIRenderer.Render(GUIs);
             TextRenderer.Render(Texts);
-
+        }
+        public void Clear3DObjects()
+        {
+            AllEntities.Clear();
             Terrains.Clear();
             Entities.Clear();
             NormalEntities.Clear();
@@ -285,11 +295,11 @@ namespace BlobRPG.Render
             NormalRenderer.Render(NormalEntities, camera, lights, fog, clipPlane, ref toShadowSpace);
             TerrainRenderer.Render(Terrains, camera, lights, fog, clipPlane, ref toShadowSpace);
             SkyboxRenderer.Render(camera, fog, clipPlane);
+            SunRenderer.Render(camera, clipPlane);
         }
         private void RenderShadowMap(Light sun)
         {
             ShadowRenderer.Render(AllEntities, sun);
-            AllEntities.Clear();
         }
 
         public void CleanUp()
@@ -301,6 +311,7 @@ namespace BlobRPG.Render
             GUIShader.CleanUp();
             TextShader.CleanUp();
             SkyboxShader.CleanUp();
+            SunShader.CleanUp();
             WaterShader.CleanUp();
             ShadowRenderer.CleanUp();
         }
@@ -404,6 +415,10 @@ namespace BlobRPG.Render
             SkyboxShader.Start();
             SkyboxShader.LoadProjectionMatrix(ref ProjectionMatrix);
             SkyboxShader.Stop();
+
+            SunShader.Start();
+            SunShader.LoadProjectionMatrix(ref ProjectionMatrix);
+            SunShader.Stop();
 
             WaterShader.Start();
             WaterShader.LoadProjectionMatrix(ref ProjectionMatrix);

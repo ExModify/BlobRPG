@@ -35,7 +35,7 @@ namespace BlobRPG
         {
             return Extensions.Contains(extension.ToLower());
         }
-        
+
         // Player related
         public static double DeltaTime { get; set; } = 0;
         public static double Gravity { get; set; } = -10;
@@ -45,6 +45,7 @@ namespace BlobRPG
         public const float RunSpeed = 20;
         public const float JumpHeight = 8;
         public const float MaxZoom = 100;
+        public const float SunSize = 20f;
 
         public static bool AllowFlight { get; set; } = false;
 
@@ -54,10 +55,29 @@ namespace BlobRPG
         public const float NEAR = 0.1f;
         public const float FAR = 1000f;
 
-        public static vec3 SkyColor { get; set; } = new vec3(0.529f, 0.807f, 0.921f);
-        public static vec3 NightColor { get; set; } = new vec3(0.529f, 0.807f, 0.921f) * 0.5f;
+        public static vec3 DayColor { get; set; } = new vec3(192, 255, 248) / 255f;
+        public static vec3 NightColor { get; set; } = new vec3(3, 61, 113) / 255f;
 
-        public static Light Sun { get; set; } = new Light(new vec3(1000000, 1500000, -1000000), new vec3(.8f, .8f, .8f));
+        public static vec3 DayLight { get; set; } = new vec3(255, 255, 255) / 255f;
+        public static vec3 NightLight { get; set; } = new vec3(0, 65, 143) / 255f;
+        public static vec3 NoLight { get; set; } = vec3.Zero;
+        public static vec3 SkyColor { get; set; } = DayColor;
+
+        public const float TimeMultiplier = 1000;
+        public const float MaxTime = 24000;
+        public const float PhaseTime = 3000;
+
+        public const float DayPhaseStart = 5000;
+        public const float DayPhaseEnd = DayPhaseStart + PhaseTime;
+        public const float DayDuration = NightPhaseStart - DayPhaseEnd;
+
+        public const float NightPhaseStart = MaxTime - PhaseTime - DayPhaseStart;
+        public const float NightPhaseEnd = MaxTime - DayPhaseStart;
+        public const float NightDuration = MaxTime - NightPhaseEnd + DayPhaseStart;
+
+        public static float IngameTime { get; set; } = 0;
+
+        public static Sun Sun { get; set; }
 
         public static float AspectRatio { get; set; } = Width / (float)Height;
 
@@ -82,8 +102,6 @@ namespace BlobRPG
          */
         [Savable("Main"), Default(LogSeverity.Debug)]
         public static LogSeverity LogSeverity { get; set; } = LogSeverity.Debug;
-
-
 
         [Savable("Video"), Min(0), Default(1280)]
         public static int Width { get; set; } = 1280;
