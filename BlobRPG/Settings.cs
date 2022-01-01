@@ -36,6 +36,10 @@ namespace BlobRPG
             return Extensions.Contains(extension.ToLower());
         }
 
+        // Audio related
+        public const int AudioBufferCount = 4;
+        public const int AudioBufferSize = 1024 * 128;
+
         // Player related
         public static double DeltaTime { get; set; } = 0;
         public static double Gravity { get; set; } = -10;

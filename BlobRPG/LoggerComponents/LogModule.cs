@@ -15,6 +15,7 @@ namespace BlobRPG.LoggerComponents
         Texture = 4,
         Shader = 5,
         Renderer = 6,
-        Input = 7
+        Input = 7,
+        Audio = 8
     }
 }

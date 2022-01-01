@@ -17,11 +17,13 @@ using BlobRPG.Particles;
 using BlobRPG.SettingsComponents;
 using BlobRPG.Render.PostProcessing;
 using BlobRPG.Render.PostProcessing.Filters;
+using BlobRPG.Audio;
 
 namespace BlobRPG.MainComponents
 {
     public class Window : GameWindow
     {
+
         public Window(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings) { }
 
         public Renderer Renderer;
@@ -32,10 +34,12 @@ namespace BlobRPG.MainComponents
         List<Light> Lights;
 
         List<Entity> Entities;
-        List<Entity> NormalEntities;
         List<Terrain> Terrains;
         List<WaterTile> WaterTiles;
         Fog Fog;
+
+        MusicSource TestSource;
+
 
         protected override void OnResize(ResizeEventArgs e)
         {
@@ -97,7 +101,6 @@ namespace BlobRPG.MainComponents
             InputManager.InitMouseRay(this);
 
             Entities = new List<Entity>();
-            NormalEntities = new List<Entity>();
             Terrains = new List<Terrain>();
             WaterTiles = new List<WaterTile>();
 
@@ -154,7 +157,12 @@ namespace BlobRPG.MainComponents
             };
             Entity barrel = new(new TexturedModel(barrelModel, barrelTexture), new vec3(153, 15, -274));
 
-            NormalEntities.Add(barrel);
+            Entities.Add(barrel);
+
+            RawModel radioModel = OBJLoader.LoadOBJ("starter/model/player.obj");
+            ModelTexture radioTexture = new(Loader.LoadTexture("starter/texture/player.png"));
+            Entity radio = new(new TexturedModel(radioModel, radioTexture), new vec3(140.9178f, 10.12988f, -294.9091f));
+            Entities.Add(radio);
             //Loader.AddText("Meiryo", new vec2(0.0f, 0.5f), "Meiryo");
             //Loader.AddText("Candara", new vec2(0.5f, 0.5f), "Candara");
             //Renderer.AddGUI(new GUITexture(Renderer.ShadowMapTexture, new vec2(0.5f, 0.5f), new vec2(0.5f, 0.5f)));
@@ -176,7 +184,15 @@ namespace BlobRPG.MainComponents
                 //PostProcessor.RegisterFilter(new ContrastFilter(this));
             }
 
-            Settings.Sun.CurrentTexture = new ModelTexture(Loader.LoadTexture("starter/texture/sun.png")); ;
+            Settings.Sun.CurrentTexture = new ModelTexture(Loader.LoadTexture("starter/texture/sun.png"));
+
+
+            AudioHandler.Init();
+            AudioHandler.SetListenerData(vec3.Zero);
+            //TestSource = AudioHandler.LoadSfx("starter/music/menhera.ogg");
+            //TestSource.Position = radio.Position;
+            TestSource = AudioHandler.LoadMusic("starter/music/menhera.ogg");
+            TestSource.Loop = true;
         }
 
         protected override void OnClosed()
@@ -194,19 +210,30 @@ namespace BlobRPG.MainComponents
             Settings.IngameTime %= Settings.MaxTime;
 
             InputManager.Update(this);
-
+            if (InputManager.IsKeyPressed(OpenTK.Windowing.GraphicsLibraryFramework.Keys.P))
+            {
+                if (TestSource.Playing)
+                    TestSource.Stop();
+                else
+                    TestSource.Play();
+            }
             if (InputManager.IsKeyPressed(OpenTK.Windowing.GraphicsLibraryFramework.Keys.Escape))
             {
                 Close();
+            }
+            if (InputManager.IsKeyPressed(OpenTK.Windowing.GraphicsLibraryFramework.Keys.Space))
+            {
+                Console.WriteLine(Player.Position.ToString());
             }
             if (InputManager.IsKeyPressed(OpenTK.Windowing.GraphicsLibraryFramework.Keys.LeftControl))
             {
                 InputManager.ToggleMouse(this);
             }
 
-            Player.Move(Terrains);
+            Player.Move(Terrains, Entities);
             Player.Update();
-            
+            AudioHandler.SetListenerData(Player.Position);
+
             Camera.Move();
             InputManager.UpdateMouseRay();
             Settings.Sun.Update();
@@ -215,10 +242,10 @@ namespace BlobRPG.MainComponents
                 Renderer.ProcessObject(Player);
 
             foreach (Entity t in Entities)
-                Renderer.ProcessObject(t);
-
-            foreach (Entity t in NormalEntities)
-                Renderer.ProcessNormalObject(t);
+                if (t.Model.Texture.NormalMap == -1)
+                    Renderer.ProcessObject(t);
+                else
+                    Renderer.ProcessNormalObject(t);
 
             foreach (Terrain t in Terrains)
                 Renderer.ProcessTerrain(t);

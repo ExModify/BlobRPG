@@ -10,7 +10,7 @@ namespace BlobRPG.Textures
         private int _SpecularMap;
 
         public int Id { get; private set; }
-        public int NormalMap { get; set; }
+        public int NormalMap { get; set; } = -1;
         public int SpecularMap
         {
             get

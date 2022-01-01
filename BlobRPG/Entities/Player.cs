@@ -29,7 +29,7 @@ namespace BlobRPG.Entities
             UpwardSpeed = 0;
         }
 
-        public void Move(List<Terrain> terrains)
+        public void Move(List<Terrain> terrains, List<Entity> colliders)
         {
             ProcessInput();
 

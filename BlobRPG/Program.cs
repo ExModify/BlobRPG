@@ -1,4 +1,5 @@
-﻿using BlobRPG.LoggerComponents;
+﻿using BlobRPG.Audio;
+using BlobRPG.LoggerComponents;
 using BlobRPG.MainComponents;
 using BlobRPG.SettingsComponents;
 using OpenTK.Graphics.OpenGL;
@@ -48,6 +49,7 @@ namespace BlobRPG
             Game.Dispose();
 
             Loader.CleanUp();
+            AudioHandler.CleanUp();
             Settings.LogFile.Flush();
             Settings.LogFile.Close();
         }

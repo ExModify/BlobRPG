@@ -6,11 +6,8 @@ using System.Threading.Tasks;
 
 namespace BlobRPG.Shaders.Filters
 {
-    class BrightShader : ShaderCore
+    public class BrightShader : ShaderCore
     {
-        private int ColorTextureLocation;
-        private int HighlightTextureLocation;
-
         public BrightShader() : base("simple", "bright")
         {
 
