@@ -46,6 +46,12 @@ namespace BlobRPG.Audio
         {
             AL.SourceStop(SourceId);
         }
+        public void SetAttenuation(float rollOff, float referenceDistance, float maxDistance)
+        {
+            AL.Source(SourceId, ALSourcef.RolloffFactor, rollOff);
+            AL.Source(SourceId, ALSourcef.ReferenceDistance, referenceDistance);
+            AL.Source(SourceId, ALSourcef.MaxDistance, maxDistance);
+        }
 
         public override void CleanUp()
         {

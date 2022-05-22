@@ -96,10 +96,10 @@ namespace BlobRPG.Entities
         }
         private void CalculatePitch()
         {
-            float pitchChange = (float)(InputManager.YDelta * Settings.DeltaTime * 20);
+            float pitchChange = (float)(InputManager.YDelta * Settings.DeltaTime * 40);
             Pitch += pitchChange;
             Pitch = MathHelper.Clamp(Pitch, 5, 60);
-
+            Console.WriteLine(Pitch);
         }
         private void CalculateAngleAroundPlayer()
         {

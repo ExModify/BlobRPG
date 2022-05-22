@@ -18,6 +18,7 @@ using BlobRPG.SettingsComponents;
 using BlobRPG.Render.PostProcessing;
 using BlobRPG.Render.PostProcessing.Filters;
 using BlobRPG.Audio;
+using OpenTK.Audio.OpenAL;
 
 namespace BlobRPG.MainComponents
 {
@@ -30,6 +31,7 @@ namespace BlobRPG.MainComponents
         public Camera Camera;
         public ParticleSystem ParticleSystem;
 
+
         Player Player;
         List<Light> Lights;
 
@@ -38,7 +40,7 @@ namespace BlobRPG.MainComponents
         List<WaterTile> WaterTiles;
         Fog Fog;
 
-        MusicSource TestSource;
+        SfxSource TestSource;
 
 
         protected override void OnResize(ResizeEventArgs e)
@@ -188,11 +190,15 @@ namespace BlobRPG.MainComponents
 
 
             AudioHandler.Init();
-            AudioHandler.SetListenerData(vec3.Zero);
-            //TestSource = AudioHandler.LoadSfx("starter/music/menhera.ogg");
-            //TestSource.Position = radio.Position;
-            TestSource = AudioHandler.LoadMusic("starter/music/menhera.ogg");
+            AudioHandler.SetListenerData(vec3.Zero, new float[6] { 0, 0, 0, 0, 1, 0 });
+            AudioHandler.SetDistanceModel();
+            TestSource = AudioHandler.LoadSfx("starter/music/music.ogg");
+            TestSource.Position = radio.Position;
             TestSource.Loop = true;
+
+            TestSource.SetAttenuation(1, 15, 50);
+            //TestSource = AudioHandler.LoadMusic("starter/music/menhera.ogg");
+            //TestSource.Loop = true;
         }
 
         protected override void OnClosed()
@@ -200,7 +206,7 @@ namespace BlobRPG.MainComponents
             Renderer.CleanUp();
             base.OnClosed();
         }
-
+        bool autoplay = true;
         protected override void OnUpdateFrame(FrameEventArgs args)
         {
             Renderer.Clear3DObjects();
@@ -208,6 +214,13 @@ namespace BlobRPG.MainComponents
             Settings.DeltaTime = args.Time;
             Settings.IngameTime += (float)Settings.DeltaTime * Settings.TimeMultiplier;
             Settings.IngameTime %= Settings.MaxTime;
+
+            if (autoplay)
+            {
+                autoplay = false;
+                if (!TestSource.Playing)
+                    TestSource.Play();
+            }
 
             InputManager.Update(this);
             if (InputManager.IsKeyPressed(OpenTK.Windowing.GraphicsLibraryFramework.Keys.P))
@@ -232,7 +245,7 @@ namespace BlobRPG.MainComponents
 
             Player.Move(Terrains, Entities);
             Player.Update();
-            AudioHandler.SetListenerData(Player.Position);
+            AudioHandler.SetListenerData(Player.Position, Player.Orientation);
 
             Camera.Move();
             InputManager.UpdateMouseRay();

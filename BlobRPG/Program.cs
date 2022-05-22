@@ -7,6 +7,7 @@ using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using System;
 using System.Globalization;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
 
@@ -17,8 +18,10 @@ namespace BlobRPG
         private static Window Game;
         static void Main(string[] args)
         {
+            Console.WriteLine(Environment.CurrentDirectory);
             Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo("en-US");
             Thread.CurrentThread.CurrentUICulture = CultureInfo.GetCultureInfo("en-US");
+            
 
             SettingsLoader.LoadSettings();
 

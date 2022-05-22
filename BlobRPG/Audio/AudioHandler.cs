@@ -37,10 +37,15 @@ namespace BlobRPG.Audio
                 Initialized = true;
             }
         }
-        public static void SetListenerData(vec3 position)
+        public static void SetListenerData(vec3 position, float[] orientation)
         {
             AL.Listener(ALListener3f.Position, position.x, position.y, position.z);
             AL.Listener(ALListener3f.Velocity, 0, 0, 0);
+            AL.Listener(ALListenerfv.Orientation, orientation);
+        }
+        public static void SetDistanceModel(ALDistanceModel model = ALDistanceModel.LinearDistanceClamped)
+        {
+            AL.DistanceModel(model);
         }
 
         public static SfxSource LoadSfx(string file)

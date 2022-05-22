@@ -20,6 +20,7 @@ namespace BlobRPG.Entities
         public bool Render { get; set; } = false;
         bool InAir { get; set; } = false;
 
+        public float[] Orientation { get; private set; }
 
         public Player(TexturedModel model, vec3 position, float rx = 0, float ry = 0, float rz = 0, float scale = 1, int textureIndex = 1) : base(model, position, rx, ry, rz, scale, textureIndex)
         {
@@ -27,6 +28,10 @@ namespace BlobRPG.Entities
             CurrentHorizontalSpeed = 0;
             Accelerator = 1;
             UpwardSpeed = 0;
+            Orientation = new float[6];
+            Orientation[3] = 0;
+            Orientation[4] = 1;
+            Orientation[5] = 0;
         }
 
         public void Move(List<Terrain> terrains, List<Entity> colliders)
@@ -65,6 +70,10 @@ namespace BlobRPG.Entities
                 InAir = false;
             }
 
+            vec3 origin = new vec3(Position.x + dX, Position.y + dY, Position.z + dZ);
+            float radius = 3;
+            float radius2 = radius * radius;
+
             Position = new vec3(Position.x + dX, Position.y + dY, Position.z + dZ);
         }
         private void Jump()
@@ -92,7 +101,11 @@ namespace BlobRPG.Entities
 
             if (!InputManager.IsMouseLeftDown && !InputManager.IsMouseRightDown)
             {
-                Rotate(0, -InputManager.XDelta * 0.2f, 0);
+                Rotate(0, -(float)(InputManager.XDelta * Settings.DeltaTime * 40), 0);
+
+                Orientation[0] = RotationX;
+                Orientation[1] = RotationY;
+                Orientation[2] = RotationZ;
             }
         }
 
